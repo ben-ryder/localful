@@ -1,0 +1,31 @@
+{
+  "name": "local-first-backend",
+  "version": "1.0.0",
+  "description": "A generic backend for local-first applications including content backup, cross-device sync and multi-user support.",
+  "main": "index.js",
+  "private": true,
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "install": "concurrently 'npm:install:*'",
+    "install:server": "cd ./projects/server && npm i"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ben-Ryder/local-first-backend.git"
+  },
+  "author": "Ben-Ryder",
+  "license": "AGPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/Ben-Ryder/local-first-backend/issues"
+  },
+  "homepage": "https://github.com/Ben-Ryder/local-first-backend#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^17.1.2",
+    "@commitlint/config-conventional": "^17.1.0",
+    "concurrently": "^7.4.0",
+    "husky": "^8.0.1"
+  }
+}

@@ -1,2 +1,8 @@
-node_modules
+# IDEs
 .idea
+
+# Node
+node_modules
+
+# Notes
+/notes
