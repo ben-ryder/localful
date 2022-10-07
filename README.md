@@ -1,4 +1,4 @@
-# Local-first server
+# Local-first backend
 A generic backend for local-first applications including content backup, cross-device sync and multi-user support.  
 
 **Disclaimer:** This project is early in development and has not yet been thoroughly tested in a production context.

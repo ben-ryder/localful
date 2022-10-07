@@ -1,5 +1,5 @@
-import * as dotenv from 'dotenv';
-import { Injectable } from '@nestjs/common';
+import * as dotenv from "dotenv";
+import { Injectable } from "@nestjs/common";
 dotenv.config();
 
 /**
@@ -48,7 +48,7 @@ export interface ConfigInterface {
 export const config: ConfigInterface = Object.freeze({
   node: {
     port: parseInt(process.env.NODE_PORT as string) || 3000,
-    environment: process.env.NODE_ENV || 'production',
+    environment: process.env.NODE_ENV || "production",
   },
   database: {
     url: process.env.DATABASE_URL,
@@ -71,10 +71,10 @@ export const config: ConfigInterface = Object.freeze({
     },
   },
   app: {
-    registrationEnabled: process.env.APP_REGISTRATION_ENABLED === 'true',
+    registrationEnabled: process.env.APP_REGISTRATION_ENABLED === "true",
   },
   testing: {
-    endpointEnabled: process.env.TESTTING_ENDPOINT_ENABLED === 'true',
+    endpointEnabled: process.env.TESTTING_ENDPOINT_ENABLED === "true",
     key: process.env.TESTING_ENDPOINT_KEY,
   },
 } as ConfigInterface);

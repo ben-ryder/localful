@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common";
 
 import { decode, JwtPayload, sign, verify } from "jsonwebtoken";
 import { CacheService } from "../cache/cache.service";
-import { UserDto } from "../../common/user.dto";
 import { ConfigService } from "../config/config";
+import {UserDto} from "../../common/schemas/users/dtos/user.dto";
 
 export interface TokenPayload extends JwtPayload {
   userId: string;

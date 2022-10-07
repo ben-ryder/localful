@@ -1,4 +1,4 @@
-import { UserError } from '../base/user.error';
+import { UserError } from "../base/user.error";
 
 /**
  * A subset of UserError specifically for access related errors

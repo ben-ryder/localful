@@ -1,6 +1,7 @@
-import Redis, { Redis as IRedis } from 'ioredis';
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '../config/config';
+import Redis, { Redis as IRedis } from "ioredis";
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "../config/config";
+import {SystemError} from "../../common/errors/base/system.error";
 
 export interface CacheOptions {
   epochExpiry: number;
@@ -15,9 +16,9 @@ export class CacheService {
   }
 
   checkStatus() {
-    if (this.redis.status !== 'ready') {
+    if (this.redis.status !== "ready") {
       throw new SystemError({
-        message: 'Redis connection has not been established.',
+        message: "Redis connection has not been established.",
       });
     }
   }
@@ -27,13 +28,15 @@ export class CacheService {
 
     try {
       if (options?.epochExpiry) {
-        await this.redis.set(key, value, 'EXAT', options.epochExpiry);
-      } else {
+        await this.redis.set(key, value, "EXAT", options.epochExpiry);
+      }
+ else {
         await this.redis.set(key, value);
       }
-    } catch (e) {
+    }
+ catch (e) {
       throw new SystemError({
-        message: 'Error adding item to cache',
+        message: "Error adding item to cache",
         originalError: e,
       });
     }
@@ -45,9 +48,10 @@ export class CacheService {
     try {
       // Using !! to convert 0/1 to false/true
       return !!(await this.redis.exists(key));
-    } catch (e) {
+    }
+ catch (e) {
       throw new SystemError({
-        message: 'Error adding item to cache',
+        message: "Error adding item to cache",
         originalError: e,
       });
     }

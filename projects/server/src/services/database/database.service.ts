@@ -1,6 +1,6 @@
-import { ConfigService } from '../config/config';
-import postgres, { Sql } from 'postgres';
-import { Injectable } from '@nestjs/common';
+import { ConfigService } from "../config/config";
+import postgres, { Sql } from "postgres";
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class DatabaseService {
@@ -17,7 +17,7 @@ export class DatabaseService {
       connection: {
         // This stops timestamps being returned in the server's timezone and leaves
         // timezone conversion upto API clients.
-        timezone: 'UTC',
+        timezone: "UTC",
       },
     });
     return this.sql;
