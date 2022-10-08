@@ -1,4 +1,5 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
+import { Request } from "express";
 
 export interface RequestUser {
   id: string;
@@ -7,6 +8,10 @@ export interface RequestUser {
 
 export interface RequestContext {
   user: RequestUser;
+}
+
+export interface RequestWithContext extends Request {
+  context: RequestContext;
 }
 
 export const RequestContext = createParamDecorator(

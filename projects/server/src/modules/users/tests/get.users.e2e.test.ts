@@ -4,6 +4,7 @@ import {testUsers} from "../../../../tests/test-data/test-data";
 import {expectForbidden} from "../../../../tests/e2e/common-expects/expect-forbidden";
 import {expectBadRequest} from "../../../../tests/e2e/common-expects/expect-bad-request";
 import {ErrorIdentifiers} from "../../../common/errors/error-identifiers";
+import {UserDto} from "../../../common/schemas/users/dtos/user.dto";
 
 
 describe("Get User - /v1/users/:id [GET]",() => {
@@ -30,7 +31,15 @@ describe("Get User - /v1/users/:id [GET]",() => {
       .get(`/v1/users/${testUsers[0].id}`)
       .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`);
 
-    const {encryptionKey, passwordHash, password, ...expectedUser} = testUsers[0];
+    const expectedUser = {
+      id: testUsers[0].id,
+      username: testUsers[0].username,
+      email: testUsers[0].email,
+      encryptionSecret: testUsers[0].encryptionSecret,
+      isVerified: testUsers[0].isVerified,
+      createdAt: testUsers[0].createdAt,
+      updatedAt: testUsers[0].updatedAt
+    };
 
     expect(statusCode).toEqual(200);
     expect(body).toEqual(expectedUser);

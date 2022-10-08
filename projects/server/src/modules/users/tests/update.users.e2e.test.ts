@@ -237,48 +237,52 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
       })
     })
 
-    describe("When not supplying username as a string, the request should fail",
+    describe("When not supplying username as a string, the request should fail", () => {
       testInvalidDataTypes({
-        clientFunction: testHelper.client.patch.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        testHelper: testHelper,
+        clientMethod: "patch",
+        user: testUsers[0],
         endpoint: `/v1/users/${testUsers[0].id}`,
         data: {},
         testFieldKey: "username",
         testCases: [1, 1.5, true, null, {test: "yes"}, [1, 2]]
       })
-    )
+    })
 
-    describe("When not supplying email as a string, the request should fail",
+    describe("When not supplying email as a string, the request should fail", () => {
       testInvalidDataTypes({
-        clientFunction: testHelper.client.patch.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        testHelper: testHelper,
+        clientMethod: "patch",
+        user: testUsers[0],
         endpoint: `/v1/users/${testUsers[0].id}`,
         data: {},
         testFieldKey: "email",
         testCases: [1, 1.5, true, null, {test: "yes"}, [1, 2]]
       })
-    )
+    })
 
-    describe("When not supplying password as a string, the request should fail",
+    describe("When not supplying password as a string, the request should fail", () => {
       testInvalidDataTypes({
-        clientFunction: testHelper.client.patch.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        testHelper: testHelper,
+        clientMethod: "patch",
+        user: testUsers[0],
         endpoint: `/v1/users/${testUsers[0].id}`,
         data: {},
         testFieldKey: "password",
         testCases: [1, 1.5, true, null, {test: "yes"}, [1, 2]]
       })
-    )
+    })
 
-    describe("When not supplying encryptionSecret as a string, the request should fail",
+    describe("When not supplying encryptionSecret as a string, the request should fail", () => {
       testInvalidDataTypes({
-        clientFunction: testHelper.client.patch.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        testHelper: testHelper,
+        clientMethod: "patch",
+        user: testUsers[0],
         endpoint: `/v1/users/${testUsers[0].id}`,
         data: {},
         testFieldKey: "encryptionSecret",
         testCases: [1, 1.5, true, null, {test: "yes"}, [1, 2]]
       })
-    )
+    })
   })
 })

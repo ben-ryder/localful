@@ -22,7 +22,7 @@ export class PasswordService {
     try {
       return await compare(password, passwordHash);
     }
- catch (e) {
+    catch (e) {
       throw new SystemError({
         message: "Error while checking password hash",
         originalError: e,

@@ -24,5 +24,10 @@ export enum ErrorIdentifiers {
   USER_REGISTRATION_DISABLED = "user-registration-disabled",
   USER_USERNAME_EXISTS = "user-username-exists",
   USER_EMAIL_EXISTS = "user-email-exists",
-  USER_NOT_FOUND = "user-not-found"
+  USER_NOT_FOUND = "user-not-found",
+
+  // Auth Errors
+  AUTH_CREDENTIALS_INVALID = "auth-credentials-invalid",
+  AUTH_TOKEN_INVALID = "auth-token-invalid",
+  AUTH_EMAIL_NOT_VERIFIED = "auth-email-not-verified"
 }
