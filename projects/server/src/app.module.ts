@@ -1,8 +1,9 @@
 import { Module } from "@nestjs/common";
 import {BaseModule} from "./modules/base/base.module";
 import {InfoModule} from "./modules/info/info.module";
-import {TestingModule} from "./modules/testing/testing.module";
+import {TestDataModule} from "./modules/test-data/test-data.module";
 import {ServicesModule} from "./services/services.module";
+import {UsersModule} from "./modules/users/users.module";
 
 
 @Module({
@@ -10,7 +11,8 @@ import {ServicesModule} from "./services/services.module";
     ServicesModule,
     BaseModule,
     InfoModule,
-    TestingModule
+    TestDataModule,
+    UsersModule
   ],
 })
 export class AppModule {}

@@ -3,7 +3,7 @@ import {agent, SuperAgentTest} from "supertest";
 import {UserDto} from "../../src/common/schemas/users/dtos/user.dto";
 import {TokenPair, TokenService} from "../../src/services/token/token.service";
 import {DatabaseService} from "../../src/services/database/database.service";
-import {resetTestData} from "./database-scripts";
+import {clearDatabase, resetTestData, seedTestData} from "./database-scripts";
 import {CacheService} from "../../src/services/cache/cache.service";
 import {createApp} from "../../src/app";
 
@@ -44,7 +44,8 @@ export class TestHelper {
   async resetDatabase() {
     const databaseService = this.app.get(DatabaseService);
     const sql = await databaseService.getSQL();
-    await resetTestData(sql);
+    await clearDatabase(sql);
+    await seedTestData(sql);
   }
 
   async killApplication() {

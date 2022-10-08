@@ -13,6 +13,7 @@ export const testEnvironmentVars = {
 /**
  * Test users.
  * These can be used to for authentication, access control testing etc.
+ * These are added to the database during test data seeding.
  *
  * THIS IS THE ONLY PLACE WITH SOME COUPLING BETWEEN THE FRONT AND THE BACK END
  * IMPLEMENTATIONS AS THE USER PASSWORD AND SERVER PASSWORD ARE DIFFERENT, SO

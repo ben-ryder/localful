@@ -1,5 +1,4 @@
 import {TestHelper} from "../../../tests/e2e/test-helper";
-import {HttpStatus} from "@nestjs/common";
 
 
 describe("Base Module",() => {
@@ -22,7 +21,7 @@ describe("Base Module",() => {
     test("When a request is made, the response should be a string message", async () => {
       const {body, statusCode} = await testHelper.client.get("/");
 
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(200);
       expect(body).toEqual(expect.objectContaining({
         message: expect.any(String)
       }));
@@ -39,7 +38,7 @@ describe("Base Module",() => {
     test("When a request is made, the response should be a string message", async () => {
       const {body, statusCode} = await testHelper.client.get("/");
 
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(200);
       expect(body).toEqual(expect.objectContaining({
         message: expect.any(String)
       }));

@@ -6,4 +6,4 @@ import { BaseError } from "./base.error";
  * This can be used when the error could occur
  * during normal operation such as invalid input etc.
  */
-export class UserError extends BaseError {}
+export class UserRequestError extends BaseError {}

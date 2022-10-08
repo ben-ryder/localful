@@ -4,7 +4,7 @@ import {ConfigService} from "../../services/config/config";
 
 
 @Injectable()
-export class TestingGuard implements CanActivate {
+export class TestDataGuard implements CanActivate {
   constructor(
     private configService: ConfigService
   ) {}

@@ -2,13 +2,12 @@ import {
   ExceptionFilter,
   Catch,
   ArgumentsHost,
-  HttpException,
 } from "@nestjs/common";
 import { Response } from "express";
 import { BaseError } from "./base/base.error";
 import { fallbackMapping, errorHttpMapping } from "./error-http-mappings";
 
-@Catch(HttpException)
+@Catch(BaseError)
 export class ErrorFilter implements ExceptionFilter {
   catch(error: BaseError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();

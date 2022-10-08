@@ -1,5 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 import { ErrorIdentifiers } from "./error-identifiers";
+import {UserRequestError} from "./base/user-request.error";
 
 export interface ErrorHttpMapping {
   identifier: string;
@@ -19,8 +20,8 @@ export const fallbackMapping: ErrorHttpMapping = {
 };
 
 export const errorHttpMapping: ErrorHttpMappings = {
-  UserError: {
-    identifier: ErrorIdentifiers.USER_REQUEST_INVALID,
+  UserRequestError: {
+    identifier: ErrorIdentifiers.REQUEST_INVALID,
     statusCode: HttpStatus.BAD_REQUEST,
     defaultMessage: "Your request was invalid.",
   },

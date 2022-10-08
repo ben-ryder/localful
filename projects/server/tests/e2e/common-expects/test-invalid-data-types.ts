@@ -1,28 +1,29 @@
 import {expectBadRequest} from "./expect-bad-request";
-import {SuperAgentRequest} from "superagent";
+import {TestHelper} from "../test-helper";
+import {UserDto} from "../../../src/common/schemas/users/dtos/user.dto";
 
 export interface TestInvalidDataTypesConfig {
-  clientFunction: (url: string) => SuperAgentRequest,
+  testHelper: TestHelper,
+  clientMethod: "get" | "post" | "patch" | "delete",
   endpoint: string,
-  accessToken: string,
+  user: UserDto,
   data: object,
   testFieldKey: string,
   testCases: any[]
 }
 
+
 export function testInvalidDataTypes(config: TestInvalidDataTypesConfig) {
-  return () => {
-    test.each(config.testCases)(`When ${config.testFieldKey} is %s, the request should fail`, async testCase => {
-      const testData = {
-        ...config.data,
-        [config.testFieldKey]: testCase
-      };
+  test.each(config.testCases)(`When ${config.testFieldKey} is %s, the request should fail`, async testCase => {
+    const testData = {
+      ...config.data,
+      [config.testFieldKey]: testCase
+    };
 
-      const {body, statusCode} = await config.clientFunction(config.endpoint)
-        .set("Authorization", `Bearer ${config.accessToken}`)
-        .send(testData);
+    const {body, statusCode} = await config.testHelper.client[config.clientMethod](config.endpoint)
+      .set("Authorization", `Bearer ${config.testHelper.getUserAccessToken(config.user)}`)
+      .send(testData);
 
-      expectBadRequest(body, statusCode);
-    })
-  }
+    expectBadRequest(body, statusCode);
+  })
 }

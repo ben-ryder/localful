@@ -1,5 +1,4 @@
 import {TestHelper} from "../../../tests/e2e/test-helper";
-import {HttpStatus} from "@nestjs/common";
 
 
 describe("Info Module",() => {
@@ -22,7 +21,7 @@ describe("Info Module",() => {
     test("When a request is made, the response should be info message", async () => {
       const {body, statusCode} = await testHelper.client.get("/v1/info");
 
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(200);
       expect(body).toEqual(expect.objectContaining({
         version: expect.any(String),
         registrationEnabled: expect.any(Boolean)
