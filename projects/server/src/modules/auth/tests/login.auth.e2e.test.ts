@@ -26,7 +26,7 @@ describe("Login Auth",() => {
         .post("/v1/auth/login")
         .send({
           username: testUsers[0].username,
-          password: testUsers[0].password
+          password: testUsers[0].serverPassword
         });
 
       expect(statusCode).toEqual(200);
@@ -74,7 +74,7 @@ describe("Login Auth",() => {
         .post("/v1/auth/login")
         .send({
           username: "randomuser",
-          password: testUsers[0].password
+          password: testUsers[0].serverPassword
         });
 
       expectForbidden(body, statusCode, ErrorIdentifiers.AUTH_CREDENTIALS_INVALID)
@@ -89,7 +89,7 @@ describe("Login Auth",() => {
         endpoint: "/v1/auth/login",
         data: {
           username: testUsers[0].username,
-          password: testUsers[0].password
+          password: testUsers[0].serverPassword
         },
         testFieldKey: "username"
       })
@@ -102,7 +102,7 @@ describe("Login Auth",() => {
         endpoint: "/v1/auth/login",
         data: {
           username: testUsers[0].username,
-          password: testUsers[0].password
+          password: testUsers[0].serverPassword
         },
         testFieldKey: "password"
       })

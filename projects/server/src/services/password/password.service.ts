@@ -1,4 +1,4 @@
-import { hash, compare, genSalt } from "bcrypt";
+import { hash, compare } from "bcrypt";
 import { Injectable } from "@nestjs/common";
 import {SystemError} from "../../common/errors/base/system.error";
 

@@ -4,7 +4,6 @@ import {testUsers} from "../../../../tests/test-data/test-data";
 import {expectForbidden} from "../../../../tests/e2e/common-expects/expect-forbidden";
 import {expectBadRequest} from "../../../../tests/e2e/common-expects/expect-bad-request";
 import {ErrorIdentifiers} from "../../../common/errors/error-identifiers";
-import {UserDto} from "../../../common/schemas/users/dtos/user.dto";
 
 
 describe("Get User - /v1/users/:id [GET]",() => {
