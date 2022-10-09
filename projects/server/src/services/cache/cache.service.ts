@@ -61,8 +61,7 @@ export class CacheService {
     await this.redis.flushall();
   }
 
-  // todo: add @OnKill() decorator or similar to kangojs so services can handle cleanup
-  async onKill() {
+  async onModuleDestroy() {
     this.redis.disconnect();
   }
 }

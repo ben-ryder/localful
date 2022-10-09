@@ -51,9 +51,9 @@ export class TestHelper {
   async killApplication() {
     // Clean up internal and redis connections before exiting
     const cacheService = this.app.get(CacheService);
-    await cacheService.onKill();
+    await cacheService.onModuleDestroy();
     const databaseService = this.app.get(DatabaseService);
-    await databaseService.onKill();
+    await databaseService.onModuleDestroy();
   }
 
   async beforeEach() {

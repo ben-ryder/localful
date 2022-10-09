@@ -23,7 +23,7 @@ export class DatabaseService {
     return this.sql;
   }
 
-  public async onKill() {
+  public async onModuleDestroy() {
     if (this.sql) {
       await this.sql.end();
     }

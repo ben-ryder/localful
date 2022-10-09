@@ -5,6 +5,7 @@ import {TestDataModule} from "./modules/test-data/test-data.module";
 import {ServicesModule} from "./services/services.module";
 import {UsersModule} from "./modules/users/users.module";
 import {AuthModule} from "./modules/auth/auth.module";
+import {ChangesModule} from "./modules/changes/changes.module";
 
 
 @Module({
@@ -14,7 +15,8 @@ import {AuthModule} from "./modules/auth/auth.module";
     InfoModule,
     TestDataModule,
     UsersModule,
-    AuthModule
+    AuthModule,
+    ChangesModule
   ],
 })
 export class AppModule {}
