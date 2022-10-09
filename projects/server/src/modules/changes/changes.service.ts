@@ -1,6 +1,6 @@
 import {ChangesDatabaseService} from "./database/changes.database.service";
 import {Injectable} from "@nestjs/common";
-import {ChangeDto} from "../../common/schemas/changes/dtos/change.dto";
+import {ChangeDto} from "@ben-ryder/lfb-common";
 
 
 @Injectable()

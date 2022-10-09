@@ -1,14 +1,11 @@
 import {Injectable} from "@nestjs/common";
 import {UsersService} from "../users/users.service";
 import {TokenService} from "../../services/token/token.service";
-import {LoginResponse} from "../../common/schemas/auth/response/login.auth.response";
-import {DatabaseUserDto} from "../../common/schemas/users/dtos/internal/database-user.dto";
+import {LoginResponse, DatabaseUserDto, RevokeRequest, RefreshResponse} from "@ben-ryder/lfb-common";
 import {AccessForbiddenError} from "../../common/errors/access/access-forbidden.error";
-import {ErrorIdentifiers} from "../../common/errors/error-identifiers";
+import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 import {PasswordService} from "../../services/password/password.service";
-import {RevokeRequest} from "../../common/schemas/auth/request/revoke.auth.request";
 import {AccessUnauthorizedError} from "../../common/errors/access/access-unauthorized.error";
-import {RefreshResponse} from "../../common/schemas/auth/response/refresh.auth.response";
 
 
 @Injectable()

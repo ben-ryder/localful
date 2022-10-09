@@ -1,10 +1,9 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards} from "@nestjs/common";
 import {ChangesService} from "./changes.service";
-import {ZodValidationPipe} from "../../common/schemas/zod-validation.pipe";
-import {AddChangesRequest} from "../../common/schemas/changes/request/add.changes.request";
+import {AddChangesRequest, GetChangesQueryParams} from "@ben-ryder/lfb-common";
 import {RequestContext} from "../../common/request-context.decorator";
 import {AuthGuard} from "../auth/auth.guard";
-import {GetChangesQueryParams} from "../../common/schemas/changes/request/url-params.get.changes.request";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
 
 @Controller({

@@ -1,6 +1,6 @@
 import {expectBadRequest} from "./expect-bad-request";
 import {TestHelper} from "../test-helper";
-import {UserDto} from "../../../src/common/schemas/users/dtos/user.dto";
+import {UserDto} from "@ben-ryder/lfb-common";
 
 export interface TestInvalidDataTypesConfig {
   testHelper: TestHelper,

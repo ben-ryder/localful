@@ -2,13 +2,15 @@ import { PasswordService } from "../../services/password/password.service";
 import {UsersDatabaseService} from "./database/users.database.service";
 import {Injectable} from "@nestjs/common";
 import {AccessForbiddenError} from "../../common/errors/access/access-forbidden.error";
-import {GetUserResponse} from "../../common/schemas/users/response/get.user.response";
-import {DatabaseUserDto} from "../../common/schemas/users/dtos/internal/database-user.dto";
-import {UserDto} from "../../common/schemas/users/dtos/user.dto";
-import {CreateUserRequest} from "../../common/schemas/users/request/create.users.request";
-import {UpdateUserRequest} from "../../common/schemas/users/request/update.users.request";
-import {UpdateDatabaseUserDto} from "../../common/schemas/users/dtos/internal/update.database-user.dto";
-import {UpdateUserResponse} from "../../common/schemas/users/response/update.users.response";
+import {
+    GetUserResponse,
+    DatabaseUserDto,
+    CreateUserRequest,
+    UpdateUserRequest,
+    UpdateDatabaseUserDto,
+    UpdateUserResponse,
+    UserDto
+} from "@ben-ryder/lfb-common";
 
 
 @Injectable()

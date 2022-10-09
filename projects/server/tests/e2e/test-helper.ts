@@ -1,11 +1,11 @@
 import {INestApplication} from "@nestjs/common";
 import {agent, SuperAgentTest} from "supertest";
-import {UserDto} from "../../src/common/schemas/users/dtos/user.dto";
+import {UserDto} from "@ben-ryder/lfb-common";
 import {TokenPair, TokenService} from "../../src/services/token/token.service";
 import {DatabaseService} from "../../src/services/database/database.service";
-import {clearDatabase, resetTestData, seedTestData} from "./database-scripts";
+import {clearDatabase, seedTestData} from "./database-scripts";
 import {CacheService} from "../../src/services/cache/cache.service";
-import {createApp} from "../../src/app";
+import {createApp} from "../../src/create-app";
 
 
 export class TestHelper {

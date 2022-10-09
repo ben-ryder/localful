@@ -3,7 +3,7 @@ import {expectUnauthorized} from "../../../../tests/e2e/common-expects/expect-un
 import {testUsers} from "../../../../tests/test-data/test-data";
 import {expectForbidden} from "../../../../tests/e2e/common-expects/expect-forbidden";
 import {expectBadRequest} from "../../../../tests/e2e/common-expects/expect-bad-request";
-import {ErrorIdentifiers} from "../../../common/errors/error-identifiers";
+import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 
 
 describe("Get User - /v1/users/:id [GET]",() => {

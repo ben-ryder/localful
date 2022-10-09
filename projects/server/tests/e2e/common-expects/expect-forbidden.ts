@@ -1,5 +1,5 @@
 import {HttpStatus} from "@nestjs/common";
-import {ErrorIdentifiers} from "../../../src/common/errors/error-identifiers";
+import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 
 export function expectForbidden(body: any, statusCode: any, identifier: string = ErrorIdentifiers.ACCESS_FORBIDDEN) {
   expect(statusCode).toEqual(HttpStatus.FORBIDDEN);

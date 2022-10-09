@@ -1,8 +1,6 @@
-
 import {DatabaseService} from "../../../services/database/database.service";
 import {Injectable} from "@nestjs/common";
-import {InternalDatabaseChangeDto} from "../../../common/schemas/changes/dtos/internal/internal-database-change.dto";
-import {ChangeDto} from "../../../common/schemas/changes/dtos/change.dto";
+import {InternalDatabaseChangeDto, ChangeDto} from "@ben-ryder/lfb-common";
 import {SystemError} from "../../../common/errors/base/system.error";
 
 

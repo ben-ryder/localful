@@ -3,7 +3,7 @@ import {testUsers} from "../../../../tests/test-data/test-data";
 import {ConfigService} from "../../../services/config/config";
 import {sign} from "jsonwebtoken";
 import {expectUnauthorized} from "../../../../tests/e2e/common-expects/expect-unauthorized";
-import {ErrorIdentifiers} from "../../../common/errors/error-identifiers";
+import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 import {expectBadRequest} from "../../../../tests/e2e/common-expects/expect-bad-request";
 import {testInvalidDataTypes} from "../../../../tests/e2e/common-expects/test-invalid-data-types";
 

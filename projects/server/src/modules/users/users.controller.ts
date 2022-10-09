@@ -2,14 +2,12 @@ import {ConfigService} from "../../services/config/config";
 import {UsersService} from "./users.service";
 import {TokenService} from "../../services/token/token.service";
 import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
-import {CreateUserRequest} from "../../common/schemas/users/request/create.users.request";
+import {CreateUserRequest, UsersURLParams, UpdateUserRequest} from "@ben-ryder/lfb-common";
 import {AccessForbiddenError} from "../../common/errors/access/access-forbidden.error";
-import {ErrorIdentifiers} from "../../common/errors/error-identifiers";
-import {UsersURLParams} from "../../common/schemas/users/request/url-params.users.request";
+import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 import {RequestContext} from "../../common/request-context.decorator";
-import {UpdateUserRequest} from "../../common/schemas/users/request/update.users.request";
-import {ZodValidationPipe} from "../../common/schemas/zod-validation.pipe";
 import {AuthGuard} from "../auth/auth.guard";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
 
 @Controller({

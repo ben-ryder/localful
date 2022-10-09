@@ -1,5 +1,5 @@
 import {HttpStatus} from "@nestjs/common";
-import {ErrorIdentifiers} from "../../../src/common/errors/error-identifiers";
+import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 
 
 export function expectBadRequest(body: any, statusCode: any, identifier: any = ErrorIdentifiers.REQUEST_INVALID) {

@@ -9,11 +9,11 @@ import {
   WebSocketGateway
 } from "@nestjs/websockets";
 import {AccessUnauthorizedError} from "../../common/errors/access/access-unauthorized.error";
-import {ZodValidationPipe} from "../../common/schemas/zod-validation.pipe";
-import {AddChangesRequest} from "../../common/schemas/changes/request/add.changes.request";
+import {AddChangesRequest} from "@ben-ryder/lfb-common";
 import {UseGuards, UsePipes} from "@nestjs/common";
 import {AuthGatewayGuard} from "../auth/auth.gateway-guard";
 import {GatewayErrorFilter} from "../../common/errors/error.gateway-filter";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
 // todo: add to js-lib
 export enum ChangesSocketEvents {

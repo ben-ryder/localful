@@ -1,4 +1,4 @@
-import {ErrorIdentifiers} from "../../../src/common/errors/error-identifiers";
+import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 import {HttpStatus} from "@nestjs/common";
 
 export function expectUnauthorized(body: any, statusCode: any, identifier: string = ErrorIdentifiers.ACCESS_UNAUTHORIZED) {

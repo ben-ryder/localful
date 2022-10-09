@@ -1,11 +1,9 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service";
-import {ZodValidationPipe} from "../../common/schemas/zod-validation.pipe";
-import {LoginRequest} from "../../common/schemas/auth/request/login.auth.request";
-import {RevokeRequest} from "../../common/schemas/auth/request/revoke.auth.request";
-import {RefreshRequest} from "../../common/schemas/auth/request/refresh.auth.request";
+import {LoginRequest, RevokeRequest, RefreshRequest} from "@ben-ryder/lfb-common";
 import {AuthGuard} from "./auth.guard";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
 
 @Controller({

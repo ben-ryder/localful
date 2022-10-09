@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { decode, JwtPayload, sign, verify } from "jsonwebtoken";
 import { CacheService } from "../cache/cache.service";
 import { ConfigService } from "../config/config";
-import {UserDto} from "../../common/schemas/users/dtos/user.dto";
+import {UserDto} from "@ben-ryder/lfb-common";
 
 export interface TokenPayload extends JwtPayload {
   userId: string;

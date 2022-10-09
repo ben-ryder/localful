@@ -1,4 +1,4 @@
-import {DatabaseUserDto} from "../../src/common/schemas/users/dtos/internal/database-user.dto";
+import {DatabaseUserDto} from "@ben-ryder/lfb-common";
 
 
 export interface TestUserDto extends DatabaseUserDto {
