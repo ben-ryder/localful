@@ -1,5 +1,11 @@
-# Local-first backend
+# Local-First Backend
 A generic backend for local-first applications including content backup, cross-device sync and multi-user support.  
+
+This project includes:
+- An API server written with [NestJS](https://nestjs.com/) which applications can use for user management, content backup, cross-device content synchronisation etc
+- An opinionated JS client for interacting with the API which bundles other helpful utilities such as:
+  - Built-in client side encryption
+  - Automatic access token renewal
 
 **Disclaimer:** This project is early in development and has not yet been thoroughly tested in a production context.
 
