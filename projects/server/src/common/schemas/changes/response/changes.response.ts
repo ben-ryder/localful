@@ -1,4 +1,3 @@
 import {ChangeDto} from "../dtos/change.dto";
 
-export type ChangesResponse = ChangeDto[];
-
+export type GetChangesResponse = ChangeDto[];

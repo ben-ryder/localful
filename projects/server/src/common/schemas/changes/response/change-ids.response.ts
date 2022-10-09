@@ -1,2 +1,2 @@
 
-export type ChangesIDsResponse = string[];
+export type GetIdsResponse = string[];
