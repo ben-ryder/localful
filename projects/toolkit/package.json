@@ -1,6 +1,6 @@
 {
   "name": "@ben-ryder/lfb-toolkit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A client-side toolkit library for my Local-First Backend project which includes an API client and other useful utilities.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "homepage": "https://github.com/Ben-Ryder/local-first-backend",
@@ -29,7 +29,7 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
-    "@ben-ryder/lfb-common": "file:../common",
+    "@ben-ryder/lfb-common": "^0.1.0",
     "axios": "^1.1.2",
     "crypto-js": "^4.1.1"
   }
