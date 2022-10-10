@@ -5,7 +5,7 @@
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "license": "AGPL-3.0-only",
   "scripts": {
-    "prebuild": "rimraf dist",
+    "prebuild": "rimraf build",
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -20,7 +20,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
-    "@ben-ryder/lfb-common": "file:../common",
+    "@ben-ryder/lfb-common": "^0.1.0",
     "@nestjs/common": "^9.1.4",
     "@nestjs/core": "^9.1.4",
     "@nestjs/platform-express": "^9.1.4",

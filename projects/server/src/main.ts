@@ -7,11 +7,11 @@ async function bootstrap() {
   const app = await createApp();
 
   const configService = app.get(ConfigService);
-  await app.listen(configService.config.node.port);
+  await app.listen(configService.config.general.port);
 
-  if (configService.config.node.environment !== "production") {
+  if (configService.config.general.environment !== "production") {
     const logger = new Logger("Local Dev");
-    logger.log(`Application available at: http://localhost:${configService.config.node.port}`);
+    logger.log(`Application available at: http://localhost:${configService.config.general.port}`);
   }
 }
 bootstrap();

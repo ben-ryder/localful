@@ -6,9 +6,10 @@ dotenv.config();
  * The interface that the configuration object (and ConfigService instance attribute ".config") adhere to.
  */
 export interface ConfigInterface {
-  node: {
+  general: {
     port: number;
     environment: string;
+    corsOrigins: string[]
   };
   database: {
     url: string;
@@ -46,9 +47,10 @@ export interface ConfigInterface {
  * custom config service for testing.
  */
 export const config: ConfigInterface = Object.freeze({
-  node: {
+  general: {
     port: parseInt(process.env.NODE_PORT as string) || 3000,
     environment: process.env.NODE_ENV || "production",
+    corsOrigins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : []
   },
   database: {
     url: process.env.DATABASE_URL,
