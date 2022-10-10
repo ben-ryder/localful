@@ -16,8 +16,11 @@ TODO
 ## Installation and Usage
 TODO
 
+## Deployment
+TODO
+
 ## Contributions
-Feel free to try this project out, suggest features, raise bugs & PRs etc!
+Feel free to suggest features, give feedback, suggest improvements, raise bugs, open PRs and anything else.
 
 For development information see the [`docs/development`](docs/development/README.md) folder.
 

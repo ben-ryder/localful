@@ -1,6 +1,6 @@
 {
   "name": "local-first-backend",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A generic backend for local-first applications including content backup, cross-device sync and multi-user support.",
   "main": "index.js",
   "private": true,
@@ -10,7 +10,9 @@
   "scripts": {
     "prepare": "husky install",
     "install": "concurrently 'npm:install:*'",
-    "install:server": "cd ./projects/server && npm i"
+    "install:server": "cd ./projects/server && npm i",
+    "install:common": "cd ./projects/common && npm i",
+    "install:toolkit": "cd ./projects/toolkit && npm i"
   },
   "repository": {
     "type": "git",

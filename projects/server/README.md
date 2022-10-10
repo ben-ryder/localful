@@ -1,11 +1,24 @@
-# NestJS Server
+# Local-First Backend - Server
 This is the main Node server. 
 
-## Installation
+## Setup & Installation
 
-```bash
-$ npm install
-```
+- 0 - Install the prerequisites
+   - a. [Postgres](https://www.postgresql.org/) for the database.
+   - b. [Redis](https://redis.io/) for caching and short term data storage.
+- 1 - Set up your databases
+  - a. Main database:
+    - `cp ./scripts/example.setup.sql ./scripts/local.setup.sql`
+    - `psql postgres -f < ./scripts/local.setup.sql`
+  - b. E2E testing database:
+    - `cp ./scripts/example.setup-e2e.sql ./scripts/local.setup-e2e.sql`
+    - `psql postgres -f < ./scripts/local.setup-e2e.sql`
+- 2 - Install NPM dependencies
+  - `npm install`
+- 3 - Setup environment variables
+  - `cp .env.example .env`
+  - Edit as required to set up secrets, database URLs etc
+
 
 ## Running the app
 
@@ -23,11 +36,14 @@ $ npm run start:prod
 ## Test
 
 ```bash
-# unit tests
+# all tests
 $ npm run test
 
 # e2e tests
 $ npm run test:e2e
+
+# unit tests
+$ npm run test:unit
 
 # test coverage
 $ npm run test:cov
