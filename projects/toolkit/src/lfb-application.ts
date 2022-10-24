@@ -16,14 +16,14 @@ export interface LFBApplicationOptions<DocType> {
 
 
 export class LFBApplication<DocType> {
-  document: A.Doc<DocType>;
-  options: LFBApplicationOptions<DocType>;
-  isOnline: boolean;
-  updateListeners: UpdateListener<DocType>[];
+  private document: A.Doc<DocType>;
+  private options: LFBApplicationOptions<DocType>;
+  private isOnline: boolean;
+  private readonly updateListeners: UpdateListener<DocType>[];
 
-  serverClient: LFBServerClient;
-  localStore: LocalStore;
-  browserSyncClient: BrowserSyncClient<DocType>
+  private serverClient: LFBServerClient;
+  private readonly localStore: LocalStore;
+  private browserSyncClient: BrowserSyncClient<DocType>
 
   constructor(options: LFBApplicationOptions<DocType>) {
     this.options = options;
