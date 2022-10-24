@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { EncryptionHelper } from './encryption/encryption-helper';
+import { EncryptionHelper } from '../encryption/encryption-helper';
 import {
   NoAccessTokenError,
   NoEncryptionKeyError,
@@ -9,8 +9,20 @@ import {
   DataDeleteError,
   DataLoadError,
   DataSaveError
-} from './errors/errors';
-import {UserDto, LoginResponse, RefreshResponse, CreateUserRequest, InfoDto, CreateUserResponse, NoKeysUserDto, ErrorIdentifiers} from "@ben-ryder/lfb-common";
+} from '../errors/errors';
+import {
+  LoginResponse,
+  RefreshResponse,
+  CreateUserRequest,
+  InfoDto,
+  CreateUserResponse,
+  NoKeysUserDto,
+  ErrorIdentifiers,
+  ChangeDto,
+  ChangesSocketEvents
+} from "@ben-ryder/lfb-common";
+import {io, Socket} from "socket.io-client";
+import {LocalStore} from "../storage/local-store";
 
 export interface QueryOptions {
   url: string,
@@ -25,40 +37,36 @@ export type DataLoader<T> = () => Promise<T|null>;
 export type DataSaver<T> = (data: T) => Promise<void>;
 export type DataDeleter<T> = () => Promise<void>;
 
-export interface APIClientOptions {
-  apiEndpoint: string;
-
-  saveEncryptionKey: DataSaver<string>;
-  loadEncryptionKey: DataLoader<string>;
-  deleteEncryptionKey: DataDeleter<string>;
-
-  loadAccessToken: DataLoader<string>;
-  saveAccessToken: DataSaver<string>;
-  deleteAccessToken: DataDeleter<string>;
-
-  loadRefreshToken: DataLoader<string>;
-  saveRefreshToken: DataSaver<string>;
-  deleteRefreshToken: DataDeleter<string>;
-
-  loadCurrentUser: DataLoader<UserDto>;
-  saveCurrentUser: DataSaver<UserDto>;
-  deleteCurrentUser: DataDeleter<UserDto>;
+export interface LFBServerClientOptions {
+  serverUrl: string;
+  localStore: LocalStore,
+  handleServerChanges: (changes: ChangeDto[]) => void
 }
 
-export class APIClient {
-  private readonly options: APIClientOptions;
+
+export class LFBServerClient {
+  private readonly socket: Socket
+  private readonly options: LFBServerClientOptions;
+  private readonly localStore: LocalStore;
+
   private encryptionKey?: string;
   private accessToken?: string;
   private refreshToken?: string;
 
-  constructor(options: APIClientOptions) {
+  constructor(options: LFBServerClientOptions) {
     this.options = options;
+    this.localStore = options.localStore;
+    this.socket = io(this.options.serverUrl);
+
+    this.socket.on("changes", (changes: ChangeDto[]) => {
+      this.options.handleServerChanges(changes);
+    });
   }
 
   private async query<ResponseType>(options: QueryOptions, repeat = false): Promise<ResponseType> {
     if (!options.noAuthRequired && !this.accessToken) {
-      const accessToken = await APIClient.loadData(this.options.loadAccessToken);
-      const refreshToken = await APIClient.loadData(this.options.loadRefreshToken);
+      const accessToken = await LFBServerClient.loadData(this.localStore.loadAccessToken);
+      const refreshToken = await LFBServerClient.loadData(this.localStore.loadRefreshToken);
       if (refreshToken) {
         this.refreshToken = refreshToken;
       }
@@ -111,7 +119,7 @@ export class APIClient {
 
   private async checkEncryptionKey() {
     if (!this.encryptionKey) {
-      const encryptionKey = await APIClient.loadData(this.options.loadEncryptionKey);
+      const encryptionKey = await LFBServerClient.loadData(this.localStore.loadEncryptionKey);
 
       if (encryptionKey) {
         this.encryptionKey = encryptionKey;
@@ -154,7 +162,7 @@ export class APIClient {
   async getInfo() {
     return this.query<InfoDto>({
       method: 'GET',
-      url: `${this.options.apiEndpoint}/v1/info`,
+      url: `${this.options.serverUrl}/v1/info`,
       noAuthRequired: true
     });
   }
@@ -166,7 +174,7 @@ export class APIClient {
 
     const data = await this.query<LoginResponse>({
       method: 'POST',
-      url: `${this.options.apiEndpoint}/v1/auth/login`,
+      url: `${this.options.serverUrl}/v1/auth/login`,
       data: {
         username,
         password: accountKeys.serverPassword
@@ -177,15 +185,15 @@ export class APIClient {
     // Decrypt users encryptionKey with their masterKey
     // todo: don't trust data is encrypted correctly
     const encryptionKey = EncryptionHelper.decryptText(accountKeys.masterKey, data.user.encryptionSecret);
-    await APIClient.saveData(this.options.saveEncryptionKey, encryptionKey);
+    await LFBServerClient.saveData(this.localStore.saveEncryptionKey, encryptionKey);
 
     // Save user details and tokens
-    await APIClient.saveData(this.options.saveCurrentUser, data.user);
+    await LFBServerClient.saveData(this.localStore.saveCurrentUser, data.user);
 
-    await APIClient.saveData(this.options.saveRefreshToken, data.refreshToken);
+    await LFBServerClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
     this.refreshToken = data.refreshToken;
 
-    await APIClient.saveData(this.options.saveAccessToken, data.accessToken);
+    await LFBServerClient.saveData(this.localStore.saveAccessToken, data.accessToken);
     this.accessToken = data.accessToken;
 
     return data;
@@ -208,17 +216,17 @@ export class APIClient {
 
     const data = await this.query<CreateUserResponse>({
       method: 'POST',
-      url: `${this.options.apiEndpoint}/v1/users`,
+      url: `${this.options.serverUrl}/v1/users`,
       data: user,
       noAuthRequired: true
     });
 
-    await APIClient.saveData(this.options.saveEncryptionKey, encryptionKey);
-    await APIClient.saveData(this.options.saveCurrentUser, data.user);
+    await LFBServerClient.saveData(this.localStore.saveEncryptionKey, encryptionKey);
+    await LFBServerClient.saveData(this.localStore.saveCurrentUser, data.user);
 
-    await APIClient.saveData(this.options.saveRefreshToken, data.refreshToken);
+    await LFBServerClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
     this.refreshToken = data.refreshToken;
-    await APIClient.saveData(this.options.saveAccessToken, data.accessToken);
+    await LFBServerClient.saveData(this.localStore.saveAccessToken, data.accessToken);
     this.accessToken = data.accessToken;
 
     return data;
@@ -236,7 +244,7 @@ export class APIClient {
 
     await this.query({
       method: 'POST',
-      url: `${this.options.apiEndpoint}/v1/auth/revoke`,
+      url: `${this.options.serverUrl}/v1/auth/revoke`,
       noAuthRequired: true,
       data: tokens
     });
@@ -244,11 +252,11 @@ export class APIClient {
     // Don't delete storage data until after the request.
     // This ensures that in the event that the revoke request fails there is the option to try
     // again rather than just loosing all the tokens.
-    await APIClient.deleteData(this.options.deleteCurrentUser);
-    await APIClient.deleteData(this.options.deleteEncryptionKey);
+    await LFBServerClient.deleteData(this.localStore.deleteCurrentUser);
+    await LFBServerClient.deleteData(this.localStore.deleteEncryptionKey);
 
-    await APIClient.deleteData(this.options.deleteRefreshToken);
-    await APIClient.deleteData(this.options.deleteAccessToken);
+    await LFBServerClient.deleteData(this.localStore.deleteRefreshToken);
+    await LFBServerClient.deleteData(this.localStore.deleteAccessToken);
 
     delete this.refreshToken;
     delete this.accessToken;
@@ -263,7 +271,7 @@ export class APIClient {
     try {
       data = await this.query<RefreshResponse>({
         method: 'POST',
-        url: `${this.options.apiEndpoint}/v1/auth/refresh`,
+        url: `${this.options.serverUrl}/v1/auth/refresh`,
         noAuthRequired: true,
         data: {
           refreshToken: this.refreshToken
@@ -277,11 +285,39 @@ export class APIClient {
       throw e;
     }
 
-    await APIClient.saveData(this.options.saveRefreshToken, data.refreshToken);
+    await LFBServerClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
     this.refreshToken = data.refreshToken;
-    await APIClient.saveData(this.options.saveAccessToken, data.accessToken);
+    await LFBServerClient.saveData(this.localStore.saveAccessToken, data.accessToken);
     this.accessToken = data.accessToken;
 
     return data;
+  }
+
+  async getChangeIds() {
+    return this.query<string[]>({
+      method: 'GET',
+      url: `${this.options.serverUrl}/v1/changes/ids`,
+    });
+  }
+
+  async getChanges(changeIds?: string[]) {
+    if (!changeIds || changeIds.length === 0) {
+      return this.query<ChangeDto[]>({
+        method: 'GET',
+        url: `${this.options.serverUrl}/v1/changes`,
+      });
+    }
+
+    return this.query<ChangeDto[]>({
+      method: 'GET',
+      url: `${this.options.serverUrl}/v1/changes`,
+      params: {
+        ids: changeIds
+      }
+    });
+  }
+
+  emitChanges(changes: ChangeDto[]) {
+    this.socket.volatile.emit(ChangesSocketEvents.changes, changes);
   }
 }
