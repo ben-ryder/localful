@@ -1,6 +1,8 @@
 
 export * from "./errors/error-identifiers";
 
+export * from "./events/changes-socket-events";
+
 export * from "./schemas/auth/request/login.auth.request";
 export * from "./schemas/auth/request/refresh.auth.request";
 export * from "./schemas/auth/request/revoke.auth.request";
