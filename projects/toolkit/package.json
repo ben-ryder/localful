@@ -16,7 +16,9 @@
     "test": "jest"
   },
   "files": [
-    "build/**/*"
+    "build/**/*",
+    "README.md",
+    "LICENSE.txt"
   ],
   "keywords": [],
   "devDependencies": {

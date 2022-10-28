@@ -15,7 +15,9 @@
     "prepublishOnly": "npm run build"
   },
   "files": [
-    "build/**/*"
+    "build/**/*",
+    "README.md",
+    "LICENSE.txt"
   ],
   "keywords": [],
   "devDependencies": {
