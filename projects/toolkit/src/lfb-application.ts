@@ -19,8 +19,14 @@ import {
 import axios from "axios";
 import {io, Socket} from "socket.io-client";
 
+/**
+ * A listener callback fired whenever a change is made to the document.
+ */
 export type UpdateListener<DocType> = (doc: A.Doc<DocType>) => void;
 
+/**
+ * Generic options used when making an API query.
+ */
 export interface QueryOptions {
   url: string,
   method: 'GET'|'POST'|'PATCH'|'DELETE',
@@ -31,6 +37,10 @@ export interface QueryOptions {
 }
 
 
+/**
+ * The main application that exposes everything required to run
+ * an LFB application including Automerge and server interactions.
+ */
 export class LFBApplication<DocType> {
   private document: A.Doc<DocType>;
   private readonly initialDocument: A.Doc<DocType>
@@ -88,6 +98,13 @@ export class LFBApplication<DocType> {
   async nuke() {
     await this.localStore.clear();
     await this.removeServer();
+  }
+
+  /**
+   * Return the current stored document.
+   */
+  getDocument() {
+    return this.document;
   }
 
   /**
@@ -255,6 +272,7 @@ export class LFBApplication<DocType> {
 
     const updatedDocument = A.change(this.document, changeFunc);
     const rawChange = A.getLastLocalChange(updatedDocument);
+    // todo: can I use a patchCallback rather that fetching the last change maybe?
 
     // @ts-ignore - todo: fix this being required
     const encodedChange = btoa(String.fromCharCode(...rawChange));
@@ -271,6 +289,14 @@ export class LFBApplication<DocType> {
     this.emitChanges([change]);
   }
 
+  /**
+   * A generic method used to query the server.
+   * This method automatically handles refreshing the tokens if required.
+   *
+   * @param options
+   * @param repeat
+   * @private
+   */
   private async query<ResponseType>(options: QueryOptions, repeat = false): Promise<ResponseType> {
     if (!this.serverUrl) {
       throw new NoServerError();
@@ -324,11 +350,22 @@ export class LFBApplication<DocType> {
     return response.data;
   }
 
+  /**
+   * Attempt to refresh the user's tokens then retry the given query.
+   *
+   * @param options
+   * @private
+   */
   private async refreshAuthAndRetry<ResponseType>(options: QueryOptions): Promise<ResponseType> {
     await this.refresh();
     return this.query(options, true);
   }
 
+  /**
+   * Check that the user has set an encryption key.
+   *
+   * @private
+   */
   private async checkEncryptionKey() {
     if (!this.encryptionKey) {
       const encryptionKey = await this.localStore.loadEncryptionKey();
@@ -342,7 +379,9 @@ export class LFBApplication<DocType> {
     }
   }
 
-  // Info
+  /**
+   * Get information about the current server (/v1/info)
+   */
   async getInfo() {
     return this.query<InfoDto>({
       method: 'GET',
@@ -351,7 +390,12 @@ export class LFBApplication<DocType> {
     });
   }
 
-  // User
+  /**
+   * Attempt to log in to the current server as the given user
+   *
+   * @param username
+   * @param password
+   */
   public async login(username: string, password: string) {
     // Convert plain text password into serverPassword and masterKey
     const accountKeys = EncryptionHelper.getAccountKeys(username, password);
@@ -367,7 +411,7 @@ export class LFBApplication<DocType> {
     });
 
     // Decrypt users encryptionKey with their masterKey
-    // todo: don't trust data is encrypted correctly
+    // todo: don't trust data is encrypted correctly?
     const encryptionKey = EncryptionHelper.decryptText(accountKeys.masterKey, data.user.encryptionSecret);
     await this.localStore.saveEncryptionKey(encryptionKey);
 
@@ -383,6 +427,11 @@ export class LFBApplication<DocType> {
     return data;
   }
 
+  /**
+   * Register the given user.
+   *
+   * @param noKeysUser
+   */
   public async register(noKeysUser: NoKeysUserDto) {
     // Get user account keys from plain text password and overwrite the user password.
     const accountKeys = EncryptionHelper.getAccountKeys(noKeysUser.username, noKeysUser.password);
@@ -416,6 +465,9 @@ export class LFBApplication<DocType> {
     return data;
   }
 
+  /**
+   * Logout the user both with the server and the local application.
+   */
   public async logout() {
     // todo: loading from external if not found?
     let tokens: any = {};
@@ -446,6 +498,11 @@ export class LFBApplication<DocType> {
     delete this.accessToken;
   }
 
+  /**
+   * Attempt to refresh the user's access token.
+   *
+   * @private
+   */
   private async refresh() {
     if (!this.refreshToken) {
       throw new NoRefreshTokenError();
@@ -477,6 +534,11 @@ export class LFBApplication<DocType> {
     return data;
   }
 
+  /**
+   * Get all change IDs from the server.
+   *
+   * @private
+   */
   private async getChangeIds() {
     return this.query<string[]>({
       method: 'GET',
@@ -484,6 +546,11 @@ export class LFBApplication<DocType> {
     });
   }
 
+  /**
+   * Get all change or the given changes from the server.
+   *
+   * @private
+   */
   private async getChanges(changeIds?: string[]) {
     if (!changeIds || changeIds.length === 0) {
       return this.query<ChangeDto[]>({
