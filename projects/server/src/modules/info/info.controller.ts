@@ -16,7 +16,7 @@ export class InfoController {
   async getInfo() {
     const meta: InfoDto = {
       version: "v1",
-      registrationEnabled: this.configService.config.app.registrationEnabled
+      authEnabled: this.configService.config.auth.jwksEndpoint !== null
     }
 
     return meta;

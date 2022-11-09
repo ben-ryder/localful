@@ -12,36 +12,28 @@ GRANT CONNECT ON DATABASE local_first_backend_e2e TO local_first_backend_e2e;
 -- Switch to new internal
 \c local_first_backend_e2e
 
--- Create UUID extension for uuid_generate_v4 support
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- Functions for automatically managing created_at and updated_at timestamps
 CREATE OR REPLACE FUNCTION update_table_timestamps()
     RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = now();
-    RETURN NEW;
+RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
 
-
 /**
-    Users Table
+    Profiles Table
     -----------
-    Used to store user accounts.
+    Used to store user profiles.
  */
-CREATE TABLE IF NOT EXISTS users (
-    id UUID NOT NULL DEFAULT uuid_generate_v4(),
-    username VARCHAR(20) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password_hash VARCHAR(100) NOT NULL,
-    encryption_secret VARCHAR(255) NOT NULL,
-    is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+CREATE TABLE IF NOT EXISTS profiles (
+    user_id VARCHAR(100) NOT NULL UNIQUE,
+    data JSONB NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    PRIMARY KEY (id)
-);
-CREATE TRIGGER update_user_timestamps BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_table_timestamps();
+    PRIMARY KEY (user_id)
+    );
+CREATE TRIGGER update_profile_timestamps BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE PROCEDURE update_table_timestamps();
 
 /**
     Changes Table
@@ -50,11 +42,11 @@ CREATE TRIGGER update_user_timestamps BEFORE UPDATE ON users FOR EACH ROW EXECUT
  */
 CREATE TABLE IF NOT EXISTS changes (
     id VARCHAR(100) NOT NULL UNIQUE,
+    user_id VARCHAR(100) NOT NULL,
     data TEXT NOT NULL,
-    owner UUID NOT NULL,
-    CONSTRAINT change_owner FOREIGN KEY (owner) REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (id)
-);
+    );
 
 -- Grant privileges to local_first_backend_e2e user after everything is created
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO local_first_backend_e2e;

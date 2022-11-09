@@ -1,15 +1,16 @@
-import {Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards} from "@nestjs/common";
 import {ChangesService} from "./changes.service";
-import {AddChangesRequest, GetChangesQueryParams} from "@ben-ryder/lfb-common";
+import {AddChangesRequest, GetChangesQueryParams, ChangesURLParams} from "@ben-ryder/lfb-common";
 import {RequestContext} from "../../common/request-context.decorator";
-import {AuthGuard} from "../auth/auth.guard";
-import {ZodValidationPipe} from "../../common/zod-validation.pipe";
+//import {AuthGuard} from "../auth/auth.guard";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe";;
 
 
 @Controller({
-  path: "/changes",
+  path: "/:userId/changes",
   version: "1"
 })
+//@UseGuards(AuthGuard)
 export class ChangesController {
   constructor(
     private changesService: ChangesService,
@@ -17,28 +18,28 @@ export class ChangesController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard)
   async add(
+    @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
     @Body(new ZodValidationPipe(AddChangesRequest)) newChanges: AddChangesRequest,
     @RequestContext() context: RequestContext
   ) {
-    return await this.changesService.add(context.user.id, newChanges);
+    return await this.changesService.add(context.user, params.userId, newChanges);
   }
 
   @Get()
-  @UseGuards(AuthGuard)
   async list(
+    @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
     @RequestContext() context: RequestContext,
-    @Param(new ZodValidationPipe(GetChangesQueryParams)) params: GetChangesQueryParams
+    @Query(new ZodValidationPipe(GetChangesQueryParams)) query: GetChangesQueryParams
   ) {
-    return await this.changesService.list(context.user.id, params.ids);
+    return await this.changesService.list(context.user, params.userId, query.ids);
   }
 
   @Get("/ids")
-  @UseGuards(AuthGuard)
   async listIds(
+    @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
     @RequestContext() context: RequestContext,
   ) {
-    return await this.changesService.getIds(context.user.id);
+    return await this.changesService.getIds(context.user, params.userId);
   }
 }
