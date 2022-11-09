@@ -4,7 +4,7 @@ import { Controller, Get } from "@nestjs/common";
 export class BaseController {
   getWelcomeMessage() {
     return {
-      message: "Welcome to the Local-first backend API. For docs see https://github.com/Ben-Ryder/local-first-backend."
+      message: "Welcome to the Local-First Backend API. For docs see https://github.com/Ben-Ryder/local-first-backend."
     };
   }
 

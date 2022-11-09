@@ -1,7 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import {NestApplicationOptions, VersioningType} from "@nestjs/common";
-import {ErrorFilter} from "./common/errors/error.filter";
+import {ErrorFilter} from "./services/errors/error.filter";
 import {ConfigService} from "./services/config/config";
 
 

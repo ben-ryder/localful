@@ -14,25 +14,11 @@ export interface ConfigInterface {
   database: {
     url: string;
   };
-  cache: {
-    redisUrl: string;
-  };
   auth: {
-    accessToken: {
-      secret: string;
-      expiry: string;
-    };
-    refreshToken: {
-      secret: string;
-      expiry: string;
-    };
-    passwordReset: {
-      secret: string;
-      expiry: string;
-    };
-  };
-  app: {
-    registrationEnabled: boolean;
+    jwksEndpoint: string | null;
+    audience: string | null;
+    issuer: string | null;
+    tokenUserIdKey: string | null;
   };
   testing: {
     endpointEnabled: boolean;
@@ -55,25 +41,11 @@ export const config: ConfigInterface = Object.freeze({
   database: {
     url: process.env.DATABASE_URL,
   },
-  cache: {
-    redisUrl: process.env.REDIS_URL,
-  },
   auth: {
-    accessToken: {
-      secret: process.env.ACCESS_TOKEN_SECRET,
-      expiry: process.env.ACCESS_TOKEN_EXPIRY,
-    },
-    refreshToken: {
-      secret: process.env.REFRESH_TOKEN_SECRET,
-      expiry: process.env.REFRESH_TOKEN_EXPIRY,
-    },
-    passwordReset: {
-      secret: process.env.PASSWORD_RESET_TOKEN_SECRET,
-      expiry: process.env.PASSWORD_RESET_TOKEN_EXPIRY,
-    },
-  },
-  app: {
-    registrationEnabled: process.env.APP_REGISTRATION_ENABLED === "true",
+    jwksEndpoint: process.env.AUTH_JWKS_ENDPOINT || null,
+    audience: process.env.AUTH_AUDIENCE || null,
+    issuer: process.env.AUTH_ISSUER || null,
+    tokenUserIdKey: process.env.AUTH_TOKEN_USER_ID_KEY || null
   },
   testing: {
     endpointEnabled: process.env.TESTTING_ENDPOINT_ENABLED === "true",
