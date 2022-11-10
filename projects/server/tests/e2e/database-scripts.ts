@@ -27,9 +27,9 @@ export async function clearTestData(sql: Sql<any>, options?: ScriptOptions) {
 
   // Because "on delete cascade" is present on all relationships
   // deleting users will automatically delete all their content too.
-  for (const user of testUsers) {
-    await sql`DELETE FROM users where id = ${user.id}`;
-  }
+  // for (const user of testUsers) {
+  //   await sql`DELETE FROM users where id = ${user.id}`;
+  // }
 
   if (options?.logging) {
     console.log("Database clear completed");
@@ -59,12 +59,12 @@ export async function seedTestData(sql: Sql<any>, options?: ScriptOptions) {
     console.log("Running database seed");
   }
 
-  for (const user of testUsers) {
-    await sql`
-      INSERT INTO users(id, username, email, password_hash, encryption_secret, is_verified, created_at, updated_at) 
-      VALUES (${user.id}, ${user.username}, ${user.email}, ${user.passwordHash}, ${user.encryptionSecret}, ${user.isVerified}, ${user.createdAt}, ${user.updatedAt})
-     `;
-  }
+  // for (const user of testUsers) {
+  //   await sql`
+  //     INSERT INTO users(id, username, email, password_hash, encryption_secret, is_verified, created_at, updated_at)
+  //     VALUES (${user.id}, ${user.username}, ${user.email}, ${user.passwordHash}, ${user.encryptionSecret}, ${user.isVerified}, ${user.createdAt}, ${user.updatedAt})
+  //    `;
+  // }
 
   if (options?.logging) {
     console.log("Database seed completed");

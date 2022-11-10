@@ -1,4 +1,4 @@
 import {ProfileDto} from "../dtos/profile.dto";
-import {JSONObject} from "../dtos/internal/internal-database-profile.dto";
+import {JSONData} from "../json-data";
 
-export type ProfileResponse<T extends JSONObject> = ProfileDto<T>;
+export type ProfileResponse<T extends JSONData> = ProfileDto<T>;

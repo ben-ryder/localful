@@ -1,9 +1,9 @@
-import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, UseGuards, UsePipes} from "@nestjs/common";
 import {ProfileURLParams, UpdateProfileRequest} from "@ben-ryder/lfb-common";
 import {RequestContext} from "../../common/request-context.decorator";
 //import {AuthGuard} from "../auth/auth.guard";
-import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 import {ProfilesService} from "./profiles.service";
+import {ZodValidationPipe} from "@anatine/zod-nestjs";
 
 
 @Controller({
@@ -11,6 +11,7 @@ import {ProfilesService} from "./profiles.service";
   version: "1"
 })
 //@UseGuards(AuthGuard)
+@UsePipes(ZodValidationPipe)
 export class ProfilesController {
   constructor(
     private profilesService: ProfilesService,
@@ -19,16 +20,16 @@ export class ProfilesController {
   @Post()
   @HttpCode(HttpStatus.OK)
   async upsert(
-    @Param(new ZodValidationPipe(ProfileURLParams)) params: ProfileURLParams,
-    @Body(new ZodValidationPipe(UpdateProfileRequest)) profile: UpdateProfileRequest,
+    @Param() params: ProfileURLParams,
+    @Body() profile: UpdateProfileRequest,
     @RequestContext() context: RequestContext
   ) {
-    return await this.profilesService.upsert(context.user, params.userId, profile);
+    return await this.profilesService.upsert(context.user, params.userId, profile.data);
   }
 
   @Get()
   async get(
-    @Param(new ZodValidationPipe(ProfileURLParams)) params: ProfileURLParams,
+    @Param() params: ProfileURLParams,
     @RequestContext() context: RequestContext,
   ) {
     return await this.profilesService.get(context.user, params.userId);
@@ -36,7 +37,7 @@ export class ProfilesController {
 
   @Delete()
   async delete(
-    @Param(new ZodValidationPipe(ProfileURLParams)) params: ProfileURLParams,
+    @Param() params: ProfileURLParams,
     @RequestContext() context: RequestContext,
   ) {
     return await this.profilesService.delete(context.user, params.userId);

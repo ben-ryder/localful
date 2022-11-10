@@ -1,5 +1,5 @@
 import {Injectable} from "@nestjs/common";
-import {JSONObject} from "@ben-ryder/lfb-common";
+import {JSONData} from "@ben-ryder/lfb-common";
 import {ProfilesDatabaseService} from "./database/profiles.database.service";
 import {UserContext} from "../../common/request-context.decorator";
 import {ConfigService} from "../../services/config/config";
@@ -32,7 +32,7 @@ export class ProfilesService {
     return this.profilesDatabaseService.get(userId);
   }
 
-  async upsert(userContext: UserContext, userId: string, data: JSONObject) {
+  async upsert(userContext: UserContext, userId: string, data: JSONData) {
     this.controlAccess(userContext, userId);
     return this.profilesDatabaseService.upsert(userId, data);
   }
