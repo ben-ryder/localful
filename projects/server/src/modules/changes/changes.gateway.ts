@@ -8,14 +8,17 @@ import {
   WebSocketGateway
 } from "@nestjs/websockets";
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
-import {AddChangesRequest, ChangesSocketEvents, ChangesEventPayload} from "@ben-ryder/lfb-common";
+import {ChangesSocketEvents, ChangesEventPayload} from "@ben-ryder/lfb-common";
 import {UseGuards, UsePipes} from "@nestjs/common";
 import {GatewayErrorFilter} from "../../services/errors/error.gateway-filter";
-import {ZodValidationPipe} from "../../common/zod-validation.pipe";
+import {ZodValidationPipe} from "@anatine/zod-nestjs";
 
 @WebSocketGateway()
 // @UseGuards(AuthGatewayGuard)
-@UsePipes(GatewayErrorFilter)
+@UsePipes(
+  ZodValidationPipe,
+  GatewayErrorFilter
+)
 export class ChangesGateway implements OnGatewayConnection {
   constructor(
     private changesService: ChangesService,
@@ -43,7 +46,7 @@ export class ChangesGateway implements OnGatewayConnection {
   @SubscribeMessage(ChangesSocketEvents.changes)
   async onChanges(
     @ConnectedSocket() socket: Socket,
-    @MessageBody(new ZodValidationPipe(AddChangesRequest)) payload: ChangesEventPayload
+    @MessageBody() payload: ChangesEventPayload
   ) {
     this.changesService.controlAccess(null, payload.userId);
 

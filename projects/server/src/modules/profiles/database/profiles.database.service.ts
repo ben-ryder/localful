@@ -1,6 +1,6 @@
 import {DatabaseService} from "../../../services/database/database.service";
 import {Injectable} from "@nestjs/common";
-import {InternalDatabaseProfileDto, JSONObject, ProfileDto} from "@ben-ryder/lfb-common";
+import {InternalDatabaseProfileDto, JSONData, ProfileDto} from "@ben-ryder/lfb-common";
 import {SystemError} from "../../../services/errors/base/system.error";
 import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error";
 
@@ -43,7 +43,7 @@ export class ProfilesDatabaseService {
     return ProfilesDatabaseService.convertDatabaseDtoToDto(result[0]);
   }
 
-  async upsert(userId: string, data: JSONObject) {
+  async upsert(userId: string, data: JSONData) {
     const sql = await this.databaseService.getSQL();
 
     try {

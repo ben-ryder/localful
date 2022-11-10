@@ -1,7 +1,7 @@
 import {z} from "zod";
 
 export const ChangesURLParams = z.object({
-  userId: z.array(z.string())
+  userId: z.string()
 }).strict();
 
-export type GetChangesQueryParams = z.infer<typeof ChangesURLParams>;
+export type ChangesURLParams = z.infer<typeof ChangesURLParams>;
