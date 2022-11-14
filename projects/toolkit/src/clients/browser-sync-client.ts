@@ -1,11 +1,11 @@
 import {ChangeDto} from "@ben-ryder/lfb-common";
 
-export type ChangeListener = (changes: ChangeDto[]) => void;
+export type ChangesListener = (changes: ChangeDto[]) => void;
 
 
 export class BrowserSyncClient<DocType> {
   browserChannel: BroadcastChannel;
-  changeListeners: ChangeListener[];
+  changeListeners: ChangesListener[];
 
   constructor() {
     this.browserChannel = new BroadcastChannel("changes");
@@ -24,11 +24,11 @@ export class BrowserSyncClient<DocType> {
     }
   }
 
-  emitChanges(changes: ChangeDto[]) {
+  private emitChanges(changes: ChangeDto[]) {
     this.browserChannel.postMessage({type: "changes", changes: changes});
   }
 
-  addChangeListener(listener: ChangeListener) {
+  addChangesListener(listener: ChangesListener) {
     this.changeListeners.push(listener);
   }
 }

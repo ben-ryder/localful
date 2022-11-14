@@ -28,9 +28,7 @@ export interface QueryOptions {
   url: string,
   method: 'GET'|'POST'|'PATCH'|'DELETE',
   data?: object,
-  params?: object,
-  noAuthRequired?: boolean,
-  requiresEncryptionKey?: boolean
+  params?: object
 }
 
 export type DataLoader<T> = () => Promise<T|null>;
@@ -44,7 +42,7 @@ export interface LFBServerClientOptions {
 }
 
 
-export class LFBServerClient {
+export class LFBClient {
   private readonly socket: Socket
   private readonly options: LFBServerClientOptions;
   private readonly localStore: LocalStore;
