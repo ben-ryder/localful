@@ -1,0 +1,34 @@
+import {ChangeDto} from "@ben-ryder/lfb-common";
+
+export type ChangesListener = (changes: ChangeDto[]) => void;
+
+
+export class BrowserSyncClient<DocType> {
+  browserChannel: BroadcastChannel;
+  changeListeners: ChangesListener[];
+
+  constructor() {
+    this.browserChannel = new BroadcastChannel("changes");
+    this.changeListeners = [];
+
+    this.browserChannel.onmessage = (event: MessageEvent<{type: "changes", changes: ChangeDto[]}>) => {
+      if (event.data.type === "changes") {
+        this.callListeners(event.data.changes);
+      }
+    };
+  }
+
+  private callListeners(changes: ChangeDto[]) {
+    for (const listener of this.changeListeners) {
+      listener(changes);
+    }
+  }
+
+  private emitChanges(changes: ChangeDto[]) {
+    this.browserChannel.postMessage({type: "changes", changes: changes});
+  }
+
+  addChangesListener(listener: ChangesListener) {
+    this.changeListeners.push(listener);
+  }
+}
