@@ -38,9 +38,12 @@ export class ChangesGateway implements OnGatewayConnection {
   }
 
   async handleConnection(socket: Socket) {
-    await this.guardConnection(socket);
+    //await this.guardConnection(socket);
     // how to join user socket if the id isn't in the token or initial connection?
-    //socket.join(userId);
+    if (socket.handshake.auth.userId) {
+      // todo: should be based on access token instead?
+      socket.join(socket.handshake.auth.userId);
+    }
   }
 
   @SubscribeMessage(ChangesSocketEvents.changes)
@@ -48,7 +51,7 @@ export class ChangesGateway implements OnGatewayConnection {
     @ConnectedSocket() socket: Socket,
     @MessageBody() payload: ChangesEventPayload
   ) {
-    this.changesService.controlAccess(null, payload.userId);
+    //this.changesService.controlAccess(null, payload.userId);
 
     // Immediately emit the change for other connected clients
     socket.to(payload.userId).emit(ChangesSocketEvents.changes, payload);
