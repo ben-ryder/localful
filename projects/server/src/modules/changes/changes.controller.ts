@@ -24,7 +24,7 @@ export class ChangesController {
     @Body() newChanges: AddChangesRequest,
     @RequestContext() context: RequestContext
   ) {
-    return await this.changesService.add(context.user, params.userId, newChanges);
+    return await this.changesService.add(context?.user, params.userId, newChanges);
   }
 
   @Get()
@@ -33,7 +33,7 @@ export class ChangesController {
     @RequestContext() context: RequestContext,
     @Query() query: GetChangesQueryParams
   ) {
-    return await this.changesService.list(context.user, params.userId, query.ids);
+    return await this.changesService.list(context?.user, params.userId, query.ids);
   }
 
   @Get("/ids")
@@ -41,6 +41,6 @@ export class ChangesController {
     @Param() params: ChangesURLParams,
     @RequestContext() context: RequestContext,
   ) {
-    return await this.changesService.getIds(context.user, params.userId);
+    return await this.changesService.getIds(context?.user, params.userId);
   }
 }

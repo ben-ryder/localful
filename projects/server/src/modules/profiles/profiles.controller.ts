@@ -24,7 +24,7 @@ export class ProfilesController {
     @Body() profile: UpdateProfileRequest,
     @RequestContext() context: RequestContext
   ) {
-    return await this.profilesService.upsert(context.user, params.userId, profile.data);
+    return await this.profilesService.upsert(context?.user, params.userId, profile.data);
   }
 
   @Get()
@@ -32,7 +32,7 @@ export class ProfilesController {
     @Param() params: ProfileURLParams,
     @RequestContext() context: RequestContext,
   ) {
-    return await this.profilesService.get(context.user, params.userId);
+    return await this.profilesService.get(context?.user, params.userId);
   }
 
   @Delete()
@@ -40,6 +40,6 @@ export class ProfilesController {
     @Param() params: ProfileURLParams,
     @RequestContext() context: RequestContext,
   ) {
-    return await this.profilesService.delete(context.user, params.userId);
+    return await this.profilesService.delete(context?.user, params.userId);
   }
 }
