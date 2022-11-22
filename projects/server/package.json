@@ -1,6 +1,6 @@
 {
   "name": "@ben-ryder/lfb-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A generic backend for local-first applications including content backup, cross-device sync and multi-user support.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "license": "AGPL-3.0-only",
