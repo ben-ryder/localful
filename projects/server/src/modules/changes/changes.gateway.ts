@@ -11,12 +11,11 @@ import {AccessUnauthorizedError} from "../../services/errors/access/access-unaut
 import {ChangesSocketEvents, ChangesEventPayload} from "@ben-ryder/lfb-common";
 import {UseGuards, UsePipes} from "@nestjs/common";
 import {GatewayErrorFilter} from "../../services/errors/error.gateway-filter";
-import {ZodValidationPipe} from "@anatine/zod-nestjs";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
 @WebSocketGateway()
 // @UseGuards(AuthGatewayGuard)
 @UsePipes(
-  ZodValidationPipe,
   GatewayErrorFilter
 )
 export class ChangesGateway implements OnGatewayConnection {
@@ -49,7 +48,7 @@ export class ChangesGateway implements OnGatewayConnection {
   @SubscribeMessage(ChangesSocketEvents.changes)
   async onChanges(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() payload: ChangesEventPayload
+    @MessageBody(new ZodValidationPipe(ChangesEventPayload)) payload: ChangesEventPayload
   ) {
     //this.changesService.controlAccess(null, payload.userId);
 

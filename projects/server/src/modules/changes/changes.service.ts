@@ -14,11 +14,6 @@ export class ChangesService {
   ) {}
 
   controlAccess(userContext: UserContext, requestUserId: string) {
-    // Always allow access if auth is not enabled.
-    if (!this.configService.config.auth.jwksEndpoint) {
-      return;
-    }
-
     // Allow access only if the user is requesting their own data.
     if (userContext?.id === requestUserId) {
       return;

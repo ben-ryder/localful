@@ -2,9 +2,17 @@ import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 import { Request } from "express";
 
 /**
+ * User details to be included in teh request.
+ */
+export interface RequestUser {
+  id: string;
+  isVerified: boolean;
+}
+
+/**
  * The user context may be nothing in the case of an anonymous request, hence null is an option.
  */
-export type UserContext = {id: string} | null;
+export type UserContext = RequestUser | null;
 
 export interface RequestContext {
   user: UserContext

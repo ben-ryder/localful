@@ -1,10 +1,9 @@
 import {INestApplication} from "@nestjs/common";
 import {agent, SuperAgentTest} from "supertest";
-import {UserDto} from "@ben-ryder/lfb-common";
-import {TokenPair, TokenService} from "../../src/services/token/token.service";
+import {UserDto, TokenPair} from "@ben-ryder/lfb-common";
+import {TokenService} from "../../src/services/token/token.service";
 import {DatabaseService} from "../../src/services/database/database.service";
 import {clearDatabase, seedTestData} from "./database-scripts";
-import {CacheService} from "../../src/services/cache/cache.service";
 import {createApp} from "../../src/create-app";
 
 
@@ -49,19 +48,12 @@ export class TestHelper {
   }
 
   async killApplication() {
-    // Clean up internal and redis connections before exiting
-    const cacheService = this.app.get(CacheService);
-    await cacheService.onModuleDestroy();
     const databaseService = this.app.get(DatabaseService);
     await databaseService.onModuleDestroy();
   }
 
   async beforeEach() {
     await this.resetDatabase();
-
-    // Purge the cache service to ensure things like refresh/access tokens aren't persisted
-    const cacheService = this.app.get(CacheService);
-    await cacheService.purge();
   }
 
   async afterAll() {

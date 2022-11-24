@@ -23,8 +23,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
-    "@anatine/zod-nestjs": "^1.8.0",
-    "@ben-ryder/lfb-common": "^0.3.0",
+    "@ben-ryder/lfb-common": "file:../common",
     "@nestjs/common": "^9.1.4",
     "@nestjs/core": "^9.1.4",
     "@nestjs/platform-express": "^9.1.4",
@@ -32,7 +31,6 @@
     "@nestjs/websockets": "^9.1.4",
     "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
-    "ioredis": "^5.2.3",
     "jsonwebtoken": "^8.5.1",
     "postgres": "^3.3.1",
     "reflect-metadata": "^0.1.13",

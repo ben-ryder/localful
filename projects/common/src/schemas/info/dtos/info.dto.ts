@@ -1,4 +1,4 @@
 export interface InfoDto {
   version: string,
-  authEnabled: boolean
+  registrationEnabled: boolean
 }

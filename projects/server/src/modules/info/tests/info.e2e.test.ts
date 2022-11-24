@@ -24,7 +24,7 @@ describe("Info Module",() => {
       expect(statusCode).toEqual(200);
       expect(body).toEqual(expect.objectContaining({
         version: expect.any(String),
-        authEnabled: expect.any(Boolean)
+        registrationEnabled: expect.any(Boolean)
       }));
     })
   })

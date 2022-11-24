@@ -11,18 +11,25 @@ export interface ConfigInterface {
     environment: string;
     corsOrigins: string[]
   };
+  app: {
+    registrationEnabled: boolean;
+  };
   database: {
     url: string;
   };
   auth: {
-    jwksEndpoint: string | null;
-    audience: string | null;
-    issuer: string | null;
-    tokenUserIdKey: string | null;
-  };
-  testing: {
-    endpointEnabled: boolean;
-    key: string;
+    accessToken: {
+      secret: string;
+      expiry: string;
+    };
+    refreshToken: {
+      secret: string;
+      expiry: string;
+    };
+    passwordReset: {
+      secret: string;
+      expiry: string;
+    };
   };
 }
 
@@ -38,19 +45,26 @@ export const config: ConfigInterface = Object.freeze({
     environment: process.env.NODE_ENV || "production",
     corsOrigins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : []
   },
+  app: {
+    registrationEnabled: process.env.APP_REGISTRATION_ENABLED === "true",
+  },
   database: {
     url: process.env.DATABASE_URL,
   },
   auth: {
-    jwksEndpoint: process.env.AUTH_JWKS_ENDPOINT || null,
-    audience: process.env.AUTH_AUDIENCE || null,
-    issuer: process.env.AUTH_ISSUER || null,
-    tokenUserIdKey: process.env.AUTH_TOKEN_USER_ID_KEY || null
-  },
-  testing: {
-    endpointEnabled: process.env.TESTTING_ENDPOINT_ENABLED === "true",
-    key: process.env.TESTING_ENDPOINT_KEY,
-  },
+    accessToken: {
+      secret: process.env.ACCESS_TOKEN_SECRET,
+      expiry: process.env.ACCESS_TOKEN_EXPIRY,
+    },
+    refreshToken: {
+      secret: process.env.REFRESH_TOKEN_SECRET,
+      expiry: process.env.REFRESH_TOKEN_EXPIRY,
+    },
+    passwordReset: {
+      secret: process.env.PASSWORD_RESET_TOKEN_SECRET,
+      expiry: process.env.PASSWORD_RESET_TOKEN_EXPIRY,
+    },
+  }
 } as ConfigInterface);
 
 /**
