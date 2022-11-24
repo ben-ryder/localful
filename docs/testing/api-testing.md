@@ -9,13 +9,17 @@ This approach lets me test that the application **functionality itself** works a
 Unit tests can then be used to test code paths that can't be reached with e2e tests easily and also to test isolated feature/services where appropriate.
 
 ## Test File Locations
-Test files should be called `<name>.e2e.test.ts` or `<name>.unit.test.ts` and should be added near the code
+Test files follow the pattern `<name>.e2e.test.ts` or `<name>.unit.test.ts` and should be added near the code
 that they are testing rather than being seperated in the `tests` folder.  
-The `tests` folder can then be used for common test functionality designed to be used in actual feature tests.  
+The `tests` folder can then be used for common test functionality designed to be used throughout other feature tests.  
 
 ## Test Data
 Test data is populated in `tests/test-data.ts` and this is used by most tests as the initial state of the application
 database.
+
+### Setup and Teardown
+All E2E tests make use of the `TestHelper` class found in `projects/server/tests/e2e/test-helper.ts` which encapsulates creating an application to test, and exposes helper methods
+for use in tests such as `beforeAll`, `beforeEach` and `afterAll`.
 
 ## E2E Test Guidelines
 - Every test should be able to be run separately. In practice this means not relying on things like database content

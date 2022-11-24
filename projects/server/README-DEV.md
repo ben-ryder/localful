@@ -5,7 +5,6 @@ This is the main Node server.
 
 - 0 - Install the prerequisites
    - a. [Postgres](https://www.postgresql.org/) for the database.
-   - b. [Redis](https://redis.io/) for caching and short term data storage.
 - 1 - Set up your databases
   - a. Main database:
     - `cp ./scripts/example.setup.sql ./scripts/local.setup.sql`
