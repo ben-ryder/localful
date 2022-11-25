@@ -4,12 +4,14 @@ dotenv.config();
 
 /**
  * The interface that the configuration object (and ConfigService instance attribute ".config") adhere to.
+ *
+ * todo: replace with zod schema and validate config on start up.
  */
 export interface ConfigInterface {
   general: {
     port: number;
     environment: string;
-    corsOrigins: string[]
+    corsOrigins: string[];
   };
   app: {
     registrationEnabled: boolean;
@@ -17,7 +19,12 @@ export interface ConfigInterface {
   database: {
     url: string;
   };
+  dataStore: {
+    redisUrl: string
+  };
   auth: {
+    issuer: string | null;
+    audience: string | null;
     accessToken: {
       secret: string;
       expiry: string;
@@ -27,6 +34,10 @@ export interface ConfigInterface {
       expiry: string;
     };
     passwordReset: {
+      secret: string;
+      expiry: string;
+    };
+    accountVerification: {
       secret: string;
       expiry: string;
     };
@@ -51,19 +62,28 @@ export const config: ConfigInterface = Object.freeze({
   database: {
     url: process.env.DATABASE_URL,
   },
+  dataStore: {
+    redisUrl: process.env.REDIS_URL
+  },
   auth: {
+    issuer: process.env.AUTH_ISSUER || null,
+    audience: process.env.AUTH_AUDIENCE || null,
     accessToken: {
       secret: process.env.ACCESS_TOKEN_SECRET,
-      expiry: process.env.ACCESS_TOKEN_EXPIRY,
+      expiry: process.env.ACCESS_TOKEN_EXPIRY || "10 mins",
     },
     refreshToken: {
       secret: process.env.REFRESH_TOKEN_SECRET,
-      expiry: process.env.REFRESH_TOKEN_EXPIRY,
+      expiry: process.env.REFRESH_TOKEN_EXPIRY || "7 days"
     },
     passwordReset: {
       secret: process.env.PASSWORD_RESET_TOKEN_SECRET,
-      expiry: process.env.PASSWORD_RESET_TOKEN_EXPIRY,
+      expiry: process.env.PASSWORD_RESET_TOKEN_EXPIRY || "15 mins"
     },
+    accountVerification: {
+      secret: process.env.ACCOUNT_VERIFICATION_SECRET,
+      expiry: process.env.ACCOUNT_VERIFICATION_EXPIRY || "15 mins"
+    }
   }
 } as ConfigInterface);
 

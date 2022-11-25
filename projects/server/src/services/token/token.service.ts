@@ -1,14 +1,16 @@
 import { Injectable } from "@nestjs/common";
 
-import { JwtPayload, sign, verify } from "jsonwebtoken";
+import { sign, verify, decode } from "jsonwebtoken";
 import { ConfigService } from "../config/config";
 import {UserDto, TokenPair, AccessTokenPayload, RefreshTokenPayload} from "@ben-ryder/lfb-common";
+import {DataStoreService} from "../data-store/data-store.service";
 
 
 @Injectable()
 export class TokenService {
   constructor(
     private configService: ConfigService,
+    private dataStoreService: DataStoreService,
   ) {}
 
   /**
@@ -69,7 +71,12 @@ export class TokenService {
       return null;
     }
 
-    return payload;
+    const isBlacklisted = await this.dataStoreService.itemExists(token);
+    if (!isBlacklisted && typeof payload !== "string") {
+      return payload;
+    }
+
+    return null;
   }
 
   /**
@@ -173,5 +180,18 @@ export class TokenService {
       token,
       this.configService.config.auth.refreshToken.secret,
     );
+  }
+
+  async addTokenToBlacklist(token: string) {
+    const payload = decode(token);
+
+    if (typeof payload !== "string" && payload?.exp) {
+      await this.dataStoreService.addItem(token, true, {
+        epochExpiry: payload.exp,
+      });
+    }
+    else {
+      await this.dataStoreService.addItem(token, true);
+    }
   }
 }

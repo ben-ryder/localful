@@ -1,7 +1,7 @@
 import {Injectable} from "@nestjs/common";
 import {UsersService} from "../users/users.service";
 import {TokenService} from "../../services/token/token.service";
-import {LoginResponse, DatabaseUserDto, RefreshResponse, ErrorIdentifiers} from "@ben-ryder/lfb-common";
+import {LoginResponse, DatabaseUserDto, RefreshResponse, ErrorIdentifiers, RevokeRequest} from "@ben-ryder/lfb-common";
 import {PasswordService} from "../../services/password/password.service";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
@@ -59,6 +59,51 @@ export class AuthService {
 
     // As the token has been validated the supplied userId in the token can be trusted
     const userDto = await this.usersService.get(tokenPayload.userId);
+
+    await this.tokenService.addTokenToBlacklist(refreshToken);
     return this.tokenService.createTokenPair(userDto);
+  }
+
+  async revokeTokens(tokens: RevokeRequest) {
+    let blacklistedAccessToken: string | null = null;
+    let blacklistedRefreshToken: string | null = null;
+
+    if (tokens.refreshToken) {
+      const isSignedToken = await this.tokenService.isSignedRefreshToken(tokens.refreshToken);
+      if (!isSignedToken) {
+        throw new AccessUnauthorizedError({
+          identifier: ErrorIdentifiers.AUTH_TOKEN_INVALID,
+          applicationMessage: "The supplied refresh token is invalid."
+        })
+      }
+
+      const isValidToken = await this.tokenService.isValidRefreshToken(tokens.refreshToken);
+      if (isValidToken) {
+        blacklistedRefreshToken = tokens.refreshToken;
+      }
+    }
+
+    if (tokens.accessToken) {
+      const isSignedToken = await this.tokenService.isSignedAccessToken(tokens.accessToken);
+
+      if (!isSignedToken) {
+        throw new AccessUnauthorizedError({
+          identifier: ErrorIdentifiers.AUTH_TOKEN_INVALID,
+          applicationMessage: "The supplied access token is invalid."
+        })
+      }
+
+      const isValidToken = await this.tokenService.isValidAccessToken(tokens.accessToken);
+      if (isValidToken) {
+        blacklistedAccessToken = tokens.accessToken;
+      }
+    }
+
+    if (blacklistedRefreshToken) {
+      await this.tokenService.addTokenToBlacklist(blacklistedRefreshToken);
+    }
+    if (blacklistedAccessToken) {
+      await this.tokenService.addTokenToBlacklist(blacklistedAccessToken);
+    }
   }
 }

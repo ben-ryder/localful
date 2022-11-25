@@ -1,7 +1,7 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service";
-import {LoginRequest, RefreshRequest} from "@ben-ryder/lfb-common";
+import {LoginRequest, RefreshRequest, RevokeRequest} from "@ben-ryder/lfb-common";
 import {AuthGuard} from "./auth.guard";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
@@ -21,14 +21,12 @@ export class AuthController {
     return await this.authService.login(loginRequest.username, loginRequest.password);
   }
 
-  @Post("/logout")
+  @Post("/revoke")
   @HttpCode(HttpStatus.OK)
-  async revoke(@Response() res: ExpressResponse) {
-    // todo: implement /v1/auth/logout [POST]
-    return res.status(HttpStatus.NOT_IMPLEMENTED).send({
-      statusCode: HttpStatus.NOT_IMPLEMENTED,
-      message: "User logout/token revocation has not been implemented yet."
-    });
+  async revoke(
+    @Body(new ZodValidationPipe(RevokeRequest)) revokeRequest: RevokeRequest
+  ) {
+    return await this.authService.revokeTokens(revokeRequest);
   }
 
   @Post("/refresh")

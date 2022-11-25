@@ -3,6 +3,7 @@ import {ConfigService} from "./config/config";
 import {DatabaseService} from "./database/database.service";
 import {PasswordService} from "./password/password.service";
 import {TokenService} from "./token/token.service";
+import {DataStoreService} from "./data-store/data-store.service";
 
 
 @Module({
@@ -10,13 +11,15 @@ import {TokenService} from "./token/token.service";
     ConfigService,
     DatabaseService,
     PasswordService,
-    TokenService
+    TokenService,
+    DataStoreService
   ],
   exports: [
     ConfigService,
     DatabaseService,
     PasswordService,
-    TokenService
+    TokenService,
+    DataStoreService
   ]
 })
 export class ServicesModule {}

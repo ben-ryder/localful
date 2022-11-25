@@ -8,7 +8,7 @@
   - `/auth`
     - `/auth/login [POST]`
     - `/auth/refresh [POST]`
-    - ~~`/auth/logout [POST]`~~
+    - `/auth/logout [POST]`
     - `/auth/check [POST]`
   - `/changes [GET, POST]`
     - `/changes/ids [GET]`

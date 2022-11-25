@@ -40,28 +40,27 @@ describe("Refresh Auth",() => {
   })
 
   describe("Token Revocation", () => {
-    // todo: currently disabled test while general logout / token revocation is not implemented.
-    // test("After a successful refresh, the previous refreshToken should be invalid", async () => {
-    //   const { refreshToken } = testHelper.getUserTokens(testUsers[0]);
-    //
-    //   // Call a refresh to get new access & refresh token
-    //   const {statusCode} = await testHelper.client
-    //     .post("/v1/auth/refresh")
-    //     .send({
-    //       refreshToken
-    //     });
-    //
-    //   expect(statusCode).toEqual(200);
-    //
-    //   // Repeat the refresh, this time it should fail as the refreshToken should be blacklisted
-    //   const {body: retryBody, statusCode: retryStatusCode} = await testHelper.client
-    //     .post("/v1/auth/refresh")
-    //     .send({
-    //       refreshToken
-    //     });
-    //
-    //   expectUnauthorized(retryBody, retryStatusCode, ErrorIdentifiers.AUTH_TOKEN_INVALID);
-    // })
+    test("After a successful refresh, the previous refreshToken should be invalid", async () => {
+      const { refreshToken } = testHelper.getUserTokens(testUsers[0]);
+
+      // Call a refresh to get new access & refresh token
+      const {statusCode} = await testHelper.client
+        .post("/v1/auth/refresh")
+        .send({
+          refreshToken
+        });
+
+      expect(statusCode).toEqual(200);
+
+      // Repeat the refresh, this time it should fail as the refreshToken should be blacklisted
+      const {body: retryBody, statusCode: retryStatusCode} = await testHelper.client
+        .post("/v1/auth/refresh")
+        .send({
+          refreshToken
+        });
+
+      expectUnauthorized(retryBody, retryStatusCode, ErrorIdentifiers.AUTH_TOKEN_INVALID);
+    })
   })
 
   describe("Invalid Data", () => {

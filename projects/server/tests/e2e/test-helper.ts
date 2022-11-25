@@ -5,6 +5,7 @@ import {TokenService} from "../../src/services/token/token.service";
 import {DatabaseService} from "../../src/services/database/database.service";
 import {clearDatabase, seedTestData} from "./database-scripts";
 import {createApp} from "../../src/create-app";
+import {DataStoreService} from "../../src/services/data-store/data-store.service";
 
 
 export class TestHelper {
@@ -48,12 +49,19 @@ export class TestHelper {
   }
 
   async killApplication() {
+    // Clean up internal and redis connections before exiting
+    const dataStoreService = this.app.get(DataStoreService);
+    await dataStoreService.onModuleDestroy();
     const databaseService = this.app.get(DatabaseService);
     await databaseService.onModuleDestroy();
   }
 
   async beforeEach() {
     await this.resetDatabase();
+
+    // Purge the data store to ensure things like refresh/access tokens aren't persisted
+    const dataStoreService = this.app.get(DataStoreService);
+    await dataStoreService.purge();
   }
 
   async afterAll() {
