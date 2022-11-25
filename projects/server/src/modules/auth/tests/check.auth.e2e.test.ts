@@ -19,9 +19,11 @@ describe("Check Auth",() => {
   });
 
   test("When authenticated, the request should succeed", async () => {
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
     const {statusCode} = await testHelper.client
       .get("/v1/auth/check")
-      .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`);
+      .set("Authorization", `Bearer ${accessToken}`);
 
     expect(statusCode).toEqual(200);
   })

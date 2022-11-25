@@ -24,8 +24,9 @@ export class TestHelper {
    *
    * @param user
    */
-  getUserAccessToken(user: UserDto): string {
-    return this.getUserTokens(user).accessToken;
+  async getUserAccessToken(user: UserDto): Promise<string> {
+    const tokens = await this.getUserTokens(user);
+    return tokens.accessToken;
   }
 
   /**
@@ -33,9 +34,9 @@ export class TestHelper {
    *
    * @param user
    */
-  getUserTokens(user: UserDto): TokenPair {
+  async getUserTokens(user: UserDto): Promise<TokenPair> {
     const tokenService = this.app.get(TokenService);
-    return tokenService.createTokenPair(user);
+    return await tokenService.createNewTokenPair(user);
   }
 
   /**

@@ -26,9 +26,11 @@ describe("Get User - /v1/users/:id [GET]",() => {
   })
 
   test("When authorized as the user to get, the response should succeed and return the user", async () => {
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
     const {body, statusCode} = await testHelper.client
       .get(`/v1/users/${testUsers[0].id}`)
-      .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`);
+      .set("Authorization", `Bearer ${accessToken}`);
 
     const expectedUser = {
       id: testUsers[0].id,
@@ -45,17 +47,21 @@ describe("Get User - /v1/users/:id [GET]",() => {
   })
 
   test("When authorized as a different user to the one to get, the request should fail", async () => {
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
     const {body, statusCode} = await testHelper.client
       .get(`/v1/users/${testUsers[1].id}`)
-      .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`);
+      .set("Authorization", `Bearer ${accessToken}`);
 
     expectForbidden(body, statusCode);
   })
 
   test("When fetching a user that doesn't exist, the request should fail", async () => {
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
     const {body, statusCode} = await testHelper.client
       .get("/v1/users/82f7d7a4-e094-4f15-9de0-5b5621376714")
-      .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`);
+      .set("Authorization", `Bearer ${accessToken}`);
 
     expectForbidden(body, statusCode);
   })

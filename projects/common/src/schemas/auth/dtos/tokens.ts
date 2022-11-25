@@ -1,12 +1,18 @@
-import {JwtPayload} from "jsonwebtoken";
+import {Roles} from "./roles";
 
-export interface TokenPayload extends JwtPayload {
-  userId: string;
-  userIsVerified: boolean;
+export interface TokenPayload {
+  iss: boolean;
+  aud: boolean;
+  sub: string;
+  gid: string;
+  sid: number;
+  exp: number;
 }
 
 export interface AccessTokenPayload extends TokenPayload {
   type: "accessToken";
+  isVerified: boolean;
+  roles: Roles[];
 }
 export interface RefreshTokenPayload extends TokenPayload {
   type: "refreshToken";

@@ -1,7 +1,7 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service";
-import {LoginRequest, RefreshRequest, RevokeRequest} from "@ben-ryder/lfb-common";
+import {LoginRequest, LogoutRequest, RefreshRequest} from "@ben-ryder/lfb-common";
 import {AuthGuard} from "./auth.guard";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
@@ -21,12 +21,12 @@ export class AuthController {
     return await this.authService.login(loginRequest.username, loginRequest.password);
   }
 
-  @Post("/revoke")
+  @Post("/logout")
   @HttpCode(HttpStatus.OK)
-  async revoke(
-    @Body(new ZodValidationPipe(RevokeRequest)) revokeRequest: RevokeRequest
+  async logout(
+    @Body(new ZodValidationPipe(LogoutRequest)) logoutRequest: LogoutRequest
   ) {
-    return await this.authService.revokeTokens(revokeRequest);
+    return await this.authService.logout(logoutRequest.refreshToken);
   }
 
   @Post("/refresh")

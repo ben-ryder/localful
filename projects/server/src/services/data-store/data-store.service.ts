@@ -23,7 +23,7 @@ export class DataStoreService {
     }
   }
 
-  async addItem(key: string, value: any, options?: CacheOptions) {
+  async addItem(key: string, value: string, options?: CacheOptions) {
     this.checkStatus();
 
     try {
@@ -55,6 +55,10 @@ export class DataStoreService {
         originalError: e,
       });
     }
+  }
+
+  async getItem(key: string) {
+    return this.redis.get(key);
   }
 
   async purge() {

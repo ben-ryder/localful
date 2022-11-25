@@ -1,10 +1,11 @@
 import {Injectable} from "@nestjs/common";
 import {UsersService} from "../users/users.service";
 import {TokenService} from "../../services/token/token.service";
-import {LoginResponse, DatabaseUserDto, RefreshResponse, ErrorIdentifiers, RevokeRequest} from "@ben-ryder/lfb-common";
+import {LoginResponse, DatabaseUserDto, RefreshResponse, ErrorIdentifiers} from "@ben-ryder/lfb-common";
 import {PasswordService} from "../../services/password/password.service";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
+import {UserRequestError} from "../../services/errors/base/user-request.error";
 
 
 @Injectable()
@@ -38,12 +39,13 @@ export class AuthService {
     }
 
     const userDto = this.usersService.removePasswordFromUser(user);
-    const tokenPair = this.tokenService.createTokenPair(user);
+    const tokens = await this.tokenService.createNewTokenPair(user);
 
     return {
-     user: userDto,
-     ...tokenPair
-    };
+      user: userDto,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken
+    }
   }
 
   async refresh(refreshToken: string): Promise<RefreshResponse> {
@@ -57,53 +59,24 @@ export class AuthService {
       });
     }
 
-    // As the token has been validated the supplied userId in the token can be trusted
-    const userDto = await this.usersService.get(tokenPayload.userId);
+    // As the token has been validated the supplied userId/sub value in the token can in theory trusted
+    // If the user isn't found, the user service will throw an error.
+    // todo: the user service throwing an error not returning null makes the error handling here unclear.
+    const userDto = await this.usersService.get(tokenPayload.sub);
 
-    await this.tokenService.addTokenToBlacklist(refreshToken);
-    return this.tokenService.createTokenPair(userDto);
+    return this.tokenService.getRefreshedTokenPair(userDto, tokenPayload.gid);
   }
 
-  async revokeTokens(tokens: RevokeRequest) {
-    let blacklistedAccessToken: string | null = null;
-    let blacklistedRefreshToken: string | null = null;
+  async logout(refreshToken: string) {
+    const payload = await this.tokenService.validateAndDecodeRefreshToken(refreshToken);
 
-    if (tokens.refreshToken) {
-      const isSignedToken = await this.tokenService.isSignedRefreshToken(tokens.refreshToken);
-      if (!isSignedToken) {
-        throw new AccessUnauthorizedError({
-          identifier: ErrorIdentifiers.AUTH_TOKEN_INVALID,
-          applicationMessage: "The supplied refresh token is invalid."
-        })
-      }
-
-      const isValidToken = await this.tokenService.isValidRefreshToken(tokens.refreshToken);
-      if (isValidToken) {
-        blacklistedRefreshToken = tokens.refreshToken;
-      }
+    if (!payload) {
+      throw new UserRequestError({
+        identifier: ErrorIdentifiers.AUTH_TOKEN_INVALID,
+        applicationMessage: "The refresh token supplied is either invalid or already expired."
+      });
     }
 
-    if (tokens.accessToken) {
-      const isSignedToken = await this.tokenService.isSignedAccessToken(tokens.accessToken);
-
-      if (!isSignedToken) {
-        throw new AccessUnauthorizedError({
-          identifier: ErrorIdentifiers.AUTH_TOKEN_INVALID,
-          applicationMessage: "The supplied access token is invalid."
-        })
-      }
-
-      const isValidToken = await this.tokenService.isValidAccessToken(tokens.accessToken);
-      if (isValidToken) {
-        blacklistedAccessToken = tokens.accessToken;
-      }
-    }
-
-    if (blacklistedRefreshToken) {
-      await this.tokenService.addTokenToBlacklist(blacklistedRefreshToken);
-    }
-    if (blacklistedAccessToken) {
-      await this.tokenService.addTokenToBlacklist(blacklistedAccessToken);
-    }
+    await this.tokenService.blacklistTokenGroup(payload.gid, payload.exp);
   }
 }

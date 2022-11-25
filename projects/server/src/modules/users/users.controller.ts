@@ -1,14 +1,13 @@
 import {ConfigService} from "../../services/config/config";
 import {UsersService} from "./users.service";
 import {TokenService} from "../../services/token/token.service";
-import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UsePipes} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
 import {CreateUserRequest, UsersURLParams, UpdateUserRequest} from "@ben-ryder/lfb-common";
 import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 import {RequestContext} from "../../common/request-context.decorator";
 import {AuthGuard} from "../auth/auth.guard";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
-
 
 
 @Controller({
@@ -34,7 +33,7 @@ export class UsersController {
     }
 
     const newUser = await this.usersService.add(createUserRequest);
-    const tokens = await this.tokenService.createTokenPair(newUser);
+    const tokens = await this.tokenService.createNewTokenPair(newUser);
 
     return {
       user: newUser,

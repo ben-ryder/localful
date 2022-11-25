@@ -23,7 +23,7 @@ describe("Refresh Auth",() => {
 
   describe("Success Cases", () => {
     test("When supplying a valid refreshToken, an accessToken and refreshToken should be returned", async () => {
-      const { refreshToken } = testHelper.getUserTokens(testUsers[0]);
+      const { refreshToken } = await testHelper.getUserTokens(testUsers[0]);
 
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/refresh")
@@ -41,7 +41,7 @@ describe("Refresh Auth",() => {
 
   describe("Token Revocation", () => {
     test("After a successful refresh, the previous refreshToken should be invalid", async () => {
-      const { refreshToken } = testHelper.getUserTokens(testUsers[0]);
+      const { refreshToken } = await testHelper.getUserTokens(testUsers[0]);
 
       // Call a refresh to get new access & refresh token
       const {statusCode} = await testHelper.client

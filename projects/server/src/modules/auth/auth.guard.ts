@@ -27,7 +27,7 @@ export class AuthGuard implements CanActivate {
       const accessTokenPayload = await this.tokenService.validateAndDecodeAccessToken(accessToken);
 
       if (accessTokenPayload) {
-        if (!accessTokenPayload.userIsVerified) {
+        if (!accessTokenPayload.isVerified) {
           throw new AccessForbiddenError({
             identifier: ErrorIdentifiers.AUTH_EMAIL_NOT_VERIFIED,
             applicationMessage: "You must verify your account email before you can use Athena."
@@ -36,15 +36,15 @@ export class AuthGuard implements CanActivate {
 
         if (req.context) {
           req.context.user = {
-            id: accessTokenPayload.userId,
-            isVerified: accessTokenPayload.userIsVerified
+            id: accessTokenPayload.sub,
+            isVerified: accessTokenPayload.isVerified
           }
         }
         else {
           req.context = {
             user: {
-              id: accessTokenPayload.userId,
-              isVerified: accessTokenPayload.userIsVerified
+              id: accessTokenPayload.sub,
+              isVerified: accessTokenPayload.isVerified
             }
           }
         }

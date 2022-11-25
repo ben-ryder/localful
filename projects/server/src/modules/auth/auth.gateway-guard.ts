@@ -26,7 +26,7 @@ export class AuthGatewayGuard implements CanActivate {
       const payload = await this.tokenService.validateAndDecodeAccessToken(accessToken);
 
       if (payload) {
-        if (!payload.userIsVerified) {
+        if (!payload.isVerified) {
           throw new AccessForbiddenError({
             identifier: ErrorIdentifiers.AUTH_EMAIL_NOT_VERIFIED,
             applicationMessage: "You must verify your account email before."

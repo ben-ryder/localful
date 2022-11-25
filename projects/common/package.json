@@ -21,7 +21,6 @@
   ],
   "keywords": [],
   "devDependencies": {
-    "@types/jsonwebtoken": "^8.5.9",
     "@types/validator": "^13.7.7",
     "rimraf": "^3.0.2",
     "ts-node": "^10.8.1",

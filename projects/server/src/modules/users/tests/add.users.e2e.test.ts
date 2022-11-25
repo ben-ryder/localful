@@ -219,9 +219,11 @@ describe("Add User - /v1/users [POST]",() => {
 
   describe("Required Fields", () => {
     test("When not supplying a username, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        accessToken: accessToken,
         endpoint: "/v1/users",
         data: defaultTestUser,
         testFieldKey: "username"
@@ -229,9 +231,11 @@ describe("Add User - /v1/users [POST]",() => {
     })
 
     test("When not supplying an email, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        accessToken: accessToken,
         endpoint: "/v1/users",
         data: defaultTestUser,
         testFieldKey: "email"
@@ -239,9 +243,11 @@ describe("Add User - /v1/users [POST]",() => {
     })
 
     test("When not supplying a password, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        accessToken: accessToken,
         endpoint: "/v1/users",
         data: defaultTestUser,
         testFieldKey: "password"
@@ -249,9 +255,11 @@ describe("Add User - /v1/users [POST]",() => {
     })
 
     test("When not supplying an encryptionSecret, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        accessToken: accessToken,
         endpoint: "/v1/users",
         data: defaultTestUser,
         testFieldKey: "encryptionSecret"
@@ -315,9 +323,11 @@ describe("Add User - /v1/users [POST]",() => {
 
   describe("Invalid Data", () => {
     test("When supplying invalid JSON data, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       await testMalformedData({
         clientFunction: testHelper.client.post.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        accessToken: accessToken,
         endpoint: "/v1/users"
       })
     })
@@ -375,10 +385,12 @@ describe("Add User - /v1/users [POST]",() => {
   describe("Registration Status", () => {
     test("When registration is enabled, adding a new user should succeed", async () => {
       // todo: populate test
+      expect(true).toEqual(false);
     })
 
     test("When registration is disabled, adding a new user should fail", async () => {
       // todo: populate test
+      expect(true).toEqual(false);
     })
   })
 })

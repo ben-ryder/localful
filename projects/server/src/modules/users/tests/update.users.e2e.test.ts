@@ -31,9 +31,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         encryptionSecret: "updated"
       };
 
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
 
       expect(statusCode).toEqual(200);
@@ -49,9 +51,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
     })
 
     test("When updating a user, the updatedAt timestamp should become more recent", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send({email: "udpated@example.com"});
 
       expect(statusCode).toEqual(200);
@@ -73,27 +77,33 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
     })
 
     test("When authorized as a different user to the one to update, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[1].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send({username: "updatedusername"});
 
       expectForbidden(body, statusCode);
     })
 
     test("When updating a user that doesn't exist, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch("/v1/users/82f7d7a4-e094-4f15-9de0-5b5621376714")
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send({username: "updatedusername"});
 
       expectForbidden(body, statusCode);
     })
 
     test("When passing an invalid ID, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch("/v1/users/invalid")
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send({username: "updatedusername"});
 
       expectBadRequest(body, statusCode, ErrorIdentifiers.REQUEST_INVALID);
@@ -102,18 +112,22 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
 
   describe("None Unique Data", () => {
     test("When using an existing username, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send({username: testUsers[1].username});
 
       expectBadRequest(body, statusCode, ErrorIdentifiers.USER_USERNAME_EXISTS);
     })
 
     test("When using an existing email, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send({email: testUsers[1].email});
 
       expectBadRequest(body, statusCode, ErrorIdentifiers.USER_EMAIL_EXISTS);
@@ -126,9 +140,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         email: "invalid-email"
       }
 
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send(updatesUser);
 
       expectBadRequest(body, statusCode)
@@ -139,9 +155,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         password: "hi"
       }
 
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send(updatedUser );
 
       expectBadRequest(body, statusCode)
@@ -152,9 +170,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         username: ""
       }
 
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send(updatedUser);
 
       expectBadRequest(body, statusCode)
@@ -165,9 +185,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         username: "this-is-a-username-which-is-over-the-maximum"
       }
 
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send(updatedUser);
 
       expectBadRequest(body, statusCode)
@@ -180,9 +202,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         id: "a78a9859-314e-44ec-8701-f0c869cfc07f"
       }
 
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
 
       expectBadRequest(body, statusCode);
@@ -193,9 +217,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         createdAt: "2022-07-11T18:20:32.482Z"
       }
 
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
 
       expectBadRequest(body, statusCode);
@@ -206,9 +232,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         updatedAt: "2022-07-11T18:20:32.482Z"
       }
 
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
 
       expectBadRequest(body, statusCode);
@@ -219,9 +247,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         isVerified: true
       }
 
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUsers[0].id}`)
-        .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`)
+        .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
 
       expectBadRequest(body, statusCode);
@@ -230,10 +260,12 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
 
   describe("Invalid Data", () => {
     test("When supplying invalid JSON data, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       await testMalformedData({
         clientFunction: testHelper.client.patch.bind(testHelper.client),
         endpoint: `/v1/users/${testUsers[0].id}`,
-        accessToken: testHelper.getUserAccessToken(testUsers[0])
+        accessToken: accessToken
       })
     })
 

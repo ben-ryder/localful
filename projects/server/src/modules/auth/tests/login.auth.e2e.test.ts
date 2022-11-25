@@ -83,9 +83,11 @@ describe("Login Auth",() => {
 
   describe("Required Fields", () => {
     test("When not supplying a username, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        accessToken: accessToken,
         endpoint: "/v1/auth/login",
         data: {
           username: testUsers[0].username,
@@ -96,9 +98,11 @@ describe("Login Auth",() => {
     })
 
     test("When not supplying a password, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
-        accessToken: testHelper.getUserAccessToken(testUsers[0]),
+        accessToken: accessToken,
         endpoint: "/v1/auth/login",
         data: {
           username: testUsers[0].username,
@@ -111,10 +115,12 @@ describe("Login Auth",() => {
 
   describe("Invalid Data", () => {
     test("When supplying invalid JSON data, the request should fail", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
       await testMalformedData({
         clientFunction: testHelper.client.post.bind(testHelper.client),
         endpoint: "/v1/auth/login",
-        accessToken: testHelper.getUserAccessToken(testUsers[0])
+        accessToken: accessToken
       })
     })
 
