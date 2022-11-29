@@ -10,7 +10,7 @@ export async function createApp(options?: NestApplicationOptions) {
   const configService = app.get<ConfigService>(ConfigService);
 
   app.enableCors({
-    origin: configService.config.general.corsOrigins
+    origin: configService.config.app.allowedOrigins
   });
 
   app.enableVersioning({
