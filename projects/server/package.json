@@ -72,6 +72,7 @@
     "LICENSE.txt"
   ],
   "jest": {
+    "testTimeout": 10000,
     "moduleFileExtensions": [
       "js",
       "json",

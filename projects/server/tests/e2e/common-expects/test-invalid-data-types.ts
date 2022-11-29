@@ -20,8 +20,10 @@ export function testInvalidDataTypes(config: TestInvalidDataTypesConfig) {
       [config.testFieldKey]: testCase
     };
 
+    const accessToken = await config.testHelper.getUserAccessToken(config.user);
+
     const {body, statusCode} = await config.testHelper.client[config.clientMethod](config.endpoint)
-      .set("Authorization", `Bearer ${config.testHelper.getUserAccessToken(config.user)}`)
+      .set("Authorization", `Bearer ${accessToken}`)
       .send(testData);
 
     expectBadRequest(body, statusCode);

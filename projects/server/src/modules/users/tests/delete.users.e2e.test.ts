@@ -28,16 +28,17 @@ describe("Delete User - /v1/users/:id [DELETE]",() => {
   test("When authorized as the user to delete, the request & deletion should succeed", async () => {
     const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
 
+    // Make the delete request
     const {statusCode: deleteStatusCode} = await testHelper.client
       .delete(`/v1/users/${testUsers[0].id}`)
       .set("Authorization", `Bearer ${accessToken}`);
-
     expect(deleteStatusCode).toEqual(200);
 
+    // Re-fetch the user to ensure it's been deleted
+    // todo: BUG? at this point the users token should have been blacklisted and no longer be valid?
     const {statusCode: getStatusCode} = await testHelper.client
       .get(`/v1/users/${testUsers[0].id}`)
-      .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`);
-
+      .set("Authorization", `Bearer ${accessToken}`);
     expect(getStatusCode).toEqual(404);
 
   })

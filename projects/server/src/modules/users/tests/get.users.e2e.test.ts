@@ -67,9 +67,11 @@ describe("Get User - /v1/users/:id [GET]",() => {
   })
 
   test("When passing an invalid ID, the request should fail", async () => {
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+
     const {body, statusCode} = await testHelper.client
       .get("/v1/users/invalid")
-      .set("Authorization", `Bearer ${testHelper.getUserAccessToken(testUsers[0])}`);
+      .set("Authorization", `Bearer ${accessToken}`);
 
     expectBadRequest(body, statusCode, ErrorIdentifiers.REQUEST_INVALID);
   })

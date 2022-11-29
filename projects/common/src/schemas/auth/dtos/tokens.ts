@@ -5,7 +5,7 @@ export interface TokenPayload {
   aud: boolean;
   sub: string;
   gid: string;
-  sid: number;
+  cid: number;
   exp: number;
 }
 

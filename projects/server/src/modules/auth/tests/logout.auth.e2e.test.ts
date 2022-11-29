@@ -69,7 +69,14 @@ describe("Logout Auth",() => {
     test("When an incorrectly signed refresh token is supplied, the request should fail", async () => {
       //  Create a token with the expected payload but signed wrong
       const refreshToken = sign(
-        {userId: testUsers[0].id, type: "refreshToken"},
+        {
+          iss: "local-first-backend",
+          aud: "local-first-backend",
+          sub: testUsers[0].id,
+          type: "refreshToken",
+          gid: "bbafbee5-155b-4844-8f74-82bd442a4a1",
+          cid: 1
+        },
         "aergsethsrjsrj",
         {expiresIn: "1h"}
       );
@@ -80,7 +87,7 @@ describe("Logout Auth",() => {
           refreshToken
         });
 
-      expectUnauthorized(body, statusCode, ErrorIdentifiers.AUTH_TOKEN_INVALID);
+      expect(statusCode).toEqual(400);
     })
 
     test("When an invalid refresh token is supplied, the request should fail", async () => {

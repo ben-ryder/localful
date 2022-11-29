@@ -64,7 +64,7 @@ export class AuthService {
     // todo: the user service throwing an error not returning null makes the error handling here unclear.
     const userDto = await this.usersService.get(tokenPayload.sub);
 
-    return this.tokenService.getRefreshedTokenPair(userDto, tokenPayload.gid);
+    return await this.tokenService.getRefreshedTokenPair(userDto, tokenPayload.gid);
   }
 
   async logout(refreshToken: string) {
