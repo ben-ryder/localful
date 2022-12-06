@@ -19,6 +19,18 @@ export const ConfigSchema = z.object({
   dataStore: z.object({
     redisUrl: z.string()
   }),
+  email: z.object({
+    testMode: z.boolean().optional(),
+    mailgun: z.object({
+      domain: z.string(),
+      apiKey: z.string(),
+      sender: z.object({
+        name: z.string(),
+        address: z.string()
+      }),
+      isEu: z.boolean().optional(),
+    })
+  }),
   auth: z.object({
     issuer: z.string().optional(),
     audience: z.string().optional(),

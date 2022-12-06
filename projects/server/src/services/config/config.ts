@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 import { Injectable } from "@nestjs/common";
 import {ConfigSchema} from "./config-schema";
+import {z} from "zod";
 dotenv.config();
 
 /**
@@ -26,6 +27,18 @@ export class ConfigService {
     },
     dataStore: {
       redisUrl: process.env.DATA_STORE_REDIS_URL
+    },
+    email:{
+      testMode: process.env.EMAIL_TEST_MODE === "true",
+      mailgun: {
+        domain: process.env.EMAIL_MAILGUN_DOMAIN,
+        apiKey: process.env.EMAIL_MAILGUN_API_KEY,
+        sender: {
+          name: process.env.EMAIL_MAILGUN_SENDER_NAME,
+          address: process.env.EMAIL_MAILGUN_SENDER_ADDRESS
+        },
+        isEu: process.env.EMAIL_MAILGUN_IS_EU === "true",
+      }
     },
     auth: {
       issuer: process.env.AUTH_ISSUER || null,
