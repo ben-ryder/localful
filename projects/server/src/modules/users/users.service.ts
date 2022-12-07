@@ -1,12 +1,12 @@
-import { PasswordService } from "../../services/password/password.service";
+import {PasswordService} from "../../services/password/password.service";
 import {UsersDatabaseService} from "./database/users.database.service";
 import {Injectable} from "@nestjs/common";
 import {
-    GetUserResponse,
-    DatabaseUserDto,
     CreateUserRequest,
-    UpdateUserRequest,
+    DatabaseUserDto,
+    GetUserResponse,
     UpdateDatabaseUserDto,
+    UpdateUserRequest,
     UpdateUserResponse,
     UserDto
 } from "@ben-ryder/lfb-common";
@@ -63,20 +63,24 @@ export class UsersService {
     }
 
     async update(userId: string, updateUserDto: UpdateUserRequest): Promise<UserDto> {
-        let newPasswordHash: string|null = null;
+        const databaseUpdate: UpdateDatabaseUserDto = {};
+
+        if (updateUserDto.username) {
+            databaseUpdate.username = updateUserDto.username;
+        }
+        if (updateUserDto.encryptionSecret) {
+            databaseUpdate.encryptionSecret = updateUserDto.encryptionSecret;
+        }
         if (updateUserDto.password) {
-            newPasswordHash = await PasswordService.hashPassword(updateUserDto.password);
-
-            // Replace the password field with the .passwordHash field
-            delete updateUserDto.password;
+            // todo: make password change go via password reset
+            databaseUpdate.passwordHash = await PasswordService.hashPassword(updateUserDto.password);
+        }
+        if (updateUserDto.email) {
+            databaseUpdate.email = updateUserDto.email;
+            databaseUpdate.isVerified = false;
         }
 
-        const updatedUser: UpdateDatabaseUserDto = {...updateUserDto};
-        if (newPasswordHash) {
-            updatedUser.passwordHash = newPasswordHash;
-        }
-
-        const user = await this.usersDatabaseService.update(userId, updateUserDto);
+        const user = await this.usersDatabaseService.update(userId, databaseUpdate);
         return this.removePasswordFromUser(user);
     }
 
