@@ -14,24 +14,6 @@ import {v4 as createUUID} from "uuid";
 import {SystemError} from "../errors/base/system.error";
 import ms, { StringValue } from "ms";
 
-/**
- * on login:
- *  - create gid
- *  - initialize cid and persist
- *  - generate access and refresh tokens
- * on requests:
- *  - validate access token
- *  - check for gid blacklist
- *  - check token cid matches persisted cid ??
- * on refresh:
- *  - validate refresh token
- *  - check for gid blacklist
- *  - increment persisted cid
- *  - generate new tokens
- * on logout:
- *  - blacklist gid
- */
-
 
 @Injectable()
 export class TokenService {
@@ -113,7 +95,7 @@ export class TokenService {
       ...basicPayload,
       type: "accessToken",
       isVerified: userDto.isVerified,
-      roles: [Roles.user]
+      roles: [Roles.USER]
     };
     const accessToken = sign(
       accessTokenPayload,

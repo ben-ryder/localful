@@ -2,7 +2,7 @@ import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} 
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service";
 import {LoginRequest, LogoutRequest, RefreshRequest} from "@ben-ryder/lfb-common";
-import {AuthGuard} from "./auth.guard";
+import {AuthGuard} from "./auth.guards";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
 

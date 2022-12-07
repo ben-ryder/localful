@@ -1,5 +1,6 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 import { Request } from "express";
+import {Roles} from "@ben-ryder/lfb-common";
 
 /**
  * User details to be included in teh request.
@@ -7,6 +8,7 @@ import { Request } from "express";
 export interface RequestUser {
   id: string;
   isVerified: boolean;
+  roles: Roles[]
 }
 
 /**

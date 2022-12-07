@@ -5,7 +5,7 @@ import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nes
 import {CreateUserRequest, UsersURLParams, UpdateUserRequest} from "@ben-ryder/lfb-common";
 import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 import {RequestContext} from "../../common/request-context.decorator";
-import {AuthGuard} from "../auth/auth.guard";
+import {AuthGuard} from "../auth/auth.guards";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
