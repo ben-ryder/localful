@@ -4,8 +4,9 @@ import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 import {RequestWithContext, UserContext} from "../../common/request-context.decorator";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
-import {AccessControlOptions} from "./access-control";
+import {ACCESS_CONTROL_METADATA_KEY, AccessControlOptions} from "./access-control";
 import {Socket} from "socket.io";
+import {Reflector} from "@nestjs/core";
 
 /**
  * A function that validates the supplied access token.
@@ -18,11 +19,15 @@ async function validateAccessToken(accessToken: string, accessControl?: AccessCo
   const accessTokenPayload = await this.tokenService.validateAndDecodeAccessToken(accessToken);
 
   // Control access to unverified users if required.
-  if (accessControl?.isVerified || !accessTokenPayload.isVerified) {
-    throw new AccessForbiddenError({
-      identifier: ErrorIdentifiers.AUTH_EMAIL_NOT_VERIFIED,
-      applicationMessage: "You must verify your account email address before you an perform this action."
-    })
+  if (accessControl?.isVerified !== undefined){
+    if (accessTokenPayload.isVerified !== accessControl.isVerified) {
+      throw new AccessForbiddenError({
+        identifier: ErrorIdentifiers.AUTH_EMAIL_NOT_VERIFIED,
+        applicationMessage: accessTokenPayload.isVerified
+          ? "Only unverified accounts can perform this action."
+          : "You must verify your account before you can perform this action."
+      })
+    }
   }
 
   // RBAC check for users if required.
@@ -53,7 +58,8 @@ async function validateAccessToken(accessToken: string, accessControl?: AccessCo
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private reflector: Reflector
   ) {}
 
   async canActivate(
@@ -65,7 +71,12 @@ export class AuthGuard implements CanActivate {
       const accessToken = authorizationHeader.split(" ")[1];
 
       if (accessToken) {
-        const userContext = await validateAccessToken(accessToken);
+        const accessControl = this.reflector.getAllAndOverride<AccessControlOptions|undefined>(ACCESS_CONTROL_METADATA_KEY, [
+          context.getHandler(),
+          context.getClass(),
+        ]);
+
+        const userContext = await validateAccessToken(accessToken, accessControl);
         this.attachRequestContext(request, userContext);
         return true;
       }
@@ -92,7 +103,8 @@ export class AuthGuard implements CanActivate {
 @Injectable()
 export class AuthGatewayGuard implements CanActivate {
   constructor(
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private reflector: Reflector
   ) {}
 
   async canActivate(
@@ -101,7 +113,12 @@ export class AuthGatewayGuard implements CanActivate {
     const socket = context.switchToWs().getClient<Socket>();
     const accessToken = socket.handshake.auth.accessToken;
     if (accessToken) {
-      const userContext = await validateAccessToken(accessToken);
+      const accessControl = this.reflector.getAllAndOverride<AccessControlOptions|undefined>(ACCESS_CONTROL_METADATA_KEY, [
+        context.getHandler(),
+        context.getClass(),
+      ]);
+
+      const userContext = await validateAccessToken(accessToken, accessControl);
       return true;
     }
 

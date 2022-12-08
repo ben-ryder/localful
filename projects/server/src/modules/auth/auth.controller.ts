@@ -1,9 +1,10 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service";
-import {LoginRequest, LogoutRequest, RefreshRequest} from "@ben-ryder/lfb-common";
+import {LoginRequest, LogoutRequest, RefreshRequest, Roles} from "@ben-ryder/lfb-common";
 import {AuthGuard} from "./auth.guards";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
+import {UseAccessControl} from "./access-control";
 
 
 @Controller({
@@ -33,15 +34,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refresh(@Body(new ZodValidationPipe(RefreshRequest)) refreshRequest: RefreshRequest) {
     return await this.authService.refresh(refreshRequest.refreshToken);
-  }
-
-  /**
-   * An empty endpoint which can be used to check if your auth credentials are valid.
-   */
-  @Get("/check")
-  @UseGuards(AuthGuard)
-  async check() {
-    return null;
   }
 
   /**
@@ -101,5 +93,44 @@ export class AuthController {
       statusCode: HttpStatus.NOT_IMPLEMENTED,
       message: "Account verification has not been implemented yet"
     });
+  }
+
+  /**
+   * An endpoint which can be used to test if the use has a valid access token.
+   */
+  @Get("/check")
+  @UseGuards(AuthGuard)
+  async check() {
+    return null;
+  }
+
+  /**
+   * An endpoint which can be used to test if the user is verified.
+   */
+  @Get("/check/verified")
+  @UseGuards(AuthGuard)
+  @UseAccessControl({isVerified: true})
+  async checkVerified() {
+    return null;
+  }
+
+  /**
+   * An endpoint which can be used to test if the user is verified.
+   */
+  @Get("/check/unverified")
+  @UseGuards(AuthGuard)
+  @UseAccessControl({isVerified: false})
+  async checkUnverified() {
+    return null;
+  }
+
+  /**
+   * An endpoint which can be used to check if the user is admin.
+   */
+  @Get("/check/admin")
+  @UseGuards(AuthGuard)
+  @UseAccessControl({roles: [Roles.ADMIN]})
+  async checkAdmin() {
+    return null;
   }
 }
