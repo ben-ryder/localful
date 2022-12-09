@@ -1,7 +1,9 @@
 {
   "name": "@ben-ryder/lfb-testing",
   "version": "0.1.0",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "A collection of data and utils for use in Local-First Backend tests.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "homepage": "https://github.com/Ben-Ryder/local-first-backend",
