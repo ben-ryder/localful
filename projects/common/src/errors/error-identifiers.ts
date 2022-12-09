@@ -29,5 +29,6 @@ export enum ErrorIdentifiers {
   // Auth Errors
   AUTH_CREDENTIALS_INVALID = "auth-credentials-invalid",
   AUTH_TOKEN_INVALID = "auth-token-invalid",
-  AUTH_EMAIL_NOT_VERIFIED = "auth-email-not-verified"
+  AUTH_NOT_VERIFIED = "auth-not-verified",
+  AUTH_ALREADY_VERIFIED = "auth-already-verified"
 }
