@@ -32,5 +32,7 @@ export * from "./schemas/auth/dtos/tokens";
 export * from "./schemas/auth/request/login.auth.request";
 export * from "./schemas/auth/request/refresh.auth.request";
 export * from "./schemas/auth/request/logout.auth.request";
+export * from "./schemas/auth/request/reset.auth.request";
+export * from "./schemas/auth/request/verify.auth.request";
 export * from "./schemas/auth/response/login.auth.response";
 export * from "./schemas/auth/response/refresh.auth.response";
