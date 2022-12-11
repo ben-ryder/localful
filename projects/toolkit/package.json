@@ -1,6 +1,6 @@
 {
   "name": "@ben-ryder/lfb-toolkit",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "A client-side toolkit library for my Local-First Backend project which includes an API client and other useful utilities.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "homepage": "https://github.com/Ben-Ryder/local-first-backend",

@@ -23,48 +23,62 @@ import {
 } from "@ben-ryder/lfb-common";
 import {io, Socket} from "socket.io-client";
 import {LocalStore} from "../storage/local-store";
+import {ChangesListener} from "../common/changes-listener";
 
 export interface QueryOptions {
   url: string,
   method: 'GET'|'POST'|'PATCH'|'DELETE',
   data?: object,
-  params?: object
+  params?: object,
+  noAuthRequired?: boolean
 }
 
 export type DataLoader<T> = () => Promise<T|null>;
 export type DataSaver<T> = (data: T) => Promise<void>;
 export type DataDeleter<T> = () => Promise<void>;
 
-export interface LFBServerClientOptions {
+export interface LFBClientOptions {
   serverUrl: string;
-  localStore: LocalStore,
-  handleServerChanges: (changes: ChangeDto[]) => void
+  localStore: LocalStore
 }
 
 
 export class LFBClient {
   private readonly socket: Socket
-  private readonly options: LFBServerClientOptions;
+  private readonly options: LFBClientOptions;
   private readonly localStore: LocalStore;
+  private readonly changeListeners: ChangesListener[] = [];
 
   private encryptionKey?: string;
   private accessToken?: string;
   private refreshToken?: string;
 
-  constructor(options: LFBServerClientOptions) {
+  constructor(options: LFBClientOptions) {
     this.options = options;
     this.localStore = options.localStore;
     this.socket = io(this.options.serverUrl);
 
-    this.socket.on("changes", (changes: ChangeDto[]) => {
-      this.options.handleServerChanges(changes);
+    this.socket.on("changes", async (changes: ChangeDto[]) => {
+      await this.handleServerChanges(changes);
     });
   }
 
+  // Change Listeners
+  private async handleServerChanges(changes: ChangeDto[]) {
+    for (const listener of this.changeListeners) {
+      await listener(changes);
+    }
+  }
+
+  addChangesListener(listener: ChangesListener) {
+    this.changeListeners.push(listener);
+  }
+
+  // Basic Query
   private async query<ResponseType>(options: QueryOptions, repeat = false): Promise<ResponseType> {
     if (!options.noAuthRequired && !this.accessToken) {
-      const accessToken = await LFBServerClient.loadData(this.localStore.loadAccessToken);
-      const refreshToken = await LFBServerClient.loadData(this.localStore.loadRefreshToken);
+      const accessToken = await LFBClient.loadData(this.localStore.loadAccessToken);
+      const refreshToken = await LFBClient.loadData(this.localStore.loadRefreshToken);
       if (refreshToken) {
         this.refreshToken = refreshToken;
       }
@@ -117,7 +131,7 @@ export class LFBClient {
 
   private async checkEncryptionKey() {
     if (!this.encryptionKey) {
-      const encryptionKey = await LFBServerClient.loadData(this.localStore.loadEncryptionKey);
+      const encryptionKey = await LFBClient.loadData(this.localStore.loadEncryptionKey);
 
       if (encryptionKey) {
         this.encryptionKey = encryptionKey;
@@ -183,15 +197,15 @@ export class LFBClient {
     // Decrypt users encryptionKey with their masterKey
     // todo: don't trust data is encrypted correctly
     const encryptionKey = EncryptionHelper.decryptText(accountKeys.masterKey, data.user.encryptionSecret);
-    await LFBServerClient.saveData(this.localStore.saveEncryptionKey, encryptionKey);
+    await LFBClient.saveData(this.localStore.saveEncryptionKey, encryptionKey);
 
     // Save user details and tokens
-    await LFBServerClient.saveData(this.localStore.saveCurrentUser, data.user);
+    await LFBClient.saveData(this.localStore.saveCurrentUser, data.user);
 
-    await LFBServerClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
+    await LFBClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
     this.refreshToken = data.refreshToken;
 
-    await LFBServerClient.saveData(this.localStore.saveAccessToken, data.accessToken);
+    await LFBClient.saveData(this.localStore.saveAccessToken, data.accessToken);
     this.accessToken = data.accessToken;
 
     return data;
@@ -219,12 +233,12 @@ export class LFBClient {
       noAuthRequired: true
     });
 
-    await LFBServerClient.saveData(this.localStore.saveEncryptionKey, encryptionKey);
-    await LFBServerClient.saveData(this.localStore.saveCurrentUser, data.user);
+    await LFBClient.saveData(this.localStore.saveEncryptionKey, encryptionKey);
+    await LFBClient.saveData(this.localStore.saveCurrentUser, data.user);
 
-    await LFBServerClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
+    await LFBClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
     this.refreshToken = data.refreshToken;
-    await LFBServerClient.saveData(this.localStore.saveAccessToken, data.accessToken);
+    await LFBClient.saveData(this.localStore.saveAccessToken, data.accessToken);
     this.accessToken = data.accessToken;
 
     return data;
@@ -250,11 +264,11 @@ export class LFBClient {
     // Don't delete storage data until after the request.
     // This ensures that in the event that the revoke request fails there is the option to try
     // again rather than just loosing all the tokens.
-    await LFBServerClient.deleteData(this.localStore.deleteCurrentUser);
-    await LFBServerClient.deleteData(this.localStore.deleteEncryptionKey);
+    await LFBClient.deleteData(this.localStore.deleteCurrentUser);
+    await LFBClient.deleteData(this.localStore.deleteEncryptionKey);
 
-    await LFBServerClient.deleteData(this.localStore.deleteRefreshToken);
-    await LFBServerClient.deleteData(this.localStore.deleteAccessToken);
+    await LFBClient.deleteData(this.localStore.deleteRefreshToken);
+    await LFBClient.deleteData(this.localStore.deleteAccessToken);
 
     delete this.refreshToken;
     delete this.accessToken;
@@ -283,14 +297,15 @@ export class LFBClient {
       throw e;
     }
 
-    await LFBServerClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
+    await LFBClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
     this.refreshToken = data.refreshToken;
-    await LFBServerClient.saveData(this.localStore.saveAccessToken, data.accessToken);
+    await LFBClient.saveData(this.localStore.saveAccessToken, data.accessToken);
     this.accessToken = data.accessToken;
 
     return data;
   }
 
+  // Changes
   async getChangeIds() {
     return this.query<string[]>({
       method: 'GET',
