@@ -1,6 +1,5 @@
 import {ChangeDto} from "@ben-ryder/lfb-common";
-
-export type ChangesListener = (changes: ChangeDto[]) => void;
+import {ChangesListener} from "../common/changes-listener";
 
 
 export class BrowserSyncClient<DocType> {
@@ -24,7 +23,7 @@ export class BrowserSyncClient<DocType> {
     }
   }
 
-  private emitChanges(changes: ChangeDto[]) {
+  emitChanges(changes: ChangeDto[]) {
     this.browserChannel.postMessage({type: "changes", changes: changes});
   }
 
