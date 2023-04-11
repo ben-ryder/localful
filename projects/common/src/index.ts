@@ -15,6 +15,7 @@ export * from "./schemas/changes/response/changes.response";
 export * from "./schemas/info/dtos/info.dto";
 
 export * from "./schemas/profiles/dtos/profile.dto";
+export * from "./schemas/profiles/dtos/internal/database-profile.dto";
 export * from "./schemas/profiles/request/create.profiles.request";
 export * from "./schemas/profiles/request/update.profiles.request";
 export * from "./schemas/profiles/request/url-params.profiles.request";
