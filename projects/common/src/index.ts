@@ -14,25 +14,10 @@ export * from "./schemas/changes/response/changes.response";
 
 export * from "./schemas/info/dtos/info.dto";
 
-export * from "./schemas/users/dtos/user.dto";
-export * from "./schemas/users/dtos/no-keys-user.dto";
-export * from "./schemas/users/dtos/internal/internal-database-user.dto";
-export * from "./schemas/users/dtos/internal/database-user.dto";
-export * from "./schemas/users/dtos/internal/create.database-user.dto";
-export * from "./schemas/users/dtos/internal/update.database-user.dto";
-export * from "./schemas/users/request/create.users.request";
-export * from "./schemas/users/request/update.users.request";
-export * from "./schemas/users/request/url-params.users.request";
-export * from "./schemas/users/response/get.user.response";
-export * from "./schemas/users/response/create.users.response";
-export * from "./schemas/users/response/update.users.response";
+export * from "./schemas/profiles/dtos/profile.dto";
+export * from "./schemas/profiles/request/create.profiles.request";
+export * from "./schemas/profiles/request/update.profiles.request";
+export * from "./schemas/profiles/request/url-params.profiles.request";
+export * from "./schemas/profiles/response/get.profile.response";
 
-export * from "./schemas/auth/dtos/roles";
-export * from "./schemas/auth/dtos/tokens";
-export * from "./schemas/auth/request/login.auth.request";
-export * from "./schemas/auth/request/refresh.auth.request";
-export * from "./schemas/auth/request/logout.auth.request";
-export * from "./schemas/auth/request/reset.auth.request";
-export * from "./schemas/auth/request/verify.auth.request";
-export * from "./schemas/auth/response/login.auth.response";
-export * from "./schemas/auth/response/refresh.auth.response";
+export * from "./schemas/auth/scopes";
