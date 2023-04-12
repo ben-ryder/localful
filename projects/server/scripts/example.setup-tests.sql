@@ -1,16 +1,16 @@
 -- Cleaning up existing internal if present
-DROP DATABASE IF EXISTS lfb;
+DROP DATABASE IF EXISTS lfb_tests;
 
 -- Cleaning up existing user if present
-DROP USER IF EXISTS lfb;
+DROP USER IF EXISTS lfb_tests;
 
--- Create lfb user and internal
-CREATE USER lfb WITH PASSWORD 'password' LOGIN;
-CREATE DATABASE lfb;
-GRANT CONNECT ON DATABASE lfb TO lfb;
+-- Create lfb_tests user and internal
+CREATE USER lfb_tests WITH PASSWORD 'password' LOGIN;
+CREATE DATABASE lfb_tests;
+GRANT CONNECT ON DATABASE lfb_tests TO lfb_tests;
 
 -- Switch to new internal
-\c lfb
+\c lfb_tests
 
 -- Create UUID extension for uuid_generate_v4 support
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -51,6 +51,6 @@ CREATE TABLE IF NOT EXISTS changes (
     PRIMARY KEY (id)
 );
 
--- Grant privileges to lfb user after everything is created
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO lfb;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO lfb;
+-- Grant privileges to lfb_tests user after everything is created
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO lfb_tests;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO lfb_tests;

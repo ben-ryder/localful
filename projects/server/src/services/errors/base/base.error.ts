@@ -24,11 +24,11 @@ export class BaseError extends Error {
   applicationMessage?: string;
   originalError?: any;
 
-  constructor(config: ErrorConfig) {
-    super(config.message);
+  constructor(config?: ErrorConfig) {
+    super(config?.message);
 
-    this.identifier = config.identifier || undefined;
-    this.applicationMessage = config.applicationMessage || undefined;
-    this.originalError = config.originalError || undefined;
+    this.identifier = config?.identifier;
+    this.applicationMessage = config?.applicationMessage;
+    this.originalError = config?.originalError;
   }
 }

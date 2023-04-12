@@ -7,36 +7,30 @@ import {
   SubscribeMessage,
   WebSocketGateway
 } from "@nestjs/websockets";
-import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
-import {ChangesSocketEvents, ChangesEventPayload} from "@ben-ryder/lfb-common";
+import {ChangesSocketEvents, ChangesEventPayload, AccessControlScopes} from "@ben-ryder/lfb-common";
 import {UseGuards, UsePipes} from "@nestjs/common";
 import {GatewayErrorFilter} from "../../services/errors/error.gateway-filter";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
+import {AuthGatewayGuard} from "../../services/auth/auth.gateway-guard";
+import {AuthService} from "../../services/auth/auth.service";
 
 @WebSocketGateway()
-// @UseGuards(AuthGatewayGuard)
+@UseGuards(AuthGatewayGuard)
 @UsePipes(
   GatewayErrorFilter
 )
 export class ChangesGateway implements OnGatewayConnection {
   constructor(
     private changesService: ChangesService,
+    private authService: AuthService
   ) {}
 
-  async guardConnection(socket: Socket) {
-    const accessToken = socket.handshake.auth.accessToken;
-    if (!accessToken) {
-      // This is included just in case, however the AuthGatewayGuard should catch any unauthorized events/requests.
-      throw new AccessUnauthorizedError({
-        message: "Socket Access Denied"
-      })
-    }
-
-    // todo: validate token as well?
-    // This is required because the auth guard runs against events, not the initial connection
-  }
-
   async handleConnection(socket: Socket) {
+
+    this.authService.confirmAccessControlRules([
+      AccessControlScopes.
+    ])
+
     //await this.guardConnection(socket);
     // how to join user socket if the id isn't in the token or initial connection?
     if (socket.handshake.auth.userId) {

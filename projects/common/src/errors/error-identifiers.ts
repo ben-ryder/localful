@@ -21,5 +21,9 @@ export enum ErrorIdentifiers {
   RESOURCE_RELATIONSHIP_INVALID = "resource-relationship-invalid",
 
   // Auth Errors
-  AUTH_TOKEN_INVALID = "auth-token-invalid"
+  AUTH_TOKEN_INVALID = "auth-token-invalid",
+
+  // Profile Errors
+  PROFILE_NOT_FOUND = "profile-not-found",
+  PROFILE_ALREADY_EXISTS = "profile-already-exists",
 }

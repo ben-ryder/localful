@@ -15,8 +15,7 @@ export class InfoController {
   @Get()
   async getInfo() {
     const meta: InfoDto = {
-      version: "v1",
-      registrationEnabled: this.configService.config.app.registrationEnabled
+      version: "v1"
     }
 
     return meta;

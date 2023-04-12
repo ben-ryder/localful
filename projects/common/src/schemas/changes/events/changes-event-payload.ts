@@ -1,10 +1,5 @@
 import {z} from "zod";
-import {AddChangesRequest} from "../request/add.changes.request";
+import {ChangeCreateDto} from "../crud/change.create.dto";
 
-
-export const ChangesEventPayload = z.object({
-  userId: z.string(),
-  changes: AddChangesRequest
-}).strict()
-
+export const ChangesEventPayload = ChangeCreateDto;
 export type ChangesEventPayload = z.infer<typeof ChangesEventPayload>;

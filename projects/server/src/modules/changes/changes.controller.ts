@@ -1,18 +1,16 @@
-import {Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, Res, UseGuards} from "@nestjs/common";
 import {ChangesService} from "./changes.service";
-import {AddChangesRequest, GetChangesQueryParams, ChangesURLParams} from "@ben-ryder/lfb-common";
+import {ChangeCreateDto, ChangesRetrieveQueryParams, ChangesURLParams} from "@ben-ryder/lfb-common";
 import {RequestContext} from "../../common/request-context.decorator";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
-import {AuthGuard} from "../auth/auth.guards";
-import {UseAccessControl} from "../auth/access-control";
-
+import {AuthGuard} from "../../services/auth/auth.guard";
+import { Response } from "express";
 
 @Controller({
   path: "/:userId/changes",
   version: "1"
 })
 @UseGuards(AuthGuard)
-@UseAccessControl({isVerified: true})
 export class ChangesController {
   constructor(
     private changesService: ChangesService,
@@ -22,19 +20,19 @@ export class ChangesController {
   @HttpCode(HttpStatus.OK)
   async add(
     @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
-    @Body(new ZodValidationPipe(AddChangesRequest)) newChanges: AddChangesRequest,
+    @Body(new ZodValidationPipe(ChangeCreateDto)) newChanges: ChangeCreateDto,
     @RequestContext() context: RequestContext
   ) {
-    return await this.changesService.add(context?.user, params.userId, newChanges);
+    return await this.changesService.createWithAccessCheck(context?.user, params.userId, newChanges);
   }
 
   @Get()
   async list(
     @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
     @RequestContext() context: RequestContext,
-    @Query() query: GetChangesQueryParams
+    @Query() query: ChangesRetrieveQueryParams
   ) {
-    return await this.changesService.list(context?.user, params.userId, query.ids);
+    return await this.changesService.listWithAccessCheck(context?.user, params.userId, query.ids);
   }
 
   @Get("/ids")
@@ -42,6 +40,17 @@ export class ChangesController {
     @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
     @RequestContext() context: RequestContext,
   ) {
-    return await this.changesService.getIds(context?.user, params.userId);
+    return await this.changesService.getIdsWithAccessCheck(context?.user, params.userId);
+  }
+
+  @Delete()
+  async deleteChanges(
+    @Res() res: Response
+  ) {
+    // todo: implement this endpoint
+    return res.status(501).send({
+      statusCode: 501,
+      message: "Not Implemented Yet"
+    })
   }
 }

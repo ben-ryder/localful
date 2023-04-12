@@ -3,22 +3,25 @@ export * from "./errors/error-identifiers";
 
 export * from "./events/changes-socket-events";
 
-export * from "./schemas/changes/dtos/internal/internal-database-change.dto";
-export * from "./schemas/changes/dtos/change.dto";
+export * from "./schemas/auth/access-control-scopes";
+
+export * from "./schemas/info/info.dto";
+
+export * from "./schemas/changes/change.dto";
+export * from "./schemas/changes/internal/change.database.dto";
+export * from "./schemas/changes/internal/change.internal-database.dto";
 export * from "./schemas/changes/events/changes-event-payload";
-export * from "./schemas/changes/request/add.changes.request";
-export * from "./schemas/changes/request/query-params.get.changes.request";
-export * from "./schemas/changes/request/url-params.changes.request";
-export * from "./schemas/changes/response/change-ids.response";
-export * from "./schemas/changes/response/changes.response";
+export * from "./schemas/changes/crud/change.create.dto";
+export * from "./schemas/changes/crud/changes.retrieve.query-params";
+export * from "./schemas/changes/crud/changes.retrieve.response";
+export * from "./schemas/changes/crud/changes.url-params";
 
-export * from "./schemas/info/dtos/info.dto";
-
-export * from "./schemas/profiles/dtos/profile.dto";
-export * from "./schemas/profiles/dtos/internal/database-profile.dto";
-export * from "./schemas/profiles/request/create.profiles.request";
-export * from "./schemas/profiles/request/update.profiles.request";
-export * from "./schemas/profiles/request/url-params.profiles.request";
-export * from "./schemas/profiles/response/get.profile.response";
-
-export * from "./schemas/auth/scopes";
+export * from "./schemas/profiles/profile.dto";
+export * from "./schemas/profiles/internal/profile.database.dto";
+export * from "./schemas/profiles/internal/profile.internal-database.dto";
+export * from "./schemas/profiles/crud/profile.create.dto";
+export * from "./schemas/profiles/crud/profile.create.response";
+export * from "./schemas/profiles/crud/profile.retrieve.response";
+export * from "./schemas/profiles/crud/profile.update.dto";
+export * from "./schemas/profiles/crud/profile.update.response";
+export * from "./schemas/profiles/crud/profile.url-params";
