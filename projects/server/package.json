@@ -1,6 +1,6 @@
 {
   "name": "@ben-ryder/lfb-server",
-  "version": "0.2.1",
+  "version": "0.7.0",
   "description": "A generic backend for local-first applications including content backup, cross-device sync and multi-user support.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "license": "AGPL-3.0-only",
@@ -23,7 +23,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
-    "@ben-ryder/lfb-common": "../common",
+    "@ben-ryder/lfb-common": "^0.7.0",
     "@nestjs/common": "^9.1.4",
     "@nestjs/core": "^9.1.4",
     "@nestjs/platform-express": "^9.1.4",
