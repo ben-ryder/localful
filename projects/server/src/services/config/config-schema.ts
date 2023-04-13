@@ -18,7 +18,8 @@ export const ConfigSchema = z.object({
   auth: z.object({
     issuer: z.string(),
     audience: z.string(),
-    jwksUri: z.string()
+    jwksOrigin: z.string(),
+    jwksPath: z.string()
   })
 });
 

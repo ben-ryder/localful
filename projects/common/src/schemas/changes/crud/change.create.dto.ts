@@ -6,4 +6,4 @@ export const ChangeCreateDto = z.array(
     data: z.string()
   }).strict()
 )
-export type CreateChangeDto = z.infer<typeof ChangeCreateDto>;
+export type ChangeCreateDto = z.infer<typeof ChangeCreateDto>;

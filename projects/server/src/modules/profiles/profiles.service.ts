@@ -1,52 +1,83 @@
 import {ProfilesDatabaseService} from "./database/profiles.database.service";
 import {Injectable} from "@nestjs/common";
-import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
 import {UserContext} from "../../common/request-context.decorator";
-import {CreateProfileRequest, GetProfileResponse, ProfileDto, UpdateProfileRequest} from "@ben-ryder/lfb-common";
+import {
+    AccessControlScopes,
+    ProfileCreateDto,
+    ProfileDto,
+    ProfileUpdateDto
+} from "@ben-ryder/lfb-common";
+import {AuthService} from "../../services/auth/auth.service";
 
 
 @Injectable()
 export class ProfilesService {
     constructor(
-       private profilesDatabaseService: ProfilesDatabaseService
+       private profilesDatabaseService: ProfilesDatabaseService,
+       private authService: AuthService
     ) {}
 
-    private _checkAccess(userContext: UserContext, userId: string): void {
-        if (userContext?.id !== userId) {
-            throw new AccessForbiddenError({
-                message: "Access forbidden to profile"
-            })
-        }
-    }
-
-    async get(userId: string): Promise<GetProfileResponse> {
+    async _get(userId: string) {
         return await this.profilesDatabaseService.get(userId);
     }
 
-    async getWithAccessCheck(userContext: UserContext, userId: string): Promise<GetProfileResponse> {
-        this.checkAccess(userContext, userId);
-        return this.get(userId);
+    async getWithAccessCheck(currentUserContext: UserContext, userId: string) {
+        await this.authService.confirmAccessControlRules(
+          [
+            AccessControlScopes.PROFILES_RETRIEVE_SELF,
+            AccessControlScopes.PROFILES_RETRIEVE,
+          ],
+          currentUserContext, userId
+        );
+        
+        return this._get(userId);
     }
 
-    async add(createProfileRequest: CreateProfileRequest): Promise<ProfileDto> {
-        return await this.profilesDatabaseService.create(userId, createProfileRequest);
+    async _create(profileCreateDto: ProfileCreateDto): Promise<ProfileDto> {
+        return await this.profilesDatabaseService.create(profileCreateDto);
     }
 
-    async update(userId: string, updateProfileRequest: UpdateProfileRequest): Promise<ProfileDto> {
-        return await this.profilesDatabaseService.update(userId, updateProfileRequest);
+    async createWithAccessCheck(currentUserContext: UserContext, profileCreateDto: ProfileCreateDto): Promise<ProfileDto> {
+        await this.authService.confirmAccessControlRules(
+          [
+              AccessControlScopes.PROFILES_CREATE_SELF,
+              AccessControlScopes.PROFILES_CREATE,
+          ],
+          currentUserContext, profileCreateDto.userId
+        );
+        
+        return await this._create(profileCreateDto);
     }
 
-    async updateWithAccessCheck(userContext: UserContext, userId: string, updateProfileRequest: UpdateProfileRequest): Promise<ProfileDto> {
-        this.checkAccess(userContext, userId);
-        return this.update(userId, updateProfileRequest);
+    async _update(userId: string, profileUpdateDto: ProfileUpdateDto): Promise<ProfileDto> {
+        return await this.profilesDatabaseService.update(userId, profileUpdateDto);
     }
 
-    async delete(userId: string): Promise<void> {
+    async updateWithAccessCheck(currentUserContext: UserContext, userId: string, profileUpdateDto: ProfileUpdateDto): Promise<ProfileDto> {
+        await this.authService.confirmAccessControlRules(
+          [
+              AccessControlScopes.PROFILES_UPDATE_SELF,
+              AccessControlScopes.PROFILES_UPDATE,
+          ],
+          currentUserContext, userId
+        );
+        
+        return this._update(userId, profileUpdateDto);
+    }
+
+    async _delete(userId: string): Promise<void> {
         return this.profilesDatabaseService.delete(userId);
     }
 
-    async deleteWithAccessCheck(userContext: UserContext, userId: string): Promise<void> {
-        this.checkAccess(userContext, userId);
-        return this.delete(userId);
+    async deleteWithAccessCheck(currentUserContext: UserContext, userId: string): Promise<void> {
+        await this.authService.confirmAccessControlRules(
+          [
+              AccessControlScopes.PROFILES_DELETE_SELF,
+              AccessControlScopes.PROFILES_DELETE,
+          ],
+          currentUserContext, userId
+        );
+        
+        return this._delete(userId);
     }
 }

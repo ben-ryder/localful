@@ -28,7 +28,8 @@ export class ConfigService {
     auth: {
       issuer: process.env.AUTH_ISSUER,
       audience: process.env.AUTH_AUDIENCE,
-      jwksUri: process.env.AUTH_JWKS_URI,
+      jwksOrigin: process.env.AUTH_JWKS_ORIGIN,
+      jwksPath: process.env.AUTH_JWKS_PATH
     }
   });
 }

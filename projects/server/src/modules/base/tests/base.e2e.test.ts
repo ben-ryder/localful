@@ -1,4 +1,4 @@
-import {TestHelper} from "../../../../tests/e2e/test-helper";
+import {TestHelper} from "../../../../tests-utils/test-helper";
 
 
 describe("Base Module",() => {

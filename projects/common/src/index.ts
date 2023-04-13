@@ -24,4 +24,4 @@ export * from "./schemas/profiles/crud/profile.create.response";
 export * from "./schemas/profiles/crud/profile.retrieve.response";
 export * from "./schemas/profiles/crud/profile.update.dto";
 export * from "./schemas/profiles/crud/profile.update.response";
-export * from "./schemas/profiles/crud/profile.url-params";
+export * from "./schemas/profiles/crud/profiles.url-params";

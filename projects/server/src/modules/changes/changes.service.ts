@@ -34,10 +34,7 @@ export class ChangesService {
 
   async listWithAccessCheck(userContext: UserContext, userId: string, ids?: string[]){
     await this.authService.confirmAccessControlRules(
-      {
-        scopes: [],
-        combineBehaviour: "or"
-      }
+      [
         AccessControlScopes.CHANGES_RETRIEVE_SELF,
         AccessControlScopes.CHANGES_RETRIEVE
       ],

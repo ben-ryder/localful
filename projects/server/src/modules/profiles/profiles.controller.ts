@@ -5,11 +5,10 @@ import {ProfileCreateDto, ProfilesURLParams, ProfileUpdateDto} from "@ben-ryder/
 import {RequestContext} from "../../common/request-context.decorator";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 import {AuthGuard} from "../../services/auth/auth.guard";
-import {UseAccessControl} from "../../services/auth/auth.service";
 
 
 @Controller({
-  path: "/users",
+  path: "/profiles",
   version: "1"
 })
 @UseGuards(AuthGuard)
@@ -20,19 +19,14 @@ export class ProfilesController {
   ) {}
 
   @Post()
-  @UseAccessControl({
-    scopes: ["profiles:create:self"]
-  })
-  async add(
-    @Body(new ZodValidationPipe(ProfileCreateDto)) profileCreateDto: ProfileCreateDto
+  async create(
+    @Body(new ZodValidationPipe(ProfileCreateDto)) profileCreateDto: ProfileCreateDto,
+    @RequestContext() context: RequestContext
   ) {
-    return await this.profilesService.createWithAccessCheck( profileCreateDto);
+    return await this.profilesService.createWithAccessCheck(context.user, profileCreateDto);
   }
 
   @Get("/:userId")
-  @UseAccessControl({
-    scopes: ["profiles:retrieve:self"]
-  })
   async get(
     @Param(new ZodValidationPipe(ProfilesURLParams)) params: ProfilesURLParams,
     @RequestContext() context: RequestContext
@@ -41,21 +35,15 @@ export class ProfilesController {
   }
 
   @Patch("/:userId")
-  @UseAccessControl({
-    scopes: ["profiles:update:self"]
-  })
   async update(
     @Param(new ZodValidationPipe(ProfilesURLParams)) params: ProfilesURLParams,
-    @Body(new ZodValidationPipe(UpdateProfileRequest)) updateProfileRequest: UpdateProfileRequest,
+    @Body(new ZodValidationPipe(ProfileUpdateDto)) profileUpdateDto: ProfileUpdateDto,
     @RequestContext() context: RequestContext
   ) {
-    return await this.profilesService.updateWithAccessCheck(context.user, params.userId, updateProfileRequest);
+    return await this.profilesService.updateWithAccessCheck(context.user, params.userId, profileUpdateDto);
   }
 
   @Delete("/:userId")
-  @UseAccessControl({
-    scopes: ["profiles:delete:self"]
-  })
   async delete(
     @Param(new ZodValidationPipe(ProfilesURLParams)) params: ProfilesURLParams,
     @RequestContext() context: RequestContext

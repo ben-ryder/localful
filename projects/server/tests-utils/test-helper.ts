@@ -1,20 +1,32 @@
 import {INestApplication} from "@nestjs/common";
 import {agent, SuperAgentTest} from "supertest";
-import {UserDto, TokenPair} from "@ben-ryder/lfb-common";
-import {TokenService} from "../../src/services/token/token.service";
-import {DatabaseService} from "../../src/services/database/database.service";
+import createJWKSMock, {JWKSMock} from "mock-jwks"
+
 import {clearDatabase, seedTestData} from "./database-scripts";
-import {createApp} from "../../src/create-app";
-import {DataStoreService} from "../../src/services/data-store/data-store.service";
+import {createApp} from "../src/create-app";
+import {DatabaseService} from "../src/services/database/database.service";
+import {ConfigService} from "../src/services/config/config";
 
 
 export class TestHelper {
   app: INestApplication;
   client: SuperAgentTest;
+  jwksMock: JWKSMock;
 
   async beforeAll() {
+    // Create app
     this.app = await createApp({logger: false})
     await this.app.init();
+
+    // Setup JWKS mock
+    const configService = await this.app.get(ConfigService);
+    this.jwksMock = createJWKSMock(
+      configService.config.auth.jwksOrigin,
+      configService.config.auth.jwksPath,
+    );
+    this.jwksMock.start();
+
+    // Setup supertest agent for test requests
     const httpServer = this.app.getHttpServer();
     this.client = agent(httpServer);
   }
@@ -22,21 +34,20 @@ export class TestHelper {
   /**
    * Return an API access token for the given user
    *
-   * @param user
+   * @param userId
+   * @param scopes
    */
-  async getUserAccessToken(user: UserDto): Promise<string> {
-    const tokens = await this.getUserTokens(user);
-    return tokens.accessToken;
-  }
+  async getUserAccessToken(userId: string, scopes: string[]): Promise<string> {
+    const configService = this.app.get(ConfigService);
+    const iss = configService.config.auth.issuer;
+    const aud = configService.config.auth.audience;
 
-  /**
-   * Return an API access token for the given user
-   *
-   * @param user
-   */
-  async getUserTokens(user: UserDto): Promise<TokenPair> {
-    const tokenService = this.app.get(TokenService);
-    return await tokenService.createNewTokenPair(user);
+    return this.jwksMock.token({
+      sub: userId,
+      scopes: scopes.join(" "),
+      aud,
+      iss
+    });
   }
 
   /**
@@ -51,21 +62,16 @@ export class TestHelper {
 
   async killApplication() {
     // Clean up internal and redis connections before exiting
-    const dataStoreService = this.app.get(DataStoreService);
-    await dataStoreService.onModuleDestroy();
     const databaseService = this.app.get(DatabaseService);
     await databaseService.onModuleDestroy();
   }
 
   async beforeEach() {
     await this.resetDatabase();
-
-    // Purge the data store to ensure things like refresh/access tokens aren't persisted
-    const dataStoreService = this.app.get(DataStoreService);
-    await dataStoreService.purge();
   }
 
   async afterAll() {
     await this.killApplication();
+    this.jwksMock.stop();
   }
 }

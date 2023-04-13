@@ -1,6 +1,6 @@
 import {DatabaseService} from "../../../services/database/database.service";
 import {Injectable} from "@nestjs/common";
-import {InternalDatabaseChangeDto, ChangeDto} from "@ben-ryder/lfb-common";
+import {ChangeInternalDatabaseDto, ChangeDto} from "@ben-ryder/lfb-common";
 import {SystemError} from "../../../services/errors/base/system.error";
 
 
@@ -10,7 +10,7 @@ export class ChangesDatabaseService {
     private readonly databaseService: DatabaseService
   ) {}
 
-  private static convertDatabaseDtoToDto(change: InternalDatabaseChangeDto): ChangeDto {
+  private static convertDatabaseDtoToDto(change: ChangeInternalDatabaseDto): ChangeDto {
     return {
       id: change.id,
       data: change.data,
@@ -43,20 +43,17 @@ export class ChangesDatabaseService {
   async list(userId: string, ids?: string[]): Promise<ChangeDto[]> {
     const sql = await this.databaseService.getSQL();
 
-    let results: InternalDatabaseChangeDto[] = [];
+    let results: ChangeInternalDatabaseDto[] = [];
     try {
       if (ids && ids.length > 0) {
-        results = await sql<InternalDatabaseChangeDto[]>`SELECT * FROM changes WHERE user_id = ${userId} AND id IN ${sql(ids)}`;
+        results = await sql<ChangeInternalDatabaseDto[]>`SELECT * FROM changes WHERE user_id = ${userId} AND id IN ${sql(ids)}`;
       }
       else {
-        results = await sql<InternalDatabaseChangeDto[]>`SELECT * FROM changes WHERE user_id = ${userId}`;
+        results = await sql<ChangeInternalDatabaseDto[]>`SELECT * FROM changes WHERE user_id = ${userId}`;
       }
     }
     catch (e: any) {
-      throw new SystemError({
-        message: "Unexpected error while fetching changes",
-        originalError: e
-      })
+      throw ChangesDatabaseService.getDatabaseError(e);
     }
 
     return results.map(ChangesDatabaseService.convertDatabaseDtoToDto);
@@ -70,10 +67,7 @@ export class ChangesDatabaseService {
       results = await sql<{id: string}[]>`SELECT id FROM changes WHERE user_id = ${userId}`;
     }
     catch (e: any) {
-      throw new SystemError({
-        message: "Unexpected error while fetching changes",
-        originalError: e
-      })
+      throw ChangesDatabaseService.getDatabaseError(e);
     }
 
     return results.map(result => result.id);

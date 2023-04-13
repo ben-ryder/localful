@@ -7,15 +7,13 @@ import {
   SubscribeMessage,
   WebSocketGateway
 } from "@nestjs/websockets";
-import {ChangesSocketEvents, ChangesEventPayload, AccessControlScopes} from "@ben-ryder/lfb-common";
-import {UseGuards, UsePipes} from "@nestjs/common";
+import {ChangesSocketEvents, ChangesEventPayload} from "@ben-ryder/lfb-common";
+import {UsePipes} from "@nestjs/common";
 import {GatewayErrorFilter} from "../../services/errors/error.gateway-filter";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
-import {AuthGatewayGuard} from "../../services/auth/auth.gateway-guard";
 import {AuthService} from "../../services/auth/auth.service";
 
 @WebSocketGateway()
-@UseGuards(AuthGatewayGuard)
 @UsePipes(
   GatewayErrorFilter
 )
@@ -26,16 +24,17 @@ export class ChangesGateway implements OnGatewayConnection {
   ) {}
 
   async handleConnection(socket: Socket) {
+    const currentUser = await this.authService.validateToken(socket.handshake.auth.token);
 
-    this.authService.confirmAccessControlRules([
-      AccessControlScopes.
-    ])
-
-    //await this.guardConnection(socket);
-    // how to join user socket if the id isn't in the token or initial connection?
-    if (socket.handshake.auth.userId) {
-      // todo: should be based on access token instead?
-      socket.join(socket.handshake.auth.userId);
+    /**
+     * If the requesting user is valid, let them join their room to listen for changes.
+     * If the user has no valid token, immediately disconnect the socket.
+     */
+    if (currentUser) {
+      socket.join(currentUser.userId);
+    }
+    else {
+      socket.disconnect();
     }
   }
 
@@ -44,12 +43,22 @@ export class ChangesGateway implements OnGatewayConnection {
     @ConnectedSocket() socket: Socket,
     @MessageBody(new ZodValidationPipe(ChangesEventPayload)) payload: ChangesEventPayload
   ) {
-    //this.changesService.controlAccess(null, payload.userId);
+    const currentUser = await this.authService.validateToken(socket.handshake.auth.token);
 
-    // Immediately emit the change for other connected clients
-    socket.to(payload.userId).emit(ChangesSocketEvents.changes, payload);
+    // The token may no longer be valid, in which case close the socket so the client has to
+    // re-supply a valid token.
+    if (!currentUser) {
+      socket.disconnect();
+      return;
+    }
+
+    // Immediately emit the change for other connected clients, which should
+    // prevent synchronisation being delayed by database writes.
+    socket.to(currentUser.userId).emit(ChangesSocketEvents.changes, payload);
 
     // Add the change to the database
-    await this.changesService.add(null, payload.userId, payload.changes);
+    // Failures here don't matter too much, due to the nature of local-first software
+    // the changes can always just be sent and backed up at a later stage.
+    await this.changesService._create(currentUser.userId, payload);
   }
 }

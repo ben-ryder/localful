@@ -18,7 +18,7 @@ export class ChangesController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  async add(
+  async create(
     @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
     @Body(new ZodValidationPipe(ChangeCreateDto)) newChanges: ChangeCreateDto,
     @RequestContext() context: RequestContext

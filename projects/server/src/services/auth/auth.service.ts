@@ -14,11 +14,6 @@ export interface ExpectedJWTPayload extends JWTPayload {
 	scope?: string
 }
 
-export interface AccessControlRule {
-	scopes: string[],
-	combineBehaviour: "or" | "and"
-}
-
 @Injectable()
 export class AuthService {
 	constructor(
@@ -31,7 +26,10 @@ export class AuthService {
 	 * @param token
 	 */
 	async validateToken(token: string): Promise<AuthValidationResult> {
-		const jwksUri= new URL(this.configService.config.auth.jwksUri);
+		const jwksOrigin = this.configService.config.auth.jwksOrigin;
+		const jwksPath = this.configService.config.auth.jwksPath;
+		const jwksUri= new URL(jwksOrigin + jwksPath);
+
 		const audience = this.configService.config.auth.audience;
 		const issuer = this.configService.config.auth.audience;
 
@@ -72,37 +70,24 @@ export class AuthService {
 	 * A helper function other services can use to check access control rules.
 	 * Will throw AccessForbiddenError if no rule is met.
 	 *
-	 * @param accessControlRule
+	 * @param validScopes
 	 * @param currentUserContext
 	 * @param userId
 	 */
 	async confirmAccessControlRules(
-		accessControlRule: AccessControlRule,
+		validScopes: string[],
 		currentUserContext: UserContext,
 		userId: string
 	): Promise<void> {
-		let hasScopeMissing = false;
-		let hasValidScope = false;
-
-		for (const scope of accessControlRule.scopes) {
+		for (const scope of validScopes) {
 			if (currentUserContext?.scopes.includes(scope)) {
 				if (!scope.endsWith(":self")) {
-					hasValidScope = true;
+					return;
 				}
 				else if (currentUserContext?.id === userId) {
-					hasValidScope = true;
+					return;
 				}
 			}
-			else {
-				hasScopeMissing = true;
-			}
-		}
-
-		if (accessControlRule.combineBehaviour === "or" && hasValidScope) {
-			return;
-		}
-		else if (accessControlRule.combineBehaviour === "and" && hasValidScope && !hasScopeMissing) {
-			return;
 		}
 
 		throw new AccessForbiddenError();
