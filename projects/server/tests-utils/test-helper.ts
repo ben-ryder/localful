@@ -2,7 +2,7 @@ import {INestApplication} from "@nestjs/common";
 import {agent, SuperAgentTest} from "supertest";
 import createJWKSMock, {JWKSMock} from "mock-jwks"
 
-import {clearDatabase, seedTestData} from "./database-scripts";
+import {resetTestData} from "./database-scripts";
 import {createApp} from "../src/create-app";
 import {DatabaseService} from "../src/services/database/database.service";
 import {ConfigService} from "../src/services/config/config";
@@ -44,7 +44,7 @@ export class TestHelper {
 
     return this.jwksMock.token({
       sub: userId,
-      scopes: scopes.join(" "),
+      scope: scopes.join(" "),
       aud,
       iss
     });
@@ -56,8 +56,7 @@ export class TestHelper {
   async resetDatabase() {
     const databaseService = this.app.get(DatabaseService);
     const sql = await databaseService.getSQL();
-    await clearDatabase(sql);
-    await seedTestData(sql);
+    await resetTestData(sql);
   }
 
   async killApplication() {

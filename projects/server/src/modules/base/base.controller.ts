@@ -1,4 +1,6 @@
-import { Controller, Get } from "@nestjs/common";
+import {All, Controller, Get, HttpStatus, Res} from "@nestjs/common";
+import {Response} from "express";
+import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 
 @Controller("/")
 export class BaseController {
@@ -16,5 +18,16 @@ export class BaseController {
   @Get("/v1")
   baseV1() {
     return this.getWelcomeMessage();
+  }
+
+  @All()
+  async routeNotFound(
+    @Res() res: Response
+  ) {
+    return res.status(HttpStatus.NOT_FOUND).send({
+      statusCode: HttpStatus.NOT_FOUND,
+      identifier: ErrorIdentifiers.RESOURCE_NOT_FOUND,
+      message: "The route you requested could not be found.",
+    })
   }
 }

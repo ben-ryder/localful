@@ -31,7 +31,7 @@ export class AuthService {
 		const jwksUri= new URL(jwksOrigin + jwksPath);
 
 		const audience = this.configService.config.auth.audience;
-		const issuer = this.configService.config.auth.audience;
+		const issuer = this.configService.config.auth.issuer;
 
 		let payload;
 		try {

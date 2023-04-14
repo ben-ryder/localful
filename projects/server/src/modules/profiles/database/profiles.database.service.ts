@@ -45,7 +45,7 @@ export class ProfilesDatabaseService {
   private static getDatabaseError(e: any) {
     if (e instanceof PostgresError) {
       if (e.code && e.code === PG_UNIQUE_VIOLATION) {
-        if (e.constraint_name === "profiles_user_id_key") {
+        if (e.constraint_name === "profiles_pkey") {
           return new ResourceRelationshipError({
             identifier: ErrorIdentifiers.PROFILE_ALREADY_EXISTS,
             applicationMessage: "A profile already exists for that user."

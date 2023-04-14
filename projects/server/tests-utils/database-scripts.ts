@@ -1,5 +1,5 @@
 import {Sql} from "postgres";
-import {testProfiles, testChanges} from "./test-data";
+import {seedProfiles, seedChanges, testCaseProfiles} from "./test-data";
 
 export interface ScriptOptions {
   logging: boolean
@@ -27,27 +27,16 @@ export async function clearTestData(sql: Sql<any>, options?: ScriptOptions) {
 
   // Because "on delete cascade" is present on all relationships
   // deleting profiles will automatically delete all related content too.
-  for (const profile of testProfiles) {
+  for (const profile of seedProfiles) {
+    await sql`DELETE FROM profiles where user_id = ${profile.userId}`;
+  }
+
+  for (const [key, profile] of Object.entries(testCaseProfiles)) {
     await sql`DELETE FROM profiles where user_id = ${profile.userId}`;
   }
 
   if (options?.logging) {
     console.log("Database clear completed");
-  }
-}
-
-/**
- * Fully reset all content in the database
- */
-export async function clearDatabase(sql: Sql<any>, options?: ScriptOptions) {
-  if (options?.logging) {
-    console.log("Running database clear");
-  }
-
-  await sql`DELETE FROM profiles`;
-
-  if (options?.logging) {
-    console.log("Completed database clear");
   }
 }
 
@@ -59,14 +48,14 @@ export async function seedTestData(sql: Sql<any>, options?: ScriptOptions) {
     console.log("Running database seed");
   }
 
-  for (const profile of testProfiles) {
+  for (const profile of seedProfiles) {
     await sql`
       INSERT INTO profiles(user_id, encryption_secret, created_at, updated_at)
       VALUES (${profile.userId}, ${profile.encryptionSecret}, ${profile.createdAt}, ${profile.updatedAt})
      `;
   }
 
-  for (const change of testChanges) {
+  for (const change of seedChanges) {
     await sql`
       INSERT INTO changes(id, data, user_id)
       VALUES (${change.id}, ${change.data}, ${change.user_id})

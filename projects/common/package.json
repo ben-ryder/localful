@@ -1,6 +1,6 @@
 {
   "name": "@ben-ryder/lfb-common",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "A library of common interfaces, schemas and utilities for use across my Local-First Backend project.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "homepage": "https://github.com/Ben-Ryder/local-first-backend",

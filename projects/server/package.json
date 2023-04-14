@@ -23,7 +23,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
-    "@ben-ryder/lfb-common": "^0.7.0",
+    "@ben-ryder/lfb-common": "^0.7.1",
     "@nestjs/common": "^9.1.4",
     "@nestjs/core": "^9.1.4",
     "@nestjs/platform-express": "^9.1.4",
