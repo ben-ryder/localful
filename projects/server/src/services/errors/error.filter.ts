@@ -1,13 +1,14 @@
 import {
   ExceptionFilter,
   Catch,
-  ArgumentsHost,
+  ArgumentsHost, HttpException, HttpStatus,
 } from "@nestjs/common";
 import { Response } from "express";
 import { BaseError } from "./base/base.error";
 import { fallbackMapping, errorHttpMapping } from "./error-http-mappings";
+import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
 
-@Catch(BaseError)
+@Catch(BaseError, HttpException)
 export class ErrorFilter implements ExceptionFilter {
   catch(error: BaseError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -18,6 +19,25 @@ export class ErrorFilter implements ExceptionFilter {
 
   async sendErrorResponse(err: Error, res: Response) {
     const errorName = err.constructor.name;
+
+    // Intercept NestJS errors to handle 404, otherwise fallback to NestJS formatted response.
+    if (err instanceof HttpException) {
+      if (errorName === "NotFoundException") {
+        return res.status(HttpStatus.NOT_FOUND).send({
+          identifier: ErrorIdentifiers.RESOURCE_NOT_FOUND,
+          statusCode: HttpStatus.NOT_FOUND,
+          message: "The route you requested could not be found.",
+        });
+      }
+      else {
+        return res.status(err.getStatus()).send({
+          statusCode: err.getStatus(),
+          message: err.getResponse(),
+        });
+      }
+    }
+
+    // Process custom errors
     const httpCode = errorHttpMapping[errorName]?.statusCode || fallbackMapping.statusCode;
     let message = fallbackMapping.defaultMessage;
     let identifier = fallbackMapping.identifier;
