@@ -1,6 +1,5 @@
 import {TestHelper} from "../../../../tests-utils/test-helper";
-import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
-import {HttpStatus} from "@nestjs/common";
+import {expectNotFound} from "../../../../tests-utils/common-expects/expect-not-found";
 
 
 describe("Generic 404 Response",() => {
@@ -20,33 +19,25 @@ describe("Generic 404 Response",() => {
     test("When a GET request is made to a random route, Then the response should be a '404 - not found'", async () => {
       const {body, statusCode} = await testHelper.client.get("/random-route");
 
-      expect(statusCode).toEqual(HttpStatus.NOT_FOUND);
-      expect(body).toHaveProperty("identifier");
-      expect(body.identifier).toEqual(ErrorIdentifiers.RESOURCE_NOT_FOUND);
+      expectNotFound(body, statusCode);
     })
 
     test("When a POST request is made to a random route, Then the response should be a '404 - not found'", async () => {
       const {body, statusCode} = await testHelper.client.post("/random-route");
 
-      expect(statusCode).toEqual(HttpStatus.NOT_FOUND);
-      expect(body).toHaveProperty("identifier");
-      expect(body.identifier).toEqual(ErrorIdentifiers.RESOURCE_NOT_FOUND);
+      expectNotFound(body, statusCode);
     })
 
     test("When a PATCH request is made to a random route, Then the response should be a '404 - not found'", async () => {
       const {body, statusCode} = await testHelper.client.patch("/random-route");
 
-      expect(statusCode).toEqual(HttpStatus.NOT_FOUND);
-      expect(body).toHaveProperty("identifier");
-      expect(body.identifier).toEqual(ErrorIdentifiers.RESOURCE_NOT_FOUND);
+      expectNotFound(body, statusCode);
     })
 
     test("When a DELETE request is made to a random route, Then the response should be a '404 - not found'", async () => {
       const {body, statusCode} = await testHelper.client.delete("/random-route");
 
-      expect(statusCode).toEqual(HttpStatus.NOT_FOUND);
-      expect(body).toHaveProperty("identifier");
-      expect(body.identifier).toEqual(ErrorIdentifiers.RESOURCE_NOT_FOUND);
+      expectNotFound(body, statusCode);
     })
   })
 })

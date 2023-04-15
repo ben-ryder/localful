@@ -1,37 +1,12 @@
 # API Authentication
-API authentication is done via access and refresh tokens. Here's a basic overview:
+Authentication and user management is not handled by the API itself,
+instead the server validates tokens supplied by a third party authentication and user management system,
+such as [Logto](https://logto.io/).
 
-1. A user's login details are sent to `/auth/login`. If correct an access token and refresh token are sent back.
-2. The access token is short-lived and can be used as a bearer token to authorize API requests.
-3. The refresh token is long-lived and can be used to retrieve a new access token from `/auth/refresh` when the old one expires.
-    - When a client requests a new access token they also receive a new refresh token and their old refresh and access tokens can no longer be used.
-4. If a user wishes to log out their current refresh token can be sent to `/auth/logout` and their tokens will be blacklisted until they expire.
+**IMPORTANT NOTE:** Although in theory the API should support any provider that supplies
+a valid JWT and has a JWKS endpoint, it is only actively developed and tested using [Logto](https://logto.io/).
 
-The rotation of refresh tokens as soon as they're used reduces the risk of having long-lived tokens while still
-allowing for a convenient user experience where users don't have to constantly re-authenticate.
-
-
-## Implementation Details
-When the system creates a token pair for the first time (access and refresh token) it does two important things:
-- generates a random "group id" value which is added to both tokens as the "gid" claim
-- sets a "counter id" value of 1, adds it to both tokens as the "cid" claim, and then persists this counter on the server.
-
-### Request Validation
-When validating the requests bearer token, in addition to checking the token is valid (signed correctly and not expired) the system will also check:
-- the group ID (gid claim) of the token should not be blacklisted
-- the counter ID (cid claim) of the token should match the currently stored counter ID for that token group
-
-### Refresh Token Rotation
-When a user requests a new access token they also receive a new refresh token and their old refresh token is blacklisted.  
-Storing every blacklisted token would quickly become unmanageable as refresh tokens are long-lived. This problem is solved
-by incrementing the counter ID value stored in the system and adding this updated value to the counter ID (cid) claims of the refreshed tokens.  
-This means that if an attempt is made to re-use any previous tokens, the counter ID will be old and therefore the request will be rejected.
-
-### Token Revocation
-In order to facilitate immediate logout the service can blacklist tokens. It does this by blacklisting the "group id" value
-of the given token pair which will blacklist the refresh and access token at the same time.
-
-## Potential Improvements
-- Storing a blacklist flag and counter ID on the server effectively makes the JWT no longer stateless. Given this is the case, could I just use server managed sessions instead?
-- Right now these tokens are returned to the user as JSON responses and will be stored in local storage/regular cookies by web applications. Should I use HTTP only cookies?
-  - If the tokens are saved in HTTP only cookies they will be sent on every request, which potentially defeats the purpose of having a refresh token as it will always be sent anyway?
+The API expects the JWT bearer token to have:
+- The `sub` (subject) claim, which it used as the `userId` value in the API.
+- The `scope` claim which controls what resources and actions the user is capable of in the API.
+- The `iss` (issuer) and `aud` (audience) claims, which are validated alongside the token itself.

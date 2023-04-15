@@ -1,28 +1,38 @@
 # API Testing
 The main type of testing used for the API right now is End to End (E2E) testing, meaning I'm not testing
-individual units of the application, instead I'm testing the API functionality itself via HTTP requests & responses.
+individual units of the application, instead I'm testing the API functionality itself via HTTP requests & responses.  
+Some unit tests are also used where E2E tests are harder to implement such as websocket functionality.
 
-These tests can be largely described like this:  
-`Given the application is in a predefined state, When I make this API request, Then I should get this API response` 
+This approach means tests focus on the **functionality itself** rather than implementation details, which makes
+them more resilient to internal refactoring, and ensures testing focuses on how real users interact with the system.
 
-This approach lets me test that the application **functionality itself** works as it should.  
-Unit tests can then be used to test code paths that can't be reached with e2e tests easily and also to test isolated feature/services where appropriate.
+All tests should follow these rough guidelines:
+- Every test should be able to be run independently. In practice this means not relying on database content
+  created by other tests.
+- Tests should be written against public interfaces not internals where possible (basically, favour E2E tests).
 
 ## Test File Locations
-Test files follow the pattern `<name>.e2e.test.ts` or `<name>.unit.test.ts` and should be added near the code
-that they are testing rather than being seperated in the `tests` folder.  
-The `tests` folder can then be used for common test functionality designed to be used throughout other feature tests.  
+Test files follow the pattern `<name>.e2e.test.ts` or `<name>.unit.test.ts` and should be located near the code
+that they test rather than being seperated in a `tests` folder or similar.
 
-## Test Data
-Test data is populated in `tests/test-data.ts` and this is used by most tests as the initial state of the application
-database.
+## Tooling and Helpers
+[Jest](https://jestjs.io/) is the testing framework used, with [supertest](https://github.com/ladjs/supertest) being used for interacting with the API.  
+A test helper exists in `./test-utils/test-helper.ts` which handles bootstrapping the server, setting up and
+tearing down the db content before each test and mocking the JWKS validation.  
 
-### Setup and Teardown
-All E2E tests make use of the `TestHelper` class found in `projects/server/tests/e2e/test-helper.ts` which encapsulates creating an application to test, and exposes helper methods
-for use in tests such as `beforeAll`, `beforeEach` and `afterAll`.
+An E2E test template is available at `./tests-utils/test-template-e2e.ts` which includes all the setup required to write an E2E tests file.
 
-## E2E Test Guidelines
-- Every test should be able to be run separately. In practice this means not relying on things like database content
-outside of individual test setup/teardown functions.
-- Tests should be written against public interfaces not internals where possible. This means that tests are more
-resilient against refactors and internal changes.
+### JWKS Mocking and Users
+JWKS functionality is mocked using the [mock-jwks](https://github.com/Levino/mock-jwks) library, meaning tests can be run
+locally without relying on any 3rd party auth service, and tests can set up users as required with the correct permission scopes.
+
+### Test Data
+Test data is populated in `tests/test-data.ts`.
+
+#### Seed Data
+`seedProfiles` and `seedChanges` data is reset in the database after each test,
+meaning each test can rely on this data already existing in the database as defined.  
+
+#### Example Data
+`exampleProfiles` and `exampleChanges` data is removed if present in the database after each test, but will
+not be added automatically, meaning this data can be used to test things like creating content.

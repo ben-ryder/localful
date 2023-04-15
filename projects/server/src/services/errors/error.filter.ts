@@ -24,7 +24,7 @@ export class ErrorFilter implements ExceptionFilter {
     if (err instanceof HttpException) {
       if (errorName === "NotFoundException") {
         return res.status(HttpStatus.NOT_FOUND).send({
-          identifier: ErrorIdentifiers.RESOURCE_NOT_FOUND,
+          identifier: ErrorIdentifiers.NOT_FOUND,
           statusCode: HttpStatus.NOT_FOUND,
           message: "The route you requested could not be found.",
         });

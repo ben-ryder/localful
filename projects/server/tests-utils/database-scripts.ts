@@ -25,14 +25,14 @@ export async function clearTestData(sql: Sql<any>, options?: ScriptOptions) {
     console.log("Running database clear");
   }
 
-  // Because "on delete cascade" is present on all relationships
-  // deleting profiles will automatically delete all related content too.
   for (const profile of seedProfiles) {
     await sql`DELETE FROM profiles where user_id = ${profile.userId}`;
+    await sql`DELETE FROM changes where user_id = ${profile.userId}`;
   }
 
   for (const [key, profile] of Object.entries(testCaseProfiles)) {
     await sql`DELETE FROM profiles where user_id = ${profile.userId}`;
+    await sql`DELETE FROM changes where user_id = ${profile.userId}`;
   }
 
   if (options?.logging) {

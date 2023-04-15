@@ -51,7 +51,7 @@ export class TestHelper {
   }
 
   /**
-   * Reset the internal to match the predefined test content
+   * Reset the db to match the predefined test content
    */
   async resetDatabase() {
     const databaseService = this.app.get(DatabaseService);
@@ -60,7 +60,7 @@ export class TestHelper {
   }
 
   async killApplication() {
-    // Clean up internal and redis connections before exiting
+    // Clean up db connection before exiting
     const databaseService = this.app.get(DatabaseService);
     await databaseService.onModuleDestroy();
   }
