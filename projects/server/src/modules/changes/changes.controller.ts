@@ -7,7 +7,7 @@ import {AuthGuard} from "../../services/auth/auth.guard";
 import { Response } from "express";
 
 @Controller({
-  path: "/:userId/changes",
+  path: "/changes/:userId",
   version: "1"
 })
 @UseGuards(AuthGuard)
@@ -45,12 +45,9 @@ export class ChangesController {
 
   @Delete()
   async deleteChanges(
-    @Res() res: Response
+    @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
+    @RequestContext() context: RequestContext,
   ) {
-    // todo: implement this endpoint
-    return res.status(501).send({
-      statusCode: 501,
-      message: "Not Implemented Yet"
-    })
+    return await this.changesService.deleteAllWithAccessCheck(context?.user, params.userId);
   }
 }

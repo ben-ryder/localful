@@ -14,6 +14,8 @@ import {ChangesDatabaseService} from "./database/changes.database.service";
     ChangesDatabaseService,
     ChangesGateway
   ],
-  exports: []
+  exports: [
+    ChangesService
+  ]
 })
 export class ChangesModule {}

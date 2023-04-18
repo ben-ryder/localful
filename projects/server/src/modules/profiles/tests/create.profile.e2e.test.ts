@@ -83,8 +83,22 @@ describe("Create Profile - /v1/profiles [POST]",() => {
 	})
 
 	describe("Authentication & Permissions", () => {
-		test("Given user with `profiles:create:self` scope, When creating profile with different userId, Then request should be forbidden", async () => {
+		test("Given user with `profiles:create:self` scope, When creating profile with different userId, Then request should be '403 - forbidden'", async () => {
 			const accessToken = await testHelper.getUserAccessToken(seedProfiles[0].userId, [AccessControlScopes.PROFILES_CREATE_SELF]);
+
+			const {body, statusCode} = await testHelper.client
+				.post("/v1/profiles")
+				.set("Authorization", `Bearer ${accessToken}`)
+				.send({
+					userId: testCaseProfiles.example.userId,
+					encryptionSecret: testCaseProfiles.example.encryptionSecret
+				});
+
+			expectForbidden(body, statusCode);
+		})
+
+		test("Given user with no scopes, When creating profile with matching userId, Then request should be '403 - forbidden'", async () => {
+			const accessToken = await testHelper.getUserAccessToken(testCaseProfiles.example.userId, []);
 
 			const {body, statusCode} = await testHelper.client
 				.post("/v1/profiles")

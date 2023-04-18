@@ -59,4 +59,20 @@ export class ChangesService {
 
     return this._getIds(userId);
   }
+
+  async _deleteAll(userId: string) {
+    return await this.changesDatabaseService.deleteAll(userId);
+  }
+
+  async deleteAllWithAccessCheck(userContext: UserContext, userId: string){
+    await this.authService.confirmAccessControlRules(
+      [
+        AccessControlScopes.CHANGES_DELETE_SELF,
+        AccessControlScopes.CHANGES_DELETE
+      ],
+      userContext, userId
+    );
+
+    return this._deleteAll(userId);
+  }
 }

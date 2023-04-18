@@ -8,12 +8,14 @@ import {
     ProfileUpdateDto
 } from "@ben-ryder/lfb-common";
 import {AuthService} from "../../services/auth/auth.service";
+import {ChangesService} from "../changes/changes.service";
 
 
 @Injectable()
 export class ProfilesService {
     constructor(
        private profilesDatabaseService: ProfilesDatabaseService,
+       private changesService: ChangesService,
        private authService: AuthService
     ) {}
 
@@ -66,7 +68,11 @@ export class ProfilesService {
     }
 
     async _delete(userId: string): Promise<void> {
-        return this.profilesDatabaseService.delete(userId);
+        await this.profilesDatabaseService.delete(userId);
+
+        // The user should be able to delete changes without required access checks in this specific
+        // scenario, as this action is effectively deleting the users account and no content should remain.
+        await this.changesService._deleteAll(userId);
     }
 
     async deleteWithAccessCheck(currentUserContext: UserContext, userId: string): Promise<void> {
@@ -77,7 +83,7 @@ export class ProfilesService {
           ],
           currentUserContext, userId
         );
-        
+
         return this._delete(userId);
     }
 }

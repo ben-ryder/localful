@@ -33,6 +33,6 @@ Test data is populated in `tests/test-data.ts`.
 `seedProfiles` and `seedChanges` data is reset in the database after each test,
 meaning each test can rely on this data already existing in the database as defined.  
 
-#### Example Data
-`exampleProfiles` and `exampleChanges` data is removed if present in the database after each test, but will
+#### Test Case Data
+`testCaseProfiles` and `testCaseChanges` data is removed if present in the database after each test, but will
 not be added automatically, meaning this data can be used to test things like creating content.

@@ -2,7 +2,7 @@
 import {HttpStatus} from "@nestjs/common";
 import {AccessControlScopes, ErrorIdentifiers} from "@ben-ryder/lfb-common";
 import {TestHelper} from "../../../../tests-utils/test-helper";
-import {seedProfiles} from "../../../../tests-utils/test-data";
+import {seedProfiles, testCaseProfiles} from "../../../../tests-utils/test-data";
 import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
 import {expectForbidden} from "../../../../tests-utils/common-expects/expect-forbidden";
 import {expectNotFound} from "../../../../tests-utils/common-expects/expect-not-found";
@@ -39,6 +39,17 @@ describe("Retrieve Profile - /v1/profiles/:userId [GET]",() => {
         createdAt: seedProfiles[0].createdAt,
         updatedAt: seedProfiles[0].updatedAt,
       }))
+    });
+
+    test("Given user with `profiles:retrieve:self` and profile doesn't exist, When retrieving profile with matching userId, Then response should be '404 - not found'", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testCaseProfiles.example.userId, [AccessControlScopes.PROFILES_RETRIEVE_SELF]);
+
+      const {body, statusCode} = await testHelper.client
+        .get(`/v1/profiles/${testCaseProfiles.example.userId}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({});
+
+      expectNotFound(body, statusCode, ErrorIdentifiers.PROFILE_NOT_FOUND);
     });
 
     test("Given user with `profiles:retrieve`, When retrieving profile with matching userId, Then profile should be returned", async () => {

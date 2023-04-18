@@ -163,6 +163,7 @@ export class ProfilesDatabaseService {
     }
     else {
       throw new ResourceNotFoundError({
+        identifier: ErrorIdentifiers.PROFILE_NOT_FOUND,
         applicationMessage: "The requested profile could not be found."
       })
     }

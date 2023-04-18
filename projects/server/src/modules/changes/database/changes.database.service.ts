@@ -2,6 +2,8 @@ import {DatabaseService} from "../../../services/database/database.service";
 import {Injectable} from "@nestjs/common";
 import {ChangeInternalDatabaseDto, ChangeDto} from "@ben-ryder/lfb-common";
 import {SystemError} from "../../../services/errors/base/system.error";
+import {Row, RowList} from "postgres";
+import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error";
 
 
 @Injectable()
@@ -71,5 +73,16 @@ export class ChangesDatabaseService {
     }
 
     return results.map(result => result.id);
+  }
+
+  async deleteAll(userId: string): Promise<void> {
+    const sql = await this.databaseService.getSQL();
+
+    try {
+       await sql`DELETE FROM changes WHERE user_id = ${userId}`;
+    }
+    catch (e: any) {
+      throw ChangesDatabaseService.getDatabaseError(e);
+    }
   }
 }
