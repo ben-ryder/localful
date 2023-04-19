@@ -22,12 +22,14 @@ export class ProfilesDatabaseService {
 
   private static mapApplicationField(fieldName: string): string {
     switch (fieldName) {
-      case "user_id":
-        return "userId";
-      case "created_at":
-        return "createdAt";
-      case "updated_at":
-        return "updatedAt";
+      case "userId":
+        return "user_id";
+      case "encryptionSecret":
+        return "encryption_secret";
+      case "createdAt":
+        return "created_at";
+      case "updatedAt":
+        return "updated_at";
       default:
         return fieldName;
     }
