@@ -1,12 +1,13 @@
 {
   "name": "@ben-ryder/lfb-common",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "A library of common interfaces, schemas and utilities for use across my Local-First Backend project.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "homepage": "https://github.com/Ben-Ryder/local-first-backend",
   "bugs": "https://github.com/Ben-Ryder/local-first-backend/issues",
   "license": "AGPL-3.0-only",
-  "main": "build/src/index.js",
+  "type": "module",
+  "exports": "./build/src/index.js",
   "publishConfig": {
     "access": "public"
   },
@@ -21,16 +22,16 @@
   ],
   "keywords": [],
   "devDependencies": {
-    "@types/validator": "^13.7.7",
-    "rimraf": "^3.0.2",
-    "ts-node": "^10.8.1",
-    "typescript": "^4.5.2"
-  },
-  "peerDependencies": {
-    "validator": "^13.7.0",
-    "zod": "^3.19.1"
+    "@types/validator": "^13.11.5",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
   },
   "engines": {
-    "node": "18"
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "validator": "^13.11.0",
+    "zod": "^3.22.4"
   }
 }

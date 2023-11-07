@@ -1,3 +1,3 @@
-import {ProfileDto} from "../profile.dto";
+import {ProfileDto} from "../profile.dto.js";
 
 export interface ProfileUpdateResponse extends ProfileDto {}

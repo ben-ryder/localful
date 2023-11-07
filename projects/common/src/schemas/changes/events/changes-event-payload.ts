@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {ChangeCreateDto} from "../crud/change.create.dto";
+import {ChangeCreateDto} from "../crud/change.create.dto.js";
 
 export const ChangesEventPayload = ChangeCreateDto;
 export type ChangesEventPayload = z.infer<typeof ChangesEventPayload>;
