@@ -44,9 +44,6 @@ export class RequestError extends APIClientError {
     }
 }
 
-export class NoRefreshTokenError extends APIClientError {}
-export class NoAccessTokenError extends APIClientError {}
-
 // Data save/load errors
 export class DataLoadError extends APIClientError {}
 export class DataSaveError extends APIClientError {}

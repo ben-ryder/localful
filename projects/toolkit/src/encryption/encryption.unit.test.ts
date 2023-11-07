@@ -1,27 +1,27 @@
 import {EncryptionHelper} from "./encryption-helper";
 
 
-test('encrypt and decrypt a string', () => {
+test('encrypt and decrypt a string', async () => {
     const secret = "ibiova86g9q438ogr8wofw4";
     const inputText = "this is some test data";
 
-    const cipherText = EncryptionHelper.encryptText(secret, inputText);
-    const decryptedText = EncryptionHelper.decryptText(secret, cipherText);
+    const cipherText = await EncryptionHelper.encryptText(secret, inputText);
+    const decryptedText = await EncryptionHelper.decryptText(secret, cipherText);
 
     expect(decryptedText).toBe(inputText);
 })
 
-test('encrypt and decrypt a number', () => {
+test('encrypt and decrypt a number', async () => {
     const secret = "sjdfboa68934giu4twc";
     const inputNumber = 42.22;
 
-    const cipherText = EncryptionHelper.encryptData<number>(secret, inputNumber);
-    const decryptedNumber = EncryptionHelper.decryptData<number>(secret, cipherText);
+    const cipherText = await EncryptionHelper.encryptData<number>(secret, inputNumber);
+    const decryptedNumber = await EncryptionHelper.decryptData<number>(secret, cipherText);
 
     expect(inputNumber).toBe(decryptedNumber);
 })
 
-test('encrypt and decrypt an object', () => {
+test('encrypt and decrypt an object', async () => {
     const secret = "szdjnviusvg8aie4lkhtbwvioevhk4swtc9goilkshv4t";
 
     interface InputObject {
@@ -41,8 +41,8 @@ test('encrypt and decrypt an object', () => {
         }
     };
 
-    const cipherText = EncryptionHelper.encryptData<InputObject>(secret, inputObject);
-    const decryptedObject = EncryptionHelper.decryptData<InputObject>(secret, cipherText);
+    const cipherText = await EncryptionHelper.encryptData<InputObject>(secret, inputObject);
+    const decryptedObject = await EncryptionHelper.decryptData<InputObject>(secret, cipherText);
 
     expect(decryptedObject).toEqual(inputObject);
 })

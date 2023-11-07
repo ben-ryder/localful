@@ -1,11 +1,11 @@
-import {LocalStore} from "./storage/local-store";
+import {LocalStore} from "./storage/local-store.js";
 import * as A from "@automerge/automerge";
 import {ChangeDto} from "@ben-ryder/lfb-common";
 import {v4 as createUUID} from "uuid";
-import {LFBClient} from "./clients/lfb-server-client";
-import {BrowserSyncClient} from "./clients/browser-sync-client";
-import {NoEncryptionKeyError} from "./errors/errors";
-import {EncryptionHelper} from "./encryption/encryption-helper";
+import {LFBClient} from "./clients/lfb-server-client.js";
+import {BrowserSyncClient} from "./clients/browser-sync-client.js";
+import {NoEncryptionKeyError} from "./errors/errors.js";
+import {EncryptionHelper} from "./encryption/encryption-helper.js";
 
 /**
  * A listener callback fired whenever a change is made to the document.
@@ -72,10 +72,15 @@ export class LFBApplication<DocType> {
     }
 
     const encryptedChanges = await this.localStore.loadAllChanges();
-    const changes = encryptedChanges.map(encryptedChange => {
-      const change = EncryptionHelper.decryptText(encryptionKey, encryptedChange.data).replaceAll("\"", "");
-      return new Uint8Array([...atob(change)].map(char => char.charCodeAt(0))) as A.Change;
-    });
+    const changes: Uint8Array[] = [];
+
+    for (const encryptedChange of encryptedChanges) {
+      const change = await EncryptionHelper.decryptText(encryptionKey, encryptedChange.data)
+      const processedChange = change.replaceAll("\"", "");
+      const uInt8Array = new Uint8Array([...atob(processedChange)].map(char => char.charCodeAt(0))) as A.Change;
+      changes.push(uInt8Array)
+    }
+
     const [newDocument] = A.applyChanges<DocType>(A.clone(this.initialDocument), changes);
 
     this.updateDocument(newDocument);
@@ -105,7 +110,7 @@ export class LFBApplication<DocType> {
 
     // @ts-ignore - todo: fix this being required
     const encodedChange = btoa(String.fromCharCode(...rawChange));
-    const encryptedChange = EncryptionHelper.encryptData(encryptionKey, encodedChange);
+    const encryptedChange = await EncryptionHelper.encryptData(encryptionKey, encodedChange);
 
 
     const change: ChangeDto = {

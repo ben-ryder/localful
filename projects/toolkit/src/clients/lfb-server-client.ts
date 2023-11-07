@@ -1,35 +1,26 @@
-import axios from 'axios';
-
-import { EncryptionHelper } from '../encryption/encryption-helper';
+import { EncryptionHelper } from '../encryption/encryption-helper.js';
 import {
-  NoAccessTokenError,
   NoEncryptionKeyError,
-  NoRefreshTokenError,
   RequestError,
   DataDeleteError,
   DataLoadError,
   DataSaveError
-} from '../errors/errors';
+} from '../errors/errors.js';
 import {
-  LoginResponse,
-  RefreshResponse,
-  CreateUserRequest,
   InfoDto,
-  CreateUserResponse,
-  NoKeysUserDto,
   ErrorIdentifiers,
   ChangeDto,
-  ChangesSocketEvents
+  ChangesSocketEvents, ProfileUpdateDto, ProfileDto
 } from "@ben-ryder/lfb-common";
 import {io, Socket} from "socket.io-client";
-import {LocalStore} from "../storage/local-store";
-import {ChangesListener} from "../common/changes-listener";
+import {LocalStore} from "../storage/local-store.js";
+import {ChangesListener} from "../common/changes-listener.js";
 
 export interface QueryOptions {
   url: string,
   method: 'GET'|'POST'|'PATCH'|'DELETE',
   data?: object,
-  params?: object,
+  params?: URLSearchParams,
   noAuthRequired?: boolean
 }
 
@@ -37,26 +28,23 @@ export type DataLoader<T> = () => Promise<T|null>;
 export type DataSaver<T> = (data: T) => Promise<void>;
 export type DataDeleter<T> = () => Promise<void>;
 
-export interface LFBClientOptions {
+export interface LFBClientConfig {
   serverUrl: string;
-  localStore: LocalStore
+  localStore: LocalStore,
+  getAccessToken: () => Promise<string>
 }
 
 
 export class LFBClient {
   private readonly socket: Socket
-  private readonly options: LFBClientOptions;
+  private readonly config: LFBClientConfig;
   private readonly localStore: LocalStore;
   private readonly changeListeners: ChangesListener[] = [];
 
-  private encryptionKey?: string;
-  private accessToken?: string;
-  private refreshToken?: string;
-
-  constructor(options: LFBClientOptions) {
-    this.options = options;
-    this.localStore = options.localStore;
-    this.socket = io(this.options.serverUrl);
+  constructor(config: LFBClientConfig) {
+    this.config = config;
+    this.localStore = config.localStore;
+    this.socket = io(this.config.serverUrl);
 
     this.socket.on("changes", async (changes: ChangeDto[]) => {
       await this.handleServerChanges(changes);
@@ -76,42 +64,27 @@ export class LFBClient {
 
   // Basic Query
   private async query<ResponseType>(options: QueryOptions, repeat = false): Promise<ResponseType> {
-    if (!options.noAuthRequired && !this.accessToken) {
-      const accessToken = await LFBClient.loadData(this.localStore.loadAccessToken);
-      const refreshToken = await LFBClient.loadData(this.localStore.loadRefreshToken);
-      if (refreshToken) {
-        this.refreshToken = refreshToken;
-      }
-      else {
-        throw new NoRefreshTokenError();
-      }
-
-      if (accessToken) {
-        this.accessToken = accessToken;
-      }
-      else if (!repeat) {
-        return this.refreshAuthAndRetry(options);
-      }
-      else {
-        throw new NoAccessTokenError();
-      }
+    let headers: Headers = new Headers({"Content-Type": "application/json"})
+    if (!options.noAuthRequired) {
+      const accessToken = await this.config.getAccessToken();
+      headers.set("Authorization", `Bearer ${accessToken}`)
     }
 
+    let url =
+      options.params && Array.from(options.params.keys()).length > 0
+        ? `${options.url}?${options.params.toString()}`: options.url
 
-    let response: any = null;
     try {
-      response = await axios({
-        ...options,
-        headers: {
-          'Authorization': `Bearer ${this.accessToken}`
-        }
+      const response = await fetch(
+        url,
+        {
+          method: options.method,
+          body: JSON.stringify(options.data),
+          headers
       });
+      return await response.json()
     }
     catch (e: any) {
-      if (e.response?.data?.identifier === ErrorIdentifiers.ACCESS_UNAUTHORIZED && !repeat) {
-        return this.refreshAuthAndRetry<ResponseType>(options);
-      }
-
       throw new RequestError(
         {
           message: `There was an error with the request '${options.url} [${options.method}]'`,
@@ -120,196 +93,119 @@ export class LFBClient {
         }
       );
     }
-
-    return response.data;
-  }
-
-  private async refreshAuthAndRetry<ResponseType>(options: QueryOptions): Promise<ResponseType> {
-    await this.refresh();
-    return this.query(options, true);
-  }
-
-  private async checkEncryptionKey() {
-    if (!this.encryptionKey) {
-      const encryptionKey = await LFBClient.loadData(this.localStore.loadEncryptionKey);
-
-      if (encryptionKey) {
-        this.encryptionKey = encryptionKey;
-        return;
-      }
-
-      throw new NoEncryptionKeyError();
-    }
   }
 
   // Data Loading
-  private static async loadData(loader: DataLoader<any>) {
-    try {
-      return await loader();
-    }
-    catch (e) {
-      throw new DataLoadError({originalError: e});
-    }
-  }
-
-  private static async saveData(saver: DataSaver<any>, data: any) {
-    try {
-      return await saver(data);
-    }
-    catch (e) {
-      throw new DataSaveError({originalError: e});
-    }
-  }
-
-  private static async deleteData(deleter: DataDeleter<any>) {
-    try {
-      return await deleter();
-    }
-    catch (e) {
-      throw new DataDeleteError({originalError: e});
-    }
-  }
+  // private static async loadData(loader: DataLoader<any>) {
+  //   try {
+  //     return await loader();
+  //   }
+  //   catch (e) {
+  //     throw new DataLoadError({originalError: e});
+  //   }
+  // }
+  //
+  // private static async saveData(saver: DataSaver<any>, data: any) {
+  //   try {
+  //     return await saver(data);
+  //   }
+  //   catch (e) {
+  //     throw new DataSaveError({originalError: e});
+  //   }
+  // }
+  //
+  // private static async deleteData(deleter: DataDeleter<any>) {
+  //   try {
+  //     return await deleter();
+  //   }
+  //   catch (e) {
+  //     throw new DataDeleteError({originalError: e});
+  //   }
+  // }
 
   // Info
   async getInfo() {
     return this.query<InfoDto>({
       method: 'GET',
-      url: `${this.options.serverUrl}/v1/info`,
+      url: `${this.config.serverUrl}/v1/info`,
       noAuthRequired: true
     });
   }
 
+  // Profiles
+  async getProfile(userId: string) {
+    return this.query<ProfileDto>({
+      method: 'GET',
+      url: `${this.config.serverUrl}/v1/profiles/${userId}`,
+    });
+  }
+
+  async deleteProfile(userId: string) {
+    return this.query<void>({
+      method: 'DELETE',
+      url: `${this.config.serverUrl}/v1/profiles/${userId}`,
+    });
+  }
+
+  async updateProfile(userId: string, update: ProfileUpdateDto) {
+    return this.query<ProfileDto>({
+      method: 'PATCH',
+      url: `${this.config.serverUrl}/v1/profiles/${userId}`,
+      data: update
+    });
+  }
+
+  // todo: add setup now server uses third party SSO for actual login, but profiles
+  // are still fetched/managed in the API.
   // User
-  public async login(username: string, password: string) {
-    // Convert plain text password into serverPassword and masterKey
-    const accountKeys = EncryptionHelper.getAccountKeys(username, password);
-
-    const data = await this.query<LoginResponse>({
-      method: 'POST',
-      url: `${this.options.serverUrl}/v1/auth/login`,
-      data: {
-        username,
-        password: accountKeys.serverPassword
-      },
-      noAuthRequired: true
-    });
-
-    // Decrypt users encryptionKey with their masterKey
-    // todo: don't trust data is encrypted correctly
-    const encryptionKey = EncryptionHelper.decryptText(accountKeys.masterKey, data.user.encryptionSecret);
-    await LFBClient.saveData(this.localStore.saveEncryptionKey, encryptionKey);
-
-    // Save user details and tokens
-    await LFBClient.saveData(this.localStore.saveCurrentUser, data.user);
-
-    await LFBClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
-    this.refreshToken = data.refreshToken;
-
-    await LFBClient.saveData(this.localStore.saveAccessToken, data.accessToken);
-    this.accessToken = data.accessToken;
-
-    return data;
-  }
-
-  public async register(noKeysUser: NoKeysUserDto) {
-    // Get user account keys from plain text password and overwrite the user password.
-    const accountKeys = EncryptionHelper.getAccountKeys(noKeysUser.username, noKeysUser.password);
-
-    // Generate the user's encryptionSecret
-    const encryptionKey = EncryptionHelper.generateEncryptionKey();
-    const encryptionSecret = EncryptionHelper.encryptText(accountKeys.masterKey, encryptionKey);
-
-    const user: CreateUserRequest = {
-      username: noKeysUser.username,
-      email: noKeysUser.email,
-      password: accountKeys.serverPassword,
-      encryptionSecret
-    }
-
-    const data = await this.query<CreateUserResponse>({
-      method: 'POST',
-      url: `${this.options.serverUrl}/v1/users`,
-      data: user,
-      noAuthRequired: true
-    });
-
-    await LFBClient.saveData(this.localStore.saveEncryptionKey, encryptionKey);
-    await LFBClient.saveData(this.localStore.saveCurrentUser, data.user);
-
-    await LFBClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
-    this.refreshToken = data.refreshToken;
-    await LFBClient.saveData(this.localStore.saveAccessToken, data.accessToken);
-    this.accessToken = data.accessToken;
-
-    return data;
-  }
-
-  public async logout() {
-    // todo: loading from external if not found?
-    let tokens: any = {};
-    if (this.accessToken) {
-      tokens.accessToken = this.accessToken;
-    }
-    if (this.refreshToken) {
-      tokens.refreshToken = this.refreshToken;
-    }
-
-    await this.query({
-      method: 'POST',
-      url: `${this.options.serverUrl}/v1/auth/revoke`,
-      noAuthRequired: true,
-      data: tokens
-    });
-
-    // Don't delete storage data until after the request.
-    // This ensures that in the event that the revoke request fails there is the option to try
-    // again rather than just loosing all the tokens.
-    await LFBClient.deleteData(this.localStore.deleteCurrentUser);
-    await LFBClient.deleteData(this.localStore.deleteEncryptionKey);
-
-    await LFBClient.deleteData(this.localStore.deleteRefreshToken);
-    await LFBClient.deleteData(this.localStore.deleteAccessToken);
-
-    delete this.refreshToken;
-    delete this.accessToken;
-  }
-
-  private async refresh() {
-    if (!this.refreshToken) {
-      throw new NoRefreshTokenError();
-    }
-
-    let data: RefreshResponse;
-    try {
-      data = await this.query<RefreshResponse>({
-        method: 'POST',
-        url: `${this.options.serverUrl}/v1/auth/refresh`,
-        noAuthRequired: true,
-        data: {
-          refreshToken: this.refreshToken
-        }
-      });
-    }
-    catch(e) {
-      // If the refresh request fails then fully log the user out to be safe
-      await this.logout();
-
-      throw e;
-    }
-
-    await LFBClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
-    this.refreshToken = data.refreshToken;
-    await LFBClient.saveData(this.localStore.saveAccessToken, data.accessToken);
-    this.accessToken = data.accessToken;
-
-    return data;
-  }
+  // public async init(userId: string) {
+  //
+  //   let profile: ProfileDto | null = null
+  //   try {
+  //     profile = await this.getProfile(userId)
+  //   }
+  //   catch (e) {
+  //     if (e?.response?.type !== ErrorIdentifiers.PROFILE_NOT_FOUND) {
+  //       throw e;
+  //     }
+  //   }
+  //
+  //
+  //   // Convert plain text password into serverPassword and masterKey
+  //   const accountKeys = await EncryptionHelper.getAccountKeys(username, password);
+  //
+  //   const data = await this.query<LoginResponse>({
+  //     method: 'POST',
+  //     url: `${this.options.serverUrl}/v1/auth/login`,
+  //     data: {
+  //       username,
+  //       password: accountKeys.serverPassword
+  //     },
+  //     noAuthRequired: true
+  //   });
+  //
+  //   // Decrypt users encryptionKey with their masterKey
+  //   // todo: don't trust data is encrypted correctly
+  //   const encryptionKey = await EncryptionHelper.decryptText(accountKeys.masterKey, data.user.encryptionSecret);
+  //   await LFBClient.saveData(this.localStore.saveEncryptionKey, encryptionKey);
+  //
+  //   // Save user details and tokens
+  //   await LFBClient.saveData(this.localStore.saveCurrentUser, data.user);
+  //
+  //   await LFBClient.saveData(this.localStore.saveRefreshToken, data.refreshToken);
+  //   this.refreshToken = data.refreshToken;
+  //
+  //   await LFBClient.saveData(this.localStore.saveAccessToken, data.accessToken);
+  //   this.accessToken = data.accessToken;
+  //
+  //   return data;
+  // }
 
   // Changes
   async getChangeIds() {
     return this.query<string[]>({
       method: 'GET',
-      url: `${this.options.serverUrl}/v1/changes/ids`,
+      url: `${this.config.serverUrl}/v1/changes/ids`,
     });
   }
 
@@ -317,20 +213,25 @@ export class LFBClient {
     if (!changeIds || changeIds.length === 0) {
       return this.query<ChangeDto[]>({
         method: 'GET',
-        url: `${this.options.serverUrl}/v1/changes`,
+        url: `${this.config.serverUrl}/v1/changes`,
       });
+    }
+
+    const params = new URLSearchParams()
+    for (const id of changeIds) {
+      params.append("ids", id)
     }
 
     return this.query<ChangeDto[]>({
       method: 'GET',
-      url: `${this.options.serverUrl}/v1/changes`,
-      params: {
-        ids: changeIds
-      }
+      url: `${this.config.serverUrl}/v1/changes`,
+      params
     });
   }
 
   emitChanges(changes: ChangeDto[]) {
+    // todo: fix type issue here
+    // @ts-ignore
     this.socket.volatile.emit(ChangesSocketEvents.changes, changes);
   }
 }

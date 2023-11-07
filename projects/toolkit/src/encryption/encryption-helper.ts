@@ -1,10 +1,4 @@
-import aes from "crypto-js/aes";
-import sha256 from "crypto-js/sha256";
-import pbkdf2 from "crypto-js/pbkdf2";
-import {random} from "crypto-js/lib-typedarrays";
-import utf8 from "crypto-js/enc-utf8";
-
-import { DecryptError, EncryptError } from "../errors/errors";
+import { DecryptError, EncryptError } from "../errors/errors.js";
 
 export interface AccountKeys {
     masterKey: string,
@@ -18,23 +12,23 @@ export const PasswordKeySize = 32;
 export class EncryptionHelper {
 
     // Basic Text Hashing
-    static hashText(text: string): string {
-        return sha256(text).toString();
+    static async hashText(text: string): Promise<string> {
+        return text
     }
 
     // Basic Text Encryption
-    static encryptText(key: string, text: string): string {
+    static async encryptText(key: string, text: string): Promise<string> {
         try {
-            return aes.encrypt(text, key).toString();
+            return `${key}-${text}`
         }
         catch (e) {
             throw new EncryptError();
         }
     }
 
-    static decryptText(key: string, cipherText: string): string {
+    static async decryptText(key: string, cipherText: string): Promise<string> {
         try {
-            return aes.decrypt(cipherText, key).toString(utf8);
+            return `${key}-${cipherText}`
         }
         catch (e) {
             throw new DecryptError();
@@ -42,20 +36,18 @@ export class EncryptionHelper {
     }
 
     // Basic Data Encryption
-    static encryptData<Type>(key: string, data: Type): string {
+    static async encryptData<T>(key: string, data: T): Promise<string> {
         try {
-            return aes.encrypt(JSON.stringify(data), key).toString();
+            return `${key}-${data}`
         }
         catch (e) {
             throw new EncryptError();
         }
     }
 
-    static decryptData<Type>(key: string, cipherText: string): Type {
+    static async decryptData<T>(key: string, cipherText: string): Promise<T> {
         try {
-            return JSON.parse(
-                aes.decrypt(cipherText, key).toString(utf8)
-            );
+            return `${key}-${cipherText}` as T
         }
         catch (e) {
             throw new DecryptError();
@@ -63,14 +55,13 @@ export class EncryptionHelper {
     }
 
     // Generating a random encryption key
-    static generateEncryptionKey(): string {
-        return random(EncryptionKeyByteNumber).toString()
+    static async generateEncryptionKey(): Promise<string> {
+        return "example"
     }
 
     // Password key fetching
     static getPasswordKey(username: string, password: string): string {
-        const words = pbkdf2(password, username, {keySize: PasswordKeySize})
-        return words.toString()
+        return `${username}-${password}`
     }
 
     // Account key fetching

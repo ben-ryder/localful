@@ -1,5 +1,5 @@
 import {ChangeDto} from "@ben-ryder/lfb-common";
-import {ChangesListener} from "../common/changes-listener";
+import {ChangesListener} from "../common/changes-listener.js";
 
 
 export class BrowserSyncClient<DocType> {
