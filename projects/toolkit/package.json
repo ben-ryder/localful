@@ -8,8 +8,8 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "exports": {
-    "default": "./build/src/index.js",
-    "type": "./build/src/index.d.ts"
+    "types": "./build/src/index.d.ts",
+    "default": "./build/src/index.js"
   },
   "publishConfig": {
     "access": "public"
@@ -35,7 +35,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@ben-ryder/lfb-common": "^0.8.0-rc.1",
+    "@ben-ryder/lfb-common": "^0.8.0-rc.2",
     "dexie": "^3.2.4",
     "socket.io-client": "^4.7.2",
     "uuid": "^9.0.1"
