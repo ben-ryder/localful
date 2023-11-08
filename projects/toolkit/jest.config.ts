@@ -1,14 +1,16 @@
-import type {Config} from '@jest/types';
+import type { JestConfigWithTsJest } from 'ts-jest'
 
-const config: Config.InitialOptions = {
-  verbose: true,
-  transform: {
-    '^.+\\.ts$': 'ts-jest',
+const jestConfig: JestConfigWithTsJest = {
+  globals: {
+    "ts-jest": {
+      useESM: true
+    }
   },
-  "modulePaths": [
-    "<rootDir>"
-  ],
-
+  preset: 'ts-jest/presets/default-esm',
+  roots: ["tests/"],
+  modulePathIgnorePatterns: [
+    "<rootDir>/node_modules/"
+  ]
 }
 
-export default config;
+export default jestConfig

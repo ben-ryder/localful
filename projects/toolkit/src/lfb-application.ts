@@ -1,7 +1,6 @@
 import {LocalStore} from "./storage/local-store.js";
 import * as A from "@automerge/automerge";
 import {ChangeDto} from "@ben-ryder/lfb-common";
-import {v4 as createUUID} from "uuid";
 import {LFBClient} from "./clients/lfb-server-client.js";
 import {BrowserSyncClient} from "./clients/browser-sync-client.js";
 import {NoEncryptionKeyError} from "./errors/errors.js";
@@ -112,9 +111,9 @@ export class LFBApplication<DocType> {
     const encodedChange = btoa(String.fromCharCode(...rawChange));
     const encryptedChange = await EncryptionHelper.encryptData(encryptionKey, encodedChange);
 
-
+    const uuid = await EncryptionHelper.generateUUID()
     const change: ChangeDto = {
-      id: createUUID(),
+      id: uuid,
       data: encryptedChange
     };
 

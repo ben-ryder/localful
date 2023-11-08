@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "module": "node16",
-    "moduleResolution": "Node16",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "moduleDetection": "force",
-    "target": "ES2022",
+    "target": "ESNext",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule" : false,
     "declaration": true,
