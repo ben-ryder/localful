@@ -10,17 +10,47 @@ export const ConfigSchema = z.object({
     environment: z.string()
   }),
   app: z.object({
+    registrationEnabled: z.boolean(),
     allowedOrigins: z.array(z.string().url())
   }),
   database: z.object({
     url: z.string()
   }),
+  dataStore: z.object({
+    redisUrl: z.string()
+  }),
   auth: z.object({
-    issuer: z.string(),
-    audience: z.string(),
-    jwksOrigin: z.string(),
-    jwksPath: z.string()
-  })
+    issuer: z.string().optional(),
+    audience: z.string().optional(),
+    accessToken: z.object({
+      secret: z.string(),
+      expiry: z.string()
+    }),
+    refreshToken: z.object({
+      secret: z.string(),
+      expiry: z.string()
+    }),
+    passwordReset: z.object({
+      secret: z.string(),
+      expiry: z.string()
+    }),
+    accountVerification: z.object({
+      secret: z.string(),
+      expiry: z.string()
+    })
+  }),
+  email: z.object({
+    testMode: z.boolean().optional(),
+    mailgun: z.object({
+      domain: z.string(),
+      apiKey: z.string(),
+      sender: z.object({
+        name: z.string(),
+        address: z.string()
+      }),
+      isEu: z.boolean().optional(),
+    })
+  }),
 });
 
 export type ConfigSchema = z.infer<typeof ConfigSchema>;

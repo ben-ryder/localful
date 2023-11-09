@@ -3,8 +3,8 @@ import {BaseModule} from "./modules/base/base.module";
 import {InfoModule} from "./modules/info/info.module";
 import {ServicesModule} from "./services/services.module";
 import {ChangesModule} from "./modules/changes/changes.module";
-import {ProfilesModule} from "./modules/profiles/profiles.module";
-
+import {UsersModule} from "./modules/users/users.module";
+import {AuthModule} from "./modules/auth/auth.module";
 
 @Module({
   imports: [
@@ -12,7 +12,8 @@ import {ProfilesModule} from "./modules/profiles/profiles.module";
     BaseModule,
     InfoModule,
     ChangesModule,
-    ProfilesModule
+    UsersModule,
+    AuthModule
   ],
 })
 export class AppModule {}

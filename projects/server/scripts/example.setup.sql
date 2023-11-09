@@ -26,29 +26,35 @@ $$ LANGUAGE 'plpgsql';
 
 
 /**
-    Profiles Table
+    Users Table
     -----------
-    Used to store user profiles.
+    Used to store user accounts.
  */
-CREATE TABLE IF NOT EXISTS profiles (
-    user_id VARCHAR(100) NOT NULL UNIQUE,
-    encryption_secret VARCHAR(255) NOT NULL,
+CREATE TABLE IF NOT EXISTS users (
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(100) NOT NULL,
+    encrypted_vault_key VARCHAR(255) NOT NULL,
+    is_verified BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    PRIMARY KEY (user_id)
+    CONSTRAINT users_pk PRIMARY KEY (id)
 );
-CREATE TRIGGER update_profile_timestamps BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE PROCEDURE update_table_timestamps();
+CREATE TRIGGER update_user_timestamps BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_table_timestamps();
 
 /**
     Changes Table
     -----------
-    Used to store all the changes that users make to their content.
+    Used to store all the changes.
  */
 CREATE TABLE IF NOT EXISTS changes (
-    id VARCHAR(100) NOT NULL UNIQUE,
+    id VARCHAR(100) NOT NULL,
+    resource_id VARCHAR(100) NOT NULL,
     data TEXT NOT NULL,
-    user_id VARCHAR(100) NOT NULL,
-    PRIMARY KEY (id)
+    owner_id UUID NOT NULL,
+    CONSTRAINT changes_pk PRIMARY KEY (id),
+    CONSTRAINT change_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE (id, resource_id)
 );
 
 -- Grant privileges to lfb user after everything is created
