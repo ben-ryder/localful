@@ -5,7 +5,7 @@ The server itself does not handle user management, but it designed to integrate 
 
 ## Before you begin
 - [PostgreSQL](https://www.postgresql.org/) is required to run the database.
-- A third party identify service such as [Logto](https://logto.io/) must be setup to handle user management and authentication. For the requirements this provider must meet, check the [authentication docs](../../docs/server/authentication.md).
+- A third party identify service such as [Logto](https://logto.io/) must be setup to handle user management and authentication. For the requirements this provider must meet, check the [authentication docs](../../docs/authentication-rbac.md).
 
 
 ## Setting up the app

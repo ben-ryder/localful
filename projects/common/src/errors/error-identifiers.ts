@@ -21,9 +21,14 @@ export enum ErrorIdentifiers {
   RESOURCE_RELATIONSHIP_INVALID = "resource-relationship-invalid",
 
   // Auth Errors
+  AUTH_CREDENTIALS_INVALID = "auth-credentials-invalid",
   AUTH_TOKEN_INVALID = "auth-token-invalid",
+  AUTH_NOT_VERIFIED = "auth-not-verified",
+  AUTH_ALREADY_VERIFIED = "auth-already-verified",
 
-  // Profile Errors
-  PROFILE_NOT_FOUND = "profile-not-found",
-  PROFILE_ALREADY_EXISTS = "profile-already-exists",
+  // User Errors
+  USER_REGISTRATION_DISABLED = "user-registration-disabled",
+  USER_USERNAME_EXISTS = "user-username-exists",
+  USER_EMAIL_EXISTS = "user-email-exists",
+  USER_NOT_FOUND = "user-not-found",
 }

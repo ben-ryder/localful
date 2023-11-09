@@ -22,10 +22,6 @@ tearing down the db content before each test and mocking the JWKS validation.
 
 An E2E test template is available at `./tests-utils/test-template-e2e.ts` which includes all the setup required to write an E2E tests file.
 
-### JWKS Mocking and Users
-JWKS functionality is mocked using the [mock-jwks](https://github.com/Levino/mock-jwks) library, meaning tests can be run
-locally without relying on any 3rd party auth service, and tests can set up users as required with the correct permission scopes.
-
 ### Test Data
 Test data is populated in `tests/test-data.ts`.
 
