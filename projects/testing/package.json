@@ -1,6 +1,6 @@
 {
   "name": "@ben-ryder/lfb-testing",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "publishConfig": {
     "access": "public"
   },
@@ -9,7 +9,11 @@
   "homepage": "https://github.com/Ben-Ryder/local-first-backend",
   "bugs": "https://github.com/Ben-Ryder/local-first-backend/issues",
   "license": "AGPL-3.0-only",
-  "main": "build/src/index.js",
+  "type": "module",
+  "exports": {
+    "types": "./build/src/index.d.ts",
+    "default": "./build/src/index.js"
+  },
   "scripts": {
     "build": "rimraf ./build && tsc",
     "prepublishOnly": "npm run build",
@@ -21,13 +25,16 @@
   ],
   "keywords": [],
   "devDependencies": {
-    "dotenv": "^16.0.1",
-    "postgres": "^3.2.4",
-    "rimraf": "^3.0.2",
-    "ts-node": "^10.8.1",
-    "typescript": "^4.5.2"
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@ben-ryder/lfb-common": "^0.5.0"
+    "@ben-ryder/lfb-common": "../common",
+    "dotenv": "^16.3.1",
+    "postgres": "^3.4.3"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

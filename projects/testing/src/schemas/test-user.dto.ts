@@ -1,10 +1,9 @@
-import {DatabaseUserDto} from "@ben-ryder/lfb-common";
+import {UserEntity} from "@ben-ryder/lfb-common";
 
-
-export interface TestUserDto extends DatabaseUserDto {
+export interface TestUserEntity extends UserEntity {
   password: string,
   encryptionKey: string,
   masterKey: string,
   passwordKey: string,
-  serverPassword: string
+  serverPassword: string,
 }

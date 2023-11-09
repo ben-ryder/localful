@@ -1,4 +1,4 @@
-import {testUsers} from "./data/test-data";
+import {testUsers} from "./data/test-data.js";
 import {Sql} from "postgres";
 
 export interface ScriptOptions {
@@ -62,8 +62,8 @@ export async function seedTestData(sql: Sql<any>, options?: ScriptOptions) {
   for (const user of testUsers) {
     // Add user
     await sql`
-        INSERT INTO users(id, username, email, password_hash, encryption_secret, is_verified, created_at, updated_at) 
-        VALUES (${user.id}, ${user.username}, ${user.email}, ${user.passwordHash}, ${user.encryptionSecret}, ${user.isVerified}, ${user.createdAt}, ${user.updatedAt})
+        INSERT INTO users(id, email, password_hash, encrypted_vault_key, is_verified, created_at, updated_at) 
+        VALUES (${user.id}, ${user.email}, ${user.password}, ${user.encryptedVaultKey}, ${user.isVerified}, ${user.createdAt}, ${user.updatedAt})
        `;
   }
 

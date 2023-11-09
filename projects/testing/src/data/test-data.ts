@@ -1,4 +1,4 @@
-import {TestUserDto} from "../schemas/test-user.dto";
+import {TestUserEntity} from "../schemas/test-user.dto";
 
 
 export const testEnvironmentVars = {
@@ -20,7 +20,7 @@ export const testEnvironmentVars = {
  * IMPLEMENTATIONS AS THE USER PASSWORD AND SERVER PASSWORD ARE DIFFERENT, SO
  * CONSUMERS OF THIS DATA MUST DECIDE WHICH ONE THEY NEED TO USE FOR TESTING.
  */
-export const testUsers: readonly TestUserDto[] = Object.freeze([
+export const testUsers: readonly TestUserEntity[] = Object.freeze([
   {
     id: "90938b63-3b14-4b18-8185-b3cfa5de2d6a",
     username: "test1",
