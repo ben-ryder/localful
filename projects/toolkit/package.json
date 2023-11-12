@@ -1,5 +1,5 @@
 {
-  "name": "@ben-ryder/lfb-toolkit",
+  "name": "@ben-ryder/localful-device",
   "version": "0.6.0-rc.1",
   "description": "A client-side toolkit library for my Local-First Backend project which includes an API client and other useful utilities.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",

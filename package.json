@@ -1,5 +1,5 @@
 {
-  "name": "local-first-backend",
+  "name": "localful",
   "version": "0.1.0",
   "description": "A generic backend for local-first applications including content backup, cross-device sync and multi-user support.",
   "main": "index.js",

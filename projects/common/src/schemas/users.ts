@@ -2,10 +2,12 @@ import {z} from "zod";
 import {Entity} from "./entity.js";
 
 export const UserFields = z.object({
+	displayName: z.string().min(1, "Your display name must be a least 1 character."),
 	email: z.string().email("Your email must be... an email."),
-	password: z.string().min(8, "Your password must be at least 8 characters."),
+	password: z.string().min(12, "Your password must be at least 12 characters."),
 	encryptedVaultKey: z.string().min(1, "Your encrypted vault key must be at least 1 character."),
-	isVerified: z.boolean()
+	isVerified: z.boolean(),
+	isAdmin: z.boolean()
 }).strict()
 export type UserFields = z.infer<typeof UserFields>;
 

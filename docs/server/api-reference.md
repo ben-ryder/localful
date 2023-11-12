@@ -13,10 +13,6 @@ Any errors will be returned with the appropriate status code and the following J
 
 ## REST API Reference
 
-### Users
-Auth will be handled by a third party integration so no endpoints will be needed?
-This would require an internet connection which might not be desiarble.
-
 ### Base
 - `/ [GET]`
 - `/v1 [GET]`
@@ -26,17 +22,21 @@ This would require an internet connection which might not be desiarble.
 
 ### Users
 - `/v1/users [POST]`
-- `/v1/users/:userId [GET, PATCH, DELETE]`
+- `/v1/users/:id [GET, PATCH, DELETE]`
 
-### Auth
+### Authentication
 - `/v1/auth/login [POST]`
 - `/v1/auth/refresh [POST]`
 - `/v1/auth/logout [POST]`
 - `/v1/auth/check [POST]`
-- `/v1/auth/reset [GET, POST]`
+- `/v1/auth/verify [GET, POST]`
+
+### Resources
+- `/v1/resources [POST]`
+- `/v1/resources/:id [GET, PATCH, DELETE]`
 
 ### Changes
-- `/v1/changes/:userId [GET, POST]`
+- `/v1/resources/:id/changes [GET, POST]`
 
 ## Websockets Reference
 - `changes`

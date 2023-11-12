@@ -1,4 +1,4 @@
-# API Testing
+# Server Testing
 The main type of testing used for the API right now is End to End (E2E) testing, meaning I'm not testing
 individual units of the application, instead I'm testing the API functionality itself via HTTP requests & responses.  
 Some unit tests are also used where E2E tests are harder to implement such as websocket functionality.
