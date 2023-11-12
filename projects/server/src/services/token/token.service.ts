@@ -84,8 +84,8 @@ export class TokenService {
    */
   private async createTokenPair(userDto: UserDto, groupId: string, counterId: number): Promise<TokenPair> {
     const basicPayload = {
-      iss: this.configService.config.auth.issuer || "local-first-backend",
-      aud: this.configService.config.auth.audience || "local-first-backend",
+      iss: this.configService.config.auth.issuer || "localful",
+      aud: this.configService.config.auth.audience || "localful",
       sub: userDto.id,
       gid: groupId,
       cid: counterId,

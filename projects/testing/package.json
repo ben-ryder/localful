@@ -4,10 +4,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "description": "A collection of data and utils for use in Local-First Backend tests.",
+  "description": "A collection of data and utils for use in Localful tests.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
-  "homepage": "https://github.com/Ben-Ryder/local-first-backend",
-  "bugs": "https://github.com/Ben-Ryder/local-first-backend/issues",
+  "homepage": "https://github.com/Ben-Ryder/localful",
+  "bugs": "https://github.com/Ben-Ryder/localful/issues",
   "license": "AGPL-3.0-only",
   "type": "module",
   "exports": {

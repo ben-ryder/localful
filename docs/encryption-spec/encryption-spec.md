@@ -1,13 +1,13 @@
-# Local-first Backend Specification - `v1`
-This document contains the `v1` specification which described how the Local-first Backend (LFB) project achieves client-side encryption.  
-This document includes some references to the client-server architecture, security and data structure used in LFB too, but the primary focus is on the client-side encryption methodology.  
+# Localful Specification - `v1`
+This document contains the `v1` specification which described how the Localful project achieves client-side encryption.  
+This document includes some references to the client-server architecture, security and data structure used in Localful too, but the primary focus is on the client-side encryption methodology.  
 Topics such as local-first design, cross-device synchronisation and server authentication are covered in their own documentation.
 
 ---
 
 ⚠️ **Warning** ⚠️  
 I'm not a mathematician, cryptographer or security expert. If you think there is a problem with this specification or my implementation, please let me know.  
-I trust this specification and my implementation enough to use LFB in production myself, but at the end of the
+I trust this specification and my implementation enough to use Localful in production myself, but at the end of the
 day this is a side project I've made to solve my own needs and to learn.  
 This spec and my implementation have not been officially audited or anything like that... it's a personal project.
 
@@ -17,10 +17,10 @@ This spec and my implementation have not been officially audited or anything lik
 TODO
 
 ## Introduction
-TODO - Add context about the LFB data structure and functionality that informs this specification.
+TODO - Add context about the Localful data structure and functionality that informs this specification.
 
 ## Summary
-- To use LFB (even just locally with no server) a user must supply a `user email` and `user password`.  
+- To use Localful (even just locally with no server) a user must supply a `user email` and `user password`.  
 - The `user email` and `user password` are used to derive an `account key` which is then split into a `master unlock key` and `server password`.  
 - The `server password` can be used in server authenticate if required, and is never stored on the device.
 - The `master unlock key` is used to encrypt a randomly generate `master encryption key` which produces a `protected master encryption key`. This protected/encrypted value can be uploaded to the server if required.
@@ -48,12 +48,12 @@ TODO - Add context about the LFB data structure and functionality that informs t
 
 ### Keys
 Encrypted keys are stored as a string in the format `<metadata>:<ciphertext>`:
-- `<metadata>` is currently just the LFB spec version used (`v1`).
+- `<metadata>` is currently just the Localful encryption spec version used (`v1`).
 - `<ciphertext>` is a base64 encoded version of the output hash
 
 ### Data
 Encrypted data is stored as a string in the format `<metadata>:<initialization-vector>:<ciphertext>`:
-- `<metadata>` is currently just the LFB spec version used (`v1`).
+- `<metadata>` is currently just the Localful encryption spec version used (`v1`).
 - `<initialization-vector>` is a base64 encoded version of the IV value used
 - `<ciphertext>` is a base64 encoded version of the encrypted data
 

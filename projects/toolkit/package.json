@@ -1,10 +1,10 @@
 {
   "name": "@ben-ryder/localful-device",
   "version": "0.6.0-rc.1",
-  "description": "A client-side toolkit library for my Local-First Backend project which includes an API client and other useful utilities.",
+  "description": "A client-side toolkit library for my Localful project which includes an API client and other useful utilities.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
-  "homepage": "https://github.com/Ben-Ryder/local-first-backend",
-  "bugs": "https://github.com/Ben-Ryder/local-first-backend/issues",
+  "homepage": "https://github.com/Ben-Ryder/localful",
+  "bugs": "https://github.com/Ben-Ryder/localful/issues",
   "license": "AGPL-3.0-only",
   "type": "module",
   "exports": {

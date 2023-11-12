@@ -1,5 +1,5 @@
-# Local-First Backend - Server
-The LFB server is developed using [NestJS](https://nestjs.com/) (Node.js/Express) and provides a REST API and websocket
+# Localful - Server
+The Localful server is developed using [NestJS](https://nestjs.com/) (Node.js/Express) and provides a REST API and websocket
 support for syncing changes between devices, backing up content and managing user profiles.  
 The server itself does not handle user management, but it designed to integrate with third party identity services.
 
@@ -12,7 +12,7 @@ The server itself does not handle user management, but it designed to integrate 
 
 ```bash
 # setup database
-# this will create an `lfb` user & db, you can edit the script as required
+# this will create an `localful` user & db, you can edit the script as required
 $ cp ./scripts/example.setup.sql ./scripts/example.setup.sql
 $ psql postgres -f < ./scripts/setup.sql
 

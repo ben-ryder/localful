@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ben-Ryder/local-first-backend.git"
+    "url": "git+https://github.com/Ben-Ryder/localful.git"
   },
   "author": "Ben-Ryder",
   "license": "AGPL-3.0-only",
   "bugs": {
-    "url": "https://github.com/Ben-Ryder/local-first-backend/issues"
+    "url": "https://github.com/Ben-Ryder/localful/issues"
   },
-  "homepage": "https://github.com/Ben-Ryder/local-first-backend#readme",
+  "homepage": "https://github.com/Ben-Ryder/localful#readme",
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",

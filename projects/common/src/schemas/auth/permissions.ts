@@ -1,5 +1,5 @@
 /*
-This file defines the permissions/scopes used in LFB to control access to various API actions.
+This file defines the permissions/scopes used in Localful to control access to various API actions.
 
 All permissions have the following format as a convention:
 	<resource>:<action> OR <resource>:<action>:<access>

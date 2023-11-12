@@ -70,8 +70,8 @@ describe("Logout Auth",() => {
       //  Create a token with the expected payload but signed wrong
       const refreshToken = sign(
         {
-          iss: "local-first-backend",
-          aud: "local-first-backend",
+          iss: "localful",
+          aud: "localful",
           sub: testUsers[0].id,
           type: "refreshToken",
           gid: "bbafbee5-155b-4844-8f74-82bd442a4a1",

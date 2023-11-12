@@ -1,14 +1,14 @@
 # Client Synchronisation and Cloud Backups
-LFB needs to be able to sync data between devices while also supporting offline usage, client side encryption and cloud backups (saving data to a server).  
-To facilitate offline editing by multiple devices LFB uses [CRDTs](https://crdt.tech/), more specifically the [Automerge](https://automerge.org/) library.
+Localful needs to be able to sync data between devices while also supporting offline usage, client side encryption and cloud backups (saving data to a server).  
+To facilitate offline editing by multiple devices Localful uses [CRDTs](https://crdt.tech/), more specifically the [Automerge](https://automerge.org/) library.
 
 Automerge does have a number of things to help with data synchronisation, most notably its [sync protocol](https://automerge.org/docs/cookbook/real-time/#sync-protocol).  
 However, because At# Client Synchronisation and Cloud Backups
-LFB needs to be able to sync data between devices while also supporting offline usage, client side encryption and cloud backups (saving data to a server).  
-To facilitate offline editing by multiple devices LFB uses [CRDTs](https://crdt.tech/), more specifically the [Automerge](https://automerge.org/) library.  
+Localful needs to be able to sync data between devices while also supporting offline usage, client side encryption and cloud backups (saving data to a server).  
+To facilitate offline editing by multiple devices Localful uses [CRDTs](https://crdt.tech/), more specifically the [Automerge](https://automerge.org/) library.  
 
 Automerge does have a number of things to help with data synchronisation, most notably its [sync protocol](https://automerge.org/docs/cookbook/real-time/#sync-protocol).  
-However, because LFB also requires client side encryption the server can't participate in Automerge's sync protocol as the server can never
+However, because Localful also requires client side encryption the server can't participate in Automerge's sync protocol as the server can never
 actually know about any of the content.  
 One solution could be for the server to just act as a relay to facilitate devices syncing between each other, but then this wouldn't provide any cloud backup/storage functionality.   
 
