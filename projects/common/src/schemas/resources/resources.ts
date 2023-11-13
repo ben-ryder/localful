@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {Entity} from "./entity.js";
+import {Entity} from "../entity.js";
 
 export const ResourceFields = z.object({
 	// id is generated locally so must be set within the fields and not be inherited from Entity.

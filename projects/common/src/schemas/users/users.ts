@@ -1,6 +1,6 @@
 import {z} from "zod";
-import {Entity} from "./entity.js";
-import {Roles} from "./auth/permissions.js";
+import {Entity} from "../entity.js";
+import {Roles} from "../auth/permissions.js";
 
 export const UserFields = z.object({
 	displayName: z.string().min(1, "displayName must be a least 1 character."),

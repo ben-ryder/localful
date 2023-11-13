@@ -1,6 +1,6 @@
 import {z} from "zod";
 import isJWT from "validator/lib/isJWT.js";
-import {CreateUserDto} from "../../users.js";
+import {CreateUserDto} from "../../users/users.js";
 
 export const ResetPasswordRequest = CreateUserDto
   .pick({encryptionSecret: true, password: true})

@@ -1,5 +1,9 @@
-/**
- * The socket identifier and event key used in the changes websocket.
- */
-export const ChangesSocket = "changes"
-export const ChangesEvent = "changes"
+import {ChangesEvents} from "../schemas/changes/changes-events.js";
+
+interface ChangesServerToClientEvents extends ChangesEvents {}
+
+interface ChangesClientToServerEvents extends ChangesEvents {}
+
+interface ChangesInterServerEvents {}
+
+interface ChangesSocketData {}
