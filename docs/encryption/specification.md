@@ -1,4 +1,4 @@
-# Localful Specification - `v1`
+# Localful Encryption Specification - `v1`
 This document contains the `v1` specification which described how the Localful project achieves client-side encryption.  
 This document includes some references to the client-server architecture, security and data structure used in Localful too, but the primary focus is on the client-side encryption methodology.  
 Topics such as local-first design, cross-device synchronisation and server authentication are covered in their own documentation.
@@ -79,9 +79,14 @@ Encrypted data is stored as a string in the format `<metadata>:<initialization-v
 - A real world application using this system is [Athena](https://github.com/ben-ryder/athena).
 
 ## Possible Improvements
-- How would the specification in use and encryption method be updated once deployed in a real application?
+- How would the specification in use and encryption method be updated once deployed in a real application? This is partly covered in the migration docs but could be made clearer here.
 - Consider using `XChaCha20+Poly1305` for encryption? (Using [libsodium-wrappers](https://www.npmjs.com/package/libsodium-wrappers)?)
 - Server uses traditional password system. Could use Secure Remote Password (SRP) protocol instead?
+- Salt used in `account key` derivation is not random, but is at least unique. Should I used a truly random `salt` or `salt + random seed` value instead?
+  - I would then have to upload this to the server or make the user store two secrets.
+  - If stored on server, would need an API route to retrieve this on sign in. This route would have to be public or protected by 2FA? This would be like Standard Notes
+  - If user needs two secrets, this would be like 1Password's two-secret system.
+  - Any dramatic complexity added to sign up would have to be implemented in all applications using Localful.
 
 ## Credits
 The method of splitting the derived `user key` into `master encryption key` and `server password` was inspired by the [Standard Notes 004](https://github.com/standardnotes/snjs/blob/main/packages/snjs/specification.md) specification.
