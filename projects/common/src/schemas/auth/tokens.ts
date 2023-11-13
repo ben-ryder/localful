@@ -1,4 +1,5 @@
 import {z} from "zod";
+import {Roles} from "./permissions.js";
 
 export const TokenPayload = z.object({
   iss: z.string(),
@@ -13,7 +14,7 @@ export type TokenPayload = z.infer<typeof TokenPayload>;
 export const AccessTokenPayload = TokenPayload.extend({
   type: z.literal("accessToken"),
   isVerified: z.boolean(),
-  scopes: z.array(z.string())
+  role: Roles
 })
 
 export const RefreshTokenPayload = TokenPayload.extend({

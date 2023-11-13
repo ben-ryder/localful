@@ -1,45 +1,92 @@
-/*
-This file defines the permissions/scopes used in Localful to control access to various API actions.
-
-All permissions have the following format as a convention:
-	<resource>:<action> OR <resource>:<action>:<access>
-For example:
-	changes:create
-		- 'changes' is the resource
-		- 'create' is the action (could be any CRUD actions)
-		- there is no 'access' present, so this scope only grants permission to a users own changes.
-	changes:delete:all
-		- 'users' is the resource
-		- 'delete' is the action
-		- 'all' signifies that this scope grants permissions to any users changes.
- */
-
 import {z} from "zod"
 
-export enum PERMISSIONS {
+/**
+ * Permissions are used to control access to server resources and actions.
+ *
+ * All permissions have the following format as a convention:
+ * 	<resource>:<action> OR <resource>:<action>:<access>
+ * For example:
+ * 	changes:create
+ * 		- 'changes' is the resource
+ * 		- 'create' is the action (could be any CRUD actions)
+ * 		- there is no 'access' present, so this scope only grants permission to a users own changes.
+ * 	changes:delete:all
+ * 		- 'users' is the resource
+ * 		- 'delete' is the action
+ * 		- 'all' signifies that this scope grants permissions to the changes of any user.
+ */
+export const Permissions = z.enum([
 	// Scopes limited to the current users content
-	CHANGES_CREATE = "changes:create",
-	CHANGES_RETRIEVE = "changes:retrieve",
-	CHANGES_DELETE = "changes:delete",
+	"changes:create",
+	"changes:retrieve",
+	"changes:delete",
 
-	USERS_CREATE = "users:create",
-	USERS_RETRIEVE = "users:retrieve",
-	USERS_UPDATE = "users:update",
-	USERS_DELETE = "users:delete",
-
-	AUTH_VERIFY = "auth:verify",
+	"users:create",
+	"users:retrieve",
+	"users:update",
+	"users:delete",
 
 	// Special 'admin' scopes giving access to all content,
-	CHANGES_CREATE_ALL = "changes:create:all",
-	CHANGES_RETRIEVE_ALL = "changes:retrieve:all",
-	CHANGES_UPDATE_ALL = "changes:update:all",
-	CHANGES_DELETE_ALL = "changes:delete:all",
+	"changes:create:all",
+	"changes:retrieve:all",
+	"changes:update:all",
+	"changes:delete:all",
 
-	USERS_CREATE_ALL = "users:create:all",
-	USERS_RETRIEVE_ALL = "users:retrieve:all",
-	USERS_UPDATE_ALL = "users:update:all",
-	USERS_DELETE_ALL=  "users:delete:all",
+	"users:create:all",
+	"users:retrieve:all",
+	"users:update:all",
+	"users:delete:all",
+])
+export type Permissions = z.infer<typeof Permissions>
+
+/**
+ * Roles are assigned to users and define a set of permissions.
+ */
+export const Roles = z.enum([
+	"user",
+	"admin"
+]);
+export type Roles = z.infer<typeof Roles>
+
+/**
+ * Defines the type of role permissions.
+ */
+export type RolePermissions = {
+	[key in Roles]: {
+		inherit?: Roles,
+		permissions: Permissions[]
+	};
+};
+
+/**
+ * This object assigns permissions to each role.
+ * Roles are able to inherit from other roles and also include their own permissions too.
+ */
+export const RolePermissions: RolePermissions = {
+	user: {
+		permissions: [
+			"changes:create",
+			"changes:retrieve",
+			"changes:delete",
+
+			"users:create",
+			"users:retrieve",
+			"users:update",
+			"users:delete",
+		]
+	},
+	admin: {
+		inherit: "user",
+		permissions: [
+			"changes:create:all",
+			"changes:retrieve:all",
+			"changes:update:all",
+			"changes:delete:all",
+
+			"users:create:all",
+			"users:retrieve:all",
+			"users:update:all",
+			"users:delete:all",
+		]
+	}
 }
-
-export const Permissions = z.nativeEnum(PERMISSIONS);
-export type Permissions = z.infer<typeof Permissions>;
