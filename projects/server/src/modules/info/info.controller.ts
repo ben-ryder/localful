@@ -1,6 +1,6 @@
 import {ConfigService} from "../../services/config/config";
 import {Controller, Get} from "@nestjs/common";
-import {InfoDto} from "@ben-ryder/lfb-common";
+import {InfoDto} from "@localful/common";
 
 
 @Controller({

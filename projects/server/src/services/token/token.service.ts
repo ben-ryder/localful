@@ -8,7 +8,7 @@ import {
   Roles,
   TokenPair,
   UserDto
-} from "@ben-ryder/lfb-common";
+} from "@localful/common";
 import {DataStoreService} from "../data-store/data-store.service";
 import {v4 as createUUID} from "uuid";
 import {SystemError} from "../errors/base/system.error";

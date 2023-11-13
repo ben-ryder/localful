@@ -1,5 +1,5 @@
 import { Dexie, Table } from 'dexie';
-import {ChangeDto} from "@ben-ryder/lfb-common";
+import {ChangeDto} from "@localful/common";
 
 
 export class ChangesDatabase extends Dexie {

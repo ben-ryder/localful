@@ -1,5 +1,5 @@
 import {db} from "./db.js";
-import {ChangeDto, ProfileDto} from "@ben-ryder/lfb-common";
+import {ChangeDto, ProfileDto} from "@localful/common";
 
 
 export class LocalStore {

@@ -1,6 +1,6 @@
 {
-  "name": "@ben-ryder/localful-local",
-  "version": "0.6.0-rc.1",
+  "name": "@localful/local",
+  "version": "0.1.0",
   "description": "The client-side device library of Localful which includes server integrations and other useful utilities.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "homepage": "https://github.com/Ben-Ryder/localful",
@@ -35,7 +35,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@ben-ryder/lfb-common": "^0.8.0-rc.2",
+    "@localful/common": "^0.8.0-rc.2",
     "dexie": "^3.2.4",
     "socket.io-client": "^4.7.2"
   },

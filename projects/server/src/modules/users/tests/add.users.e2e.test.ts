@@ -4,7 +4,7 @@ import {expectBadRequest} from "../../../../tests/e2e/common-expects/expect-bad-
 import {testMissingField} from "../../../../tests/e2e/common-expects/test-missing-field";
 import {testInvalidDataTypes} from "../../../../tests/e2e/common-expects/test-invalid-data-types";
 import {testMalformedData} from "../../../../tests/e2e/common-expects/test-malformed-data";
-import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
+import {ErrorIdentifiers} from "@localful/common";
 
 
 // A default user which can be reused in multiple data to save a bit of copy-pasting.

@@ -1,6 +1,6 @@
 import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, Res, UseGuards} from "@nestjs/common";
 import {ChangesService} from "./changes.service";
-import {ChangeCreateDto, ChangesRetrieveQueryParams, ChangesURLParams} from "@ben-ryder/lfb-common";
+import {ChangeCreateDto, ChangesRetrieveQueryParams, ChangesURLParams} from "@localful/common";
 import {RequestContext} from "../../common/request-context.decorator";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 import {AuthGuard} from "../../services/auth/auth.guard";

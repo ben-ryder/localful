@@ -1,4 +1,4 @@
-import {ChangeDto} from "@ben-ryder/lfb-common";
+import {ChangeDto} from "@localful/common";
 import {ChangesListener} from "../common/changes-listener.js";
 
 

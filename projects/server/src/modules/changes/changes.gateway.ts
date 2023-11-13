@@ -7,7 +7,7 @@ import {
   SubscribeMessage,
   WebSocketGateway
 } from "@nestjs/websockets";
-import {ChangesSocketEvents, ChangesEventPayload} from "@ben-ryder/lfb-common";
+import {ChangesSocketEvents, ChangesEventPayload} from "@localful/common";
 import {UsePipes} from "@nestjs/common";
 import {GatewayErrorFilter} from "../../services/errors/error.gateway-filter";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";

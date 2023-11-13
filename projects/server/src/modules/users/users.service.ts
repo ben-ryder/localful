@@ -9,7 +9,7 @@ import {
     UpdateUserRequest,
     UpdateUserResponse,
     UserDto
-} from "@ben-ryder/lfb-common";
+} from "@localful/common";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
 import {UserContext} from "../../common/request-context.decorator";
 

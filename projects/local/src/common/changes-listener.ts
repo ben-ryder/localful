@@ -1,3 +1,3 @@
-import {ChangeDto} from "@ben-ryder/lfb-common";
+import {ChangeDto} from "@localful/common";
 
 export type ChangesListener = (changes: ChangeDto[]) => void;

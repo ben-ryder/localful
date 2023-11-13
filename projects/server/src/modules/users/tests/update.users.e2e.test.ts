@@ -3,7 +3,7 @@ import {testUsers} from "../../../../tests/test-data/test-data";
 import {expectUnauthorized} from "../../../../tests/e2e/common-expects/expect-unauthorized";
 import {expectForbidden} from "../../../../tests/e2e/common-expects/expect-forbidden";
 import {expectBadRequest} from "../../../../tests/e2e/common-expects/expect-bad-request";
-import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
+import {ErrorIdentifiers} from "@localful/common";
 import {testMalformedData} from "../../../../tests/e2e/common-expects/test-malformed-data";
 import {testInvalidDataTypes} from "../../../../tests/e2e/common-expects/test-invalid-data-types";
 

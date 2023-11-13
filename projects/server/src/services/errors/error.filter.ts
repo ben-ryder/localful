@@ -6,7 +6,7 @@ import {
 import { Response } from "express";
 import { BaseError } from "./base/base.error";
 import { fallbackMapping, errorHttpMapping } from "./error-http-mappings";
-import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
+import {ErrorIdentifiers} from "@localful/common";
 
 @Catch(BaseError, HttpException)
 export class ErrorFilter implements ExceptionFilter {

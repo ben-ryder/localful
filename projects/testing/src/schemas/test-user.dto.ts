@@ -1,4 +1,4 @@
-import {UserEntity} from "@ben-ryder/lfb-common";
+import {UserEntity} from "@localful/common";
 
 export interface TestUserEntity extends UserEntity {
   password: string,

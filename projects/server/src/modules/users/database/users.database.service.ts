@@ -1,8 +1,8 @@
 import {DatabaseService} from "../../../services/database/database.service";
 import {PostgresError, Row, RowList} from "postgres";
 import {PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes";
-import {InternalDatabaseUserDto, DatabaseUserDto, CreateDatabaseUserDto, UpdateDatabaseUserDto} from "@ben-ryder/lfb-common";
-import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
+import {InternalDatabaseUserDto, DatabaseUserDto, CreateDatabaseUserDto, UpdateDatabaseUserDto} from "@localful/common";
+import {ErrorIdentifiers} from "@localful/common";
 import {Injectable} from "@nestjs/common";
 import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error";
 import {SystemError} from "../../../services/errors/base/system.error";

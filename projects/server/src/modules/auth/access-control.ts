@@ -1,5 +1,5 @@
 import { SetMetadata } from "@nestjs/common";
-import {Roles} from "@ben-ryder/lfb-common";
+import {Roles} from "@localful/common";
 
 export interface AccessControlOptions {
   isVerified?: boolean,

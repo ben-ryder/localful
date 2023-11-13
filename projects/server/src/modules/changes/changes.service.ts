@@ -1,6 +1,6 @@
 import {ChangesDatabaseService} from "./database/changes.database.service";
 import {Injectable} from "@nestjs/common";
-import {ChangeDto, AccessControlScopes} from "@ben-ryder/lfb-common";
+import {ChangeDto, AccessControlScopes} from "@localful/common";
 import {UserContext} from "../../common/request-context.decorator";
 import {AuthService} from "../../services/auth/auth.service";
 

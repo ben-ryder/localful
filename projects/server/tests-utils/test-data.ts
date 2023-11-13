@@ -6,7 +6,7 @@
  * This data is purged during teardown but will not be automatically added during seeding, making it suitable for testing
  * content creation without failing on duplicate content.
  */
-import {ChangeInternalDatabaseDto, ProfileDto} from "@ben-ryder/lfb-common";
+import {ChangeInternalDatabaseDto, ProfileDto} from "@localful/common";
 
 export const seedProfiles: readonly ProfileDto[] = Object.freeze([
   {

@@ -1,6 +1,6 @@
 {
-  "name": "@ben-ryder/localful-common",
-  "version": "0.8.0-rc.3",
+  "name": "@localful/common",
+  "version": "0.1.0",
   "description": "A library of common interfaces, schemas and utilities for use across my Localful project.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "homepage": "https://github.com/Ben-Ryder/localful",

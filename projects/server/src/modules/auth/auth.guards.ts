@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
 import {TokenService} from "../../services/token/token.service";
-import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
+import {ErrorIdentifiers} from "@localful/common";
 import {RequestWithContext, UserContext} from "../../common/request-context.decorator";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";

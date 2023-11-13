@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { ErrorIdentifiers } from "@ben-ryder/lfb-common";
+import { ErrorIdentifiers } from "@localful/common";
 
 export interface ErrorHttpMapping {
   identifier: string;

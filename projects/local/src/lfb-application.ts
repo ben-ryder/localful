@@ -1,6 +1,6 @@
 import {LocalStore} from "./storage/local-store.js";
 import * as A from "@automerge/automerge";
-import {ChangeDto} from "@ben-ryder/lfb-common";
+import {ChangeDto} from "@localful/common";
 import {LFBClient} from "./clients/lfb-server-client.js";
 import {BrowserSyncClient} from "./clients/browser-sync-client.js";
 import {NoEncryptionKeyError} from "./errors/errors.js";

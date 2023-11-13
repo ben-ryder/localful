@@ -11,7 +11,7 @@ import {
   ErrorIdentifiers,
   ChangeDto,
   ChangesSocketEvents, ProfileUpdateDto, ProfileDto
-} from "@ben-ryder/lfb-common";
+} from "@localful/common";
 import {io, Socket} from "socket.io-client";
 import {LocalStore} from "../storage/local-store.js";
 import {ChangesListener} from "../common/changes-listener.js";

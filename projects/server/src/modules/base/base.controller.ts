@@ -1,6 +1,6 @@
 import {All, Controller, Get, HttpStatus, Res} from "@nestjs/common";
 import {Response} from "express";
-import {ErrorIdentifiers} from "@ben-ryder/lfb-common";
+import {ErrorIdentifiers} from "@localful/common";
 
 @Controller("/")
 export class BaseController {

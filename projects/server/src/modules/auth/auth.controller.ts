@@ -1,7 +1,7 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service";
-import {LoginRequest, LogoutRequest, RefreshRequest, Roles} from "@ben-ryder/lfb-common";
+import {LoginRequest, LogoutRequest, RefreshRequest, Roles} from "@localful/common";
 import {AuthGuard} from "./auth.guards";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 import {UseAccessControl} from "./access-control";
