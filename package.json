@@ -12,7 +12,7 @@
     "install": "concurrently 'npm:install:*'",
     "install:server": "cd ./projects/server && npm i",
     "install:common": "cd ./projects/common && npm i",
-    "install:toolkit": "cd ./projects/toolkit && npm i"
+    "install:local": "cd projects/local && npm i"
   },
   "repository": {
     "type": "git",

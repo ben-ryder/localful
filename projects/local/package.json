@@ -1,7 +1,7 @@
 {
-  "name": "@ben-ryder/localful-device",
+  "name": "@ben-ryder/localful-local",
   "version": "0.6.0-rc.1",
-  "description": "A client-side toolkit library for my Localful project which includes an API client and other useful utilities.",
+  "description": "The client-side device library of Localful which includes server integrations and other useful utilities.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "homepage": "https://github.com/Ben-Ryder/localful",
   "bugs": "https://github.com/Ben-Ryder/localful/issues",
