@@ -1,9 +1,8 @@
-import {TestHelper} from "../../../../tests/e2e/test-helper";
-import {testUsers} from "../../../../tests/test-data/test-data";
-import {expectUnauthorized} from "../../../../tests/e2e/common-expects/expect-unauthorized";
-import {expectForbidden} from "../../../../tests/e2e/common-expects/expect-forbidden";
-import {expectBadRequest} from "../../../../tests/e2e/common-expects/expect-bad-request";
 import {ErrorIdentifiers} from "@localful/common";
+import {TestHelper} from "../../../../tests-utils/test-helper";
+import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
+import {expectForbidden} from "../../../../tests-utils/common-expects/expect-forbidden";
+import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
 
 
 describe("Delete User - /v1/users/:id [DELETE]",() => {

@@ -1,10 +1,9 @@
-import {TestHelper} from "../../../../tests/e2e/test-helper";
-import {testUsers} from "../../../../tests/test-data/test-data";
-import {expectForbidden} from "../../../../tests/e2e/common-expects/expect-forbidden";
-import {ErrorIdentifiers} from "@localful/common";
-import {testMissingField} from "../../../../tests/e2e/common-expects/test-missing-field";
-import {testMalformedData} from "../../../../tests/e2e/common-expects/test-malformed-data";
-import {testInvalidDataTypes} from "../../../../tests/e2e/common-expects/test-invalid-data-types";
+import {TestHelper} from "../../../../tests-utils/test-helper";
+import {expectForbidden} from "../../../../tests-utils/common-expects/expect-forbidden";
+import {testMissingField} from "../../../../tests-utils/common-expects/test-missing-field";
+import {testMalformedData} from "../../../../tests-utils/common-expects/test-malformed-data";
+import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
+import {ErrorIdentifiers} from "@localful/common"
 
 
 describe("Login Auth",() => {

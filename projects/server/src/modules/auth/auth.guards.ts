@@ -1,10 +1,10 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
-import {TokenService} from "../../services/token/token.service";
+import {TokenService} from "../../services/token/token.service.js";
 import {ErrorIdentifiers} from "@localful/common";
-import {RequestWithContext, UserContext} from "../../common/request-context.decorator";
-import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
-import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
-import {ACCESS_CONTROL_METADATA_KEY, AccessControlOptions} from "./access-control";
+import {RequestWithContext, UserContext} from "../../common/request-context.decorator.js";
+import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
+import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error.js";
+import {ACCESS_CONTROL_METADATA_KEY, AccessControlOptions} from "./access-control.js";
 import {Socket} from "socket.io";
 import {Reflector} from "@nestjs/core";
 

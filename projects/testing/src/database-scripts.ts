@@ -59,13 +59,7 @@ export async function seedTestData(sql: Sql<any>, options?: ScriptOptions) {
     console.log("Running database seed");
   }
 
-  for (const user of testUsers) {
-    // Add user
-    await sql`
-        INSERT INTO users(id, email, password_hash, encrypted_vault_key, is_verified, created_at, updated_at) 
-        VALUES (${user.id}, ${user.email}, ${user.password}, ${user.encryptedVaultKey}, ${user.isVerified}, ${user.createdAt}, ${user.updatedAt})
-       `;
-  }
+  // @todo: write seed logic
 
   if (options?.logging) {
     console.log("Database seed completed");

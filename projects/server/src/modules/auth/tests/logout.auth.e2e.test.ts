@@ -1,11 +1,9 @@
-import {TestHelper} from "../../../../tests/e2e/test-helper";
-import {testUsers} from "../../../../tests/test-data/test-data";
 import {ConfigService} from "../../../services/config/config";
 import {sign} from "jsonwebtoken";
-import {expectUnauthorized} from "../../../../tests/e2e/common-expects/expect-unauthorized";
 import {ErrorIdentifiers} from "@localful/common";
-import {expectBadRequest} from "../../../../tests/e2e/common-expects/expect-bad-request";
-import {testInvalidDataTypes} from "../../../../tests/e2e/common-expects/test-invalid-data-types";
+import {TestHelper} from "../../../../tests-utils/test-helper";
+import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
+import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
 
 // todo: add data that revoked tokens actually are revoked and no longer work (when some are expired and some not)!!!!!
 

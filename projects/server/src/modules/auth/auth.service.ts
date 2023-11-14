@@ -1,11 +1,11 @@
 import {Injectable} from "@nestjs/common";
-import {UsersService} from "../users/users.service";
-import {TokenService} from "../../services/token/token.service";
+import {UsersService} from "../users/users.service.js";
+import {TokenService} from "../../services/token/token.service.js";
 import {LoginResponse, DatabaseUserDto, RefreshResponse, ErrorIdentifiers} from "@localful/common";
-import {PasswordService} from "../../services/password/password.service";
-import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
-import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
-import {UserRequestError} from "../../services/errors/base/user-request.error";
+import {PasswordService} from "../../services/password/password.service.js";
+import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
+import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error.js";
+import {UserRequestError} from "../../services/errors/base/user-request.error.js";
 
 
 @Injectable()

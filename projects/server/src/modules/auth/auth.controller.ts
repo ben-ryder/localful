@@ -1,10 +1,10 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
-import {AuthService} from "./auth.service";
+import {AuthService} from "./auth.service.js";
 import {LoginRequest, LogoutRequest, RefreshRequest, Roles} from "@localful/common";
-import {AuthGuard} from "./auth.guards";
-import {ZodValidationPipe} from "../../common/zod-validation.pipe";
-import {UseAccessControl} from "./access-control";
+import {AuthGuard} from "./auth.guards.js";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
+import {UseAccessControl} from "./access-control.js";
 
 
 @Controller({

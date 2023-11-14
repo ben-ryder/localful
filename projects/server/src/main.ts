@@ -1,6 +1,6 @@
-import {ConfigService} from "./services/config/config";
+import {ConfigService} from "./services/config/config.js";
 import {Logger} from "@nestjs/common";
-import {createApp} from "./create-app";
+import {createApp} from "./create-app.js";
 
 
 async function bootstrap() {

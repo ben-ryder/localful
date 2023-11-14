@@ -1,8 +1,8 @@
-import {ChangesDatabaseService} from "./database/changes.database.service";
+import {ChangesDatabaseService} from "./database/changes.database.service.js";
 import {Injectable} from "@nestjs/common";
 import {ChangeDto, AccessControlScopes} from "@localful/common";
-import {UserContext} from "../../common/request-context.decorator";
-import {AuthService} from "../../services/auth/auth.service";
+import {UserContext} from "../../common/request-context.decorator.js";
+import {AuthService} from "../../services/auth/auth.service.js";
 
 
 @Injectable()

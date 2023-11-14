@@ -1,10 +1,9 @@
-import {TestHelper} from "../../../../tests/e2e/test-helper";
-import {testUsers} from "../../../../tests/test-data/test-data";
-import {expectBadRequest} from "../../../../tests/e2e/common-expects/expect-bad-request";
-import {testMissingField} from "../../../../tests/e2e/common-expects/test-missing-field";
-import {testInvalidDataTypes} from "../../../../tests/e2e/common-expects/test-invalid-data-types";
-import {testMalformedData} from "../../../../tests/e2e/common-expects/test-malformed-data";
 import {ErrorIdentifiers} from "@localful/common";
+import {TestHelper} from "../../../../tests-utils/test-helper";
+import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
+import {testMissingField} from "../../../../tests-utils/common-expects/test-missing-field";
+import {testMalformedData} from "../../../../tests-utils/common-expects/test-malformed-data";
+import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
 
 
 // A default user which can be reused in multiple data to save a bit of copy-pasting.

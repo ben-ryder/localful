@@ -30,7 +30,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@localful/common": "../common",
+    "@localful/common": "^0.1.0",
     "dotenv": "^16.3.1",
     "postgres": "^3.4.3"
   },

@@ -1,8 +1,7 @@
-import {TestHelper} from "../../../../tests/e2e/test-helper";
 import {sign} from "jsonwebtoken";
 import {ConfigService} from "../../../services/config/config";
-import {testUsers} from "../../../../tests/test-data/test-data";
-import {expectUnauthorized} from "../../../../tests/e2e/common-expects/expect-unauthorized";
+import {TestHelper} from "../../../../tests-utils/test-helper";
+import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
 
 
 describe("Check Auth",() => {

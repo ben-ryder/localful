@@ -1,7 +1,7 @@
 import {Injectable} from "@nestjs/common";
 
 import {sign, verify} from "jsonwebtoken";
-import {ConfigService} from "../config/config";
+import {ConfigService} from "../config/config.js";
 import {
   AccessTokenPayload,
   RefreshTokenPayload,
@@ -9,9 +9,9 @@ import {
   TokenPair,
   UserDto
 } from "@localful/common";
-import {DataStoreService} from "../data-store/data-store.service";
+import {DataStoreService} from "../data-store/data-store.service.js";
 import {v4 as createUUID} from "uuid";
-import {SystemError} from "../errors/base/system.error";
+import {SystemError} from "../errors/base/system.error.js";
 import ms, { StringValue } from "ms";
 
 

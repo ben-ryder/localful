@@ -1,7 +1,7 @@
-import Redis, { Redis as IRedis } from "ioredis";
+import {Redis} from "ioredis";
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "../config/config";
-import {SystemError} from "../errors/base/system.error";
+import { ConfigService } from "../config/config.js";
+import {SystemError} from "../errors/base/system.error.js";
 
 export interface CacheOptions {
   epochExpiry: number;
@@ -9,7 +9,7 @@ export interface CacheOptions {
 
 @Injectable()
 export class DataStoreService {
-  private redis: IRedis;
+  private redis: Redis;
 
   constructor(private configService: ConfigService) {
     this.redis = new Redis(configService.config.dataStore.redisUrl);

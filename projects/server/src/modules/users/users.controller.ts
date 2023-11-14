@@ -1,13 +1,13 @@
-import {ConfigService} from "../../services/config/config";
-import {UsersService} from "./users.service";
-import {TokenService} from "../../services/token/token.service";
+import {ConfigService} from "../../services/config/config.js";
+import {UsersService} from "./users.service.js";
+import {TokenService} from "../../services/token/token.service.js";
 import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
 import {CreateUserRequest, UsersURLParams, UpdateUserRequest} from "@localful/common";
 import {ErrorIdentifiers} from "@localful/common";
-import {RequestContext} from "../../common/request-context.decorator";
-import {AuthGuard} from "../auth/auth.guards";
-import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
-import {ZodValidationPipe} from "../../common/zod-validation.pipe";
+import {RequestContext} from "../../common/request-context.decorator.js";
+import {AuthGuard} from "../auth/auth.guards.js";
+import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
 
 
 @Controller({

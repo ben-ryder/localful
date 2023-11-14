@@ -1,11 +1,11 @@
-import {TestHelper} from "../../../../tests/e2e/test-helper";
-import {testUsers} from "../../../../tests/test-data/test-data";
-import {expectUnauthorized} from "../../../../tests/e2e/common-expects/expect-unauthorized";
 import {ErrorIdentifiers} from "@localful/common";
 import {sign} from "jsonwebtoken";
-import {expectBadRequest} from "../../../../tests/e2e/common-expects/expect-bad-request";
 import {ConfigService} from "../../../services/config/config";
-import {testInvalidDataTypes} from "../../../../tests/e2e/common-expects/test-invalid-data-types";
+import {TestHelper} from "../../../../tests-utils/test-helper";
+import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
+import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
+import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
+
 
 
 describe("Refresh Auth",() => {

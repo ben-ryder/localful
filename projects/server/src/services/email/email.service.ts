@@ -1,9 +1,8 @@
-import { ConfigService } from "../config/config";
+import { ConfigService } from "../config/config.js";
 import { Injectable } from "@nestjs/common";
-import Mailgun from "mailgun.js";
-import {IMailgunClient} from "mailgun.js/interfaces/IMailgunClient";
-import Options from "mailgun.js/interfaces/Options";
+import Mailgun, {MailgunClientOptions} from "mailgun.js";
 import formData from "form-data";
+import {IMailgunClient} from "mailgun.js/Interfaces";
 
 export interface EmailData {
   to: string,
@@ -17,8 +16,8 @@ export class EmailService {
   private readonly senderString: string;
 
   constructor(private configService: ConfigService) {
-    const mailgun = new Mailgun(formData);
-    const options: Options = {
+    const mailgun = new Mailgun.default(formData);
+    const options: MailgunClientOptions = {
       username: "api",
       key: this.configService.config.email.mailgun.apiKey,
     }
@@ -27,7 +26,7 @@ export class EmailService {
     }
     this.mailgunClient = mailgun.client(options);
 
-    this.senderString = `${this.configService.config.email.mailgun.sender.name} <${this.configService.config.email.mailgun.sender.address}@${process.env.MAILGUN_DOMAIN}>`;
+    this.senderString = `${this.configService.config.email.mailgun.sender.name} <${this.configService.config.email.mailgun.sender.address}@${this.configService.config.email.mailgun.domain}>`;
   }
 
   private async sendEmail(data: EmailData) {

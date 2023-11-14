@@ -1,4 +1,4 @@
-import {ConfigService} from "../../services/config/config";
+import {ConfigService} from "../../services/config/config.js";
 import {Controller, Get} from "@nestjs/common";
 import {InfoDto} from "@localful/common";
 
@@ -15,7 +15,8 @@ export class InfoController {
   @Get()
   async getInfo() {
     const meta: InfoDto = {
-      version: "v1"
+      version: "v1",
+      registrationEnabled: this.configService.config.app.registrationEnabled
     }
 
     return meta;

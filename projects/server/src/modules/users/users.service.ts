@@ -1,5 +1,5 @@
-import {PasswordService} from "../../services/password/password.service";
-import {UsersDatabaseService} from "./database/users.database.service";
+import {PasswordService} from "../../services/password/password.service.js";
+import {UsersDatabaseService} from "./database/users.database.service.js";
 import {Injectable} from "@nestjs/common";
 import {
     CreateUserRequest,
@@ -10,8 +10,8 @@ import {
     UpdateUserResponse,
     UserDto
 } from "@localful/common";
-import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
-import {UserContext} from "../../common/request-context.decorator";
+import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
+import {UserContext} from "../../common/request-context.decorator.js";
 
 
 @Injectable()

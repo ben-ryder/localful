@@ -1,6 +1,6 @@
 import { PipeTransform, Injectable, ArgumentMetadata } from "@nestjs/common";
 import { Schema } from "zod";
-import {UserRequestError} from "../services/errors/base/user-request.error";
+import {UserRequestError} from "../services/errors/base/user-request.error.js";
 
 
 @Injectable()

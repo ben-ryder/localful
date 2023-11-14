@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import { Injectable } from "@nestjs/common";
-import {ConfigSchema} from "./config-schema";
+import {ConfigSchema} from "./config-schema.js";
 
 
 /**

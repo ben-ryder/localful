@@ -1,9 +1,7 @@
-import {DatabaseService} from "../../../services/database/database.service";
+import {DatabaseService} from "../../../services/database/database.service.js";
 import {Injectable} from "@nestjs/common";
 import {ChangeInternalDatabaseDto, ChangeDto} from "@localful/common";
-import {SystemError} from "../../../services/errors/base/system.error";
-import {Row, RowList} from "postgres";
-import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error";
+import {SystemError} from "../../../services/errors/base/system.error.js";
 
 
 @Injectable()

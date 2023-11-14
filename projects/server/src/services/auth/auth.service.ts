@@ -1,9 +1,9 @@
 import {Injectable} from "@nestjs/common";
-import {ConfigService} from "../config/config";
+import {ConfigService} from "../config/config.js";
 import {createRemoteJWKSet, JWTPayload, jwtVerify} from "jose";
-import {AccessForbiddenError} from "../errors/access/access-forbidden.error";
-import {AccessUnauthorizedError} from "../errors/access/access-unauthorized.error";
-import {UserContext} from "../../common/request-context.decorator";
+import {AccessForbiddenError} from "../errors/access/access-forbidden.error.js";
+import {AccessUnauthorizedError} from "../errors/access/access-unauthorized.error.js";
+import {UserContext} from "../../common/request-context.decorator.js";
 
 export interface AuthValidationResult {
 	userId: string,

@@ -1,5 +1,5 @@
 import {Sql} from "postgres";
-import {seedProfiles, seedChanges, testCaseProfiles} from "./test-data";
+import {testUsers} from "@localful/testing";
 
 export interface ScriptOptions {
   logging: boolean
@@ -25,14 +25,8 @@ export async function clearTestData(sql: Sql<any>, options?: ScriptOptions) {
     console.log("Running database clear");
   }
 
-  for (const profile of seedProfiles) {
-    await sql`DELETE FROM profiles where user_id = ${profile.userId}`;
-    await sql`DELETE FROM changes where user_id = ${profile.userId}`;
-  }
-
-  for (const [key, profile] of Object.entries(testCaseProfiles)) {
-    await sql`DELETE FROM profiles where user_id = ${profile.userId}`;
-    await sql`DELETE FROM changes where user_id = ${profile.userId}`;
+  for (const user of testUsers) {
+    await sql`DELETE FROM users where id = ${user.id}`;
   }
 
   if (options?.logging) {
@@ -48,19 +42,7 @@ export async function seedTestData(sql: Sql<any>, options?: ScriptOptions) {
     console.log("Running database seed");
   }
 
-  for (const profile of seedProfiles) {
-    await sql`
-      INSERT INTO profiles(user_id, encryption_secret, created_at, updated_at)
-      VALUES (${profile.userId}, ${profile.encryptionSecret}, ${profile.createdAt}, ${profile.updatedAt})
-     `;
-  }
-
-  for (const change of seedChanges) {
-    await sql`
-      INSERT INTO changes(id, data, user_id)
-      VALUES (${change.id}, ${change.data}, ${change.user_id})
-     `;
-  }
+  // @todo: implement logic for data seeding
 
   if (options?.logging) {
     console.log("Database seed completed");

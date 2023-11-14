@@ -4,8 +4,8 @@ import {
   ArgumentsHost, HttpException, HttpStatus,
 } from "@nestjs/common";
 import { Response } from "express";
-import { BaseError } from "./base/base.error";
-import { fallbackMapping, errorHttpMapping } from "./error-http-mappings";
+import { BaseError } from "./base/base.error.js";
+import { fallbackMapping, errorHttpMapping } from "./error-http-mappings.js";
 import {ErrorIdentifiers} from "@localful/common";
 
 @Catch(BaseError, HttpException)

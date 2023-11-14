@@ -1,8 +1,8 @@
 import {CanActivate, ExecutionContext, Injectable} from "@nestjs/common";
 import {Reflector} from "@nestjs/core";
-import {AccessUnauthorizedError} from "../errors/access/access-unauthorized.error";
-import {RequestWithContext, UserContext} from "../../common/request-context.decorator";
-import {AuthService} from "./auth.service";
+import {AccessUnauthorizedError} from "../errors/access/access-unauthorized.error.js";
+import {RequestWithContext, UserContext} from "../../common/request-context.decorator.js";
+import {AuthService} from "./auth.service.js";
 
 
 @Injectable()

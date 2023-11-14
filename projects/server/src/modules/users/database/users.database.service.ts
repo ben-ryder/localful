@@ -1,12 +1,12 @@
-import {DatabaseService} from "../../../services/database/database.service";
+import {DatabaseService} from "../../../services/database/database.service.js";
 import {PostgresError, Row, RowList} from "postgres";
-import {PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes";
+import {PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes.js";
 import {InternalDatabaseUserDto, DatabaseUserDto, CreateDatabaseUserDto, UpdateDatabaseUserDto} from "@localful/common";
 import {ErrorIdentifiers} from "@localful/common";
 import {Injectable} from "@nestjs/common";
-import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error";
-import {SystemError} from "../../../services/errors/base/system.error";
-import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error";
+import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error.js";
+import {SystemError} from "../../../services/errors/base/system.error.js";
+import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error.js";
 
 
 @Injectable()

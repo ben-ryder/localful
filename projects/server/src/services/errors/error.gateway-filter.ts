@@ -3,8 +3,8 @@ import {
   Catch,
   ArgumentsHost,
 } from "@nestjs/common";
-import { BaseError } from "./base/base.error";
-import { fallbackMapping, errorHttpMapping } from "./error-http-mappings";
+import { BaseError } from "./base/base.error.js";
+import { fallbackMapping, errorHttpMapping } from "./error-http-mappings.js";
 import {Socket} from "socket.io";
 
 @Catch(BaseError)
