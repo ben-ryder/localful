@@ -1,11 +1,12 @@
 import {Injectable} from "@nestjs/common";
 import {UsersService} from "../users/users.service.js";
 import {TokenService} from "../../services/token/token.service.js";
-import {LoginResponse, DatabaseUserDto, RefreshResponse, ErrorIdentifiers} from "@localful/common";
+import {LoginResponse, TokenPair, ErrorIdentifiers} from "@localful/common";
 import {PasswordService} from "../../services/password/password.service.js";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error.js";
 import {UserRequestError} from "../../services/errors/base/user-request.error.js";
+import {DatabaseUserDto} from "../users/database/database-user.js";
 
 
 @Injectable()
@@ -15,26 +16,26 @@ export class AuthService {
     private tokenService: TokenService
   ) {}
 
-  async login(username: string, password: string): Promise<LoginResponse> {
+  async login(email: string, password: string): Promise<LoginResponse> {
     let user: DatabaseUserDto;
 
     try {
-       user = await this.usersService.getWithPasswordByUsername(username);
+       user = await this.usersService.getWithPasswordByEmail(email);
     }
     catch (e) {
        throw new AccessForbiddenError({
          identifier: ErrorIdentifiers.AUTH_CREDENTIALS_INVALID,
-         message: "The supplied username & password combination is invalid.",
-         applicationMessage: "The supplied username & password combination is invalid."
+         message: "The supplied email & password combination is invalid.",
+         applicationMessage: "The supplied email & password combination is invalid."
        });
     }
 
-    const passwordValid = await PasswordService.checkPassword(password, user.passwordHash);
+    const passwordValid = await PasswordService.checkPassword(password, user.password);
     if (!passwordValid) {
       throw new AccessForbiddenError({
        identifier: ErrorIdentifiers.AUTH_CREDENTIALS_INVALID,
-       message: "The supplied username & password combination is invalid.",
-       applicationMessage: "The supplied username & password combination is invalid."
+       message: "The supplied email & password combination is invalid.",
+       applicationMessage: "The supplied email & password combination is invalid."
      });
     }
 
@@ -42,13 +43,15 @@ export class AuthService {
     const tokens = await this.tokenService.createNewTokenPair(user);
 
     return {
+      tokens: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken
+      },
       user: userDto,
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken
     }
   }
 
-  async refresh(refreshToken: string): Promise<RefreshResponse> {
+  async refresh(refreshToken: string): Promise<TokenPair> {
     const tokenPayload = await this.tokenService.validateAndDecodeRefreshToken(refreshToken);
 
     if (!tokenPayload) {

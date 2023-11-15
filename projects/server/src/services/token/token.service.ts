@@ -12,7 +12,9 @@ import {
 import {DataStoreService} from "../data-store/data-store.service.js";
 import {v4 as createUUID} from "uuid";
 import {SystemError} from "../errors/base/system.error.js";
-import ms, { StringValue } from "ms";
+import ms from "ms";
+import {AccessControlOptions} from "../../modules/auth/access-control.js";
+import {UserContext} from "../../common/request-context.decorator.js";
 
 
 @Injectable()
@@ -28,7 +30,7 @@ export class TokenService {
    * @param expiryString
    * @private
    */
-  private getTokenExpiry(expiryString: StringValue) {
+  private getTokenExpiry(expiryString: string) {
     const currentTime = new Date().getTime();
     const timeToExpiry = ms(expiryString);
     return currentTime + timeToExpiry;
@@ -46,7 +48,7 @@ export class TokenService {
     // Generate the expiry of the refresh token here so I can set an initial expiry on the sid value stored.
     // This expiry is then updated as the token is refreshed.
     // todo: the expiry of the stored sid doesn't exactly match the refresh tokens expiry as set by jsonwebtoken.
-    const expiry = this.getTokenExpiry(this.configService.config.auth.refreshToken.expiry as StringValue);
+    const expiry = this.getTokenExpiry(this.configService.config.auth.refreshToken.expiry);
 
     await this.setTokenGroupCounterId(groupId, counterId, expiry);
     return this.createTokenPair(userDto, groupId, counterId);
@@ -68,7 +70,7 @@ export class TokenService {
 
     // Update the expiry of the sequence id to match the newly generated refresh token.
     // todo: the expiry of the stored sid doesn't exactly match the refresh tokens expiry as set by jsonwebtoken.
-    const expiry = this.getTokenExpiry(this.configService.config.auth.refreshToken.expiry as StringValue);
+    const expiry = this.getTokenExpiry(this.configService.config.auth.refreshToken.expiry);
     await this.setTokenGroupCounterId(groupId, counterId + 1, expiry);
 
     return this.createTokenPair(userDto, groupId, counterId + 1);
@@ -91,7 +93,7 @@ export class TokenService {
       cid: counterId,
     };
 
-    const accessTokenPayload = {
+    const accessTokenPayload: AccessTokenPayload = {
       ...basicPayload,
       type: "accessToken",
       isVerified: userDto.isVerified,
@@ -103,7 +105,7 @@ export class TokenService {
       { expiresIn: this.configService.config.auth.accessToken.expiry },
     );
 
-    const refreshTokenPayload = {
+    const refreshTokenPayload: RefreshTokenPayload = {
       ...basicPayload,
       type: "refreshToken"
     };
@@ -155,6 +157,52 @@ export class TokenService {
     }
 
     return null;
+  }
+
+  /**
+   * A function that validates the supplied access token.
+   * Returns the user context if valid, throws an error if not.
+   *
+   * @param accessToken
+   * @param accessControl
+   */
+  async validateAccessToken(accessToken: string, accessControl?: AccessControlOptions): Promise<UserContext> {
+    const accessTokenPayload = await this.tokenService.validateAndDecodeAccessToken(accessToken);
+
+    // Control access to unverified users if required.
+    if (accessControl?.isVerified !== undefined){
+      if (accessTokenPayload.isVerified !== accessControl.isVerified) {
+        throw new AccessForbiddenError({
+          identifier: ErrorIdentifiers.AUTH_EMAIL_NOT_VERIFIED,
+          applicationMessage: accessTokenPayload.isVerified
+            ? "Only unverified accounts can perform this action."
+            : "You must verify your account before you can perform this action."
+        })
+      }
+    }
+
+    // RBAC check for users if required.
+    if (accessControl?.roles) {
+      let hasValidRole = false;
+
+      for (const role of accessControl.roles) {
+        if (accessTokenPayload.roles.includes(role)) {
+          hasValidRole = true;
+        }
+      }
+
+      if (!hasValidRole) {
+        throw new AccessForbiddenError({
+          applicationMessage: "You do not have the role required to perform this action."
+        })
+      }
+    }
+
+    return {
+      isVerified: accessTokenPayload.isVerified,
+      id: accessTokenPayload.sub,
+      roles: accessTokenPayload.roles
+    }
   }
 
   /**

@@ -30,10 +30,6 @@ export const ConfigSchema = z.object({
       secret: z.string(),
       expiry: z.string()
     }),
-    passwordReset: z.object({
-      secret: z.string(),
-      expiry: z.string()
-    }),
     accountVerification: z.object({
       secret: z.string(),
       expiry: z.string()

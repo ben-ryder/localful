@@ -40,10 +40,6 @@ export class ConfigService {
         secret: process.env.AUTH_REFRESH_TOKEN_SECRET,
         expiry: "7 days"
       },
-      passwordReset: {
-        secret: process.env.AUTH_PASSWORD_RESET_SECRET,
-        expiry: "15 mins"
-      },
       accountVerification: {
         secret: process.env.AUTH_ACCOUNT_VERIFICATION_SECRET,
         expiry: "15 mins"

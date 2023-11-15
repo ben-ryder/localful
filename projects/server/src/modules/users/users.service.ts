@@ -44,8 +44,8 @@ export class UsersService {
         return userDto;
     }
 
-    async getWithPasswordByUsername(username: string): Promise<DatabaseUserDto> {
-        return this.usersDatabaseService.getByUsername(username);
+    async getWithPasswordByEmail(email: string): Promise<DatabaseUserDto> {
+        return this.usersDatabaseService.getByEmail(email);
     }
 
     async add(createUserDto: CreateUserRequest): Promise<UserDto> {

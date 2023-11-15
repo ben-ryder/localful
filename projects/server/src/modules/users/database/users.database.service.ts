@@ -91,12 +91,12 @@ export class UsersDatabaseService {
     }
   }
 
-  async getByUsername(username: string): Promise<DatabaseUserDto> {
+  async getByEmail(email: string): Promise<DatabaseUserDto> {
     const sql = await this.databaseService.getSQL();
 
     let result: InternalDatabaseUserDto[] = [];
     try {
-      result = await sql<InternalDatabaseUserDto[]>`SELECT * FROM users WHERE username = ${username}`;
+      result = await sql<InternalDatabaseUserDto[]>`SELECT * FROM users WHERE email = ${email}`;
     }
     catch (e: any) {
       throw UsersDatabaseService.getDatabaseError(e);

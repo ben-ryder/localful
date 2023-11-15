@@ -16,10 +16,12 @@ export const AccessTokenPayload = TokenPayload.extend({
   isVerified: z.boolean(),
   role: Roles
 })
+export type AccessTokenPayload = z.infer<typeof AccessTokenPayload>;
 
 export const RefreshTokenPayload = TokenPayload.extend({
   type: z.literal("refreshToken"),
 })
+export type RefreshTokenPayload = z.infer<typeof RefreshTokenPayload>;
 
 export interface TokenPair {
   accessToken: string;

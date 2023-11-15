@@ -1,7 +1,7 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service.js";
-import {LoginRequest, LogoutRequest, RefreshRequest, Roles} from "@localful/common";
+import {LoginRequest, LogoutRequest, RefreshRequest} from "@localful/common";
 import {AuthGuard} from "./auth.guards.js";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
 import {UseAccessControl} from "./access-control.js";
@@ -19,7 +19,7 @@ export class AuthController {
   @Post("/login")
   @HttpCode(HttpStatus.OK)
   async login(@Body(new ZodValidationPipe(LoginRequest)) loginRequest: LoginRequest) {
-    return await this.authService.login(loginRequest.username, loginRequest.password);
+    return await this.authService.login(loginRequest.email, loginRequest.password);
   }
 
   @Post("/logout")
@@ -34,36 +34,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refresh(@Body(new ZodValidationPipe(RefreshRequest)) refreshRequest: RefreshRequest) {
     return await this.authService.refresh(refreshRequest.refreshToken);
-  }
-
-  /**
-   * An endpoint where users can request password reset emails.
-   * Will always succeed regardless of if the email address supplied was valid and/or an email was actually sent
-   *
-   * @param res
-   */
-  @Get("/reset")
-  async requestPasswordReset(@Response() res: ExpressResponse) {
-    // todo: implement /v1/auth/reset [GET]
-    return res.status(HttpStatus.NOT_IMPLEMENTED).send({
-      statusCode: HttpStatus.NOT_IMPLEMENTED,
-      message: "Password resets have not been implemented yet"
-    });
-  }
-
-  /**
-   * An endpoint where users can request password reset emails.
-   * Will always succeed regardless of if the email address supplied was valid and/or an email was actually sent
-   *
-   * @param res
-   */
-  @Post("/reset")
-  async requestPasswordChange(@Response() res: ExpressResponse) {
-    // todo: implement /v1/auth/reset [POST]
-    return res.status(HttpStatus.NOT_IMPLEMENTED).send({
-      statusCode: HttpStatus.NOT_IMPLEMENTED,
-      message: "Password resets have not been implemented yet"
-    });
   }
 
   /**
@@ -115,22 +85,12 @@ export class AuthController {
   }
 
   /**
-   * An endpoint which can be used to test if the user is verified.
+   * An endpoint which can be used to test if the user is unverified.
    */
   @Get("/check/unverified")
   @UseGuards(AuthGuard)
   @UseAccessControl({isVerified: false})
   async checkUnverified() {
-    return null;
-  }
-
-  /**
-   * An endpoint which can be used to check if the user is admin.
-   */
-  @Get("/check/admin")
-  @UseGuards(AuthGuard)
-  @UseAccessControl({roles: [Roles.ADMIN]})
-  async checkAdmin() {
     return null;
   }
 }
