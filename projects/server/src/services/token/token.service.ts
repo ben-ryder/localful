@@ -5,7 +5,6 @@ import {ConfigService} from "../config/config.js";
 import {
   AccessTokenPayload,
   RefreshTokenPayload,
-  Roles,
   TokenPair,
   UserDto
 } from "@localful/common";
@@ -13,15 +12,13 @@ import {DataStoreService} from "../data-store/data-store.service.js";
 import {v4 as createUUID} from "uuid";
 import {SystemError} from "../errors/base/system.error.js";
 import ms from "ms";
-import {AccessControlOptions} from "../../modules/auth/access-control.js";
-import {UserContext} from "../../common/request-context.decorator.js";
 
 
 @Injectable()
 export class TokenService {
   constructor(
     private configService: ConfigService,
-    private dataStoreService: DataStoreService,
+    private dataStoreService: DataStoreService
   ) {}
 
   /**
@@ -30,7 +27,7 @@ export class TokenService {
    * @param expiryString
    * @private
    */
-  private getTokenExpiry(expiryString: string) {
+  private _parseTokenExpiry(expiryString: string) {
     const currentTime = new Date().getTime();
     const timeToExpiry = ms(expiryString);
     return currentTime + timeToExpiry;
@@ -48,10 +45,10 @@ export class TokenService {
     // Generate the expiry of the refresh token here so I can set an initial expiry on the sid value stored.
     // This expiry is then updated as the token is refreshed.
     // todo: the expiry of the stored sid doesn't exactly match the refresh tokens expiry as set by jsonwebtoken.
-    const expiry = this.getTokenExpiry(this.configService.config.auth.refreshToken.expiry);
+    const expiry = this._parseTokenExpiry(this.configService.config.auth.refreshToken.expiry);
 
-    await this.setTokenGroupCounterId(groupId, counterId, expiry);
-    return this.createTokenPair(userDto, groupId, counterId);
+    await this._setTokenGroupCounterId(groupId, counterId, expiry);
+    return this._getTokenPair(userDto, groupId, counterId);
   }
 
   /**
@@ -61,7 +58,7 @@ export class TokenService {
    * @param groupId
    */
   async getRefreshedTokenPair(userDto: UserDto, groupId: string): Promise<TokenPair> {
-    const counterId = await this.getTokenGroupCounterId(groupId);
+    const counterId = await this._getTokenGroupCounterId(groupId);
     if (!counterId) {
       throw new SystemError({
         message: `Failed to find cid for token group '${groupId}' for user '${userDto.id}.'`
@@ -70,10 +67,10 @@ export class TokenService {
 
     // Update the expiry of the sequence id to match the newly generated refresh token.
     // todo: the expiry of the stored sid doesn't exactly match the refresh tokens expiry as set by jsonwebtoken.
-    const expiry = this.getTokenExpiry(this.configService.config.auth.refreshToken.expiry);
-    await this.setTokenGroupCounterId(groupId, counterId + 1, expiry);
+    const expiry = this._parseTokenExpiry(this.configService.config.auth.refreshToken.expiry);
+    await this._setTokenGroupCounterId(groupId, counterId + 1, expiry);
 
-    return this.createTokenPair(userDto, groupId, counterId + 1);
+    return this._getTokenPair(userDto, groupId, counterId + 1);
   }
 
   /**
@@ -84,7 +81,7 @@ export class TokenService {
    * @param counterId
    * @private
    */
-  private async createTokenPair(userDto: UserDto, groupId: string, counterId: number): Promise<TokenPair> {
+  private async _getTokenPair(userDto: UserDto, groupId: string, counterId: number): Promise<TokenPair> {
     const basicPayload = {
       iss: this.configService.config.auth.issuer || "localful",
       aud: this.configService.config.auth.audience || "localful",
@@ -93,11 +90,11 @@ export class TokenService {
       cid: counterId,
     };
 
-    const accessTokenPayload: AccessTokenPayload = {
+    const accessTokenPayload = {
       ...basicPayload,
       type: "accessToken",
       isVerified: userDto.isVerified,
-      roles: [Roles.USER]
+      role: userDto.role
     };
     const accessToken = sign(
       accessTokenPayload,
@@ -105,7 +102,7 @@ export class TokenService {
       { expiresIn: this.configService.config.auth.accessToken.expiry },
     );
 
-    const refreshTokenPayload: RefreshTokenPayload = {
+    const refreshTokenPayload = {
       ...basicPayload,
       type: "refreshToken"
     };
@@ -128,7 +125,7 @@ export class TokenService {
   async validateAndDecodeAccessToken(accessToken: string): Promise<AccessTokenPayload|null> {
     try {
       const payload = verify(accessToken, this.configService.config.auth.accessToken.secret) as unknown as AccessTokenPayload;
-      const isValidToken = await this.validateCustomAuthClaims(payload.gid, payload.cid);
+      const isValidToken = await this._validateCustomAuthClaims(payload.gid, payload.cid);
       if (isValidToken) {
         return payload;
       }
@@ -147,7 +144,7 @@ export class TokenService {
   async validateAndDecodeRefreshToken(refreshToken: string): Promise<RefreshTokenPayload|null> {
     try {
       const payload = verify(refreshToken, this.configService.config.auth.refreshToken.secret) as unknown as RefreshTokenPayload;
-      const isValidToken = await this.validateCustomAuthClaims(payload.gid, payload.cid);
+      const isValidToken = await this._validateCustomAuthClaims(payload.gid, payload.cid);
       if (isValidToken) {
         return payload;
       }
@@ -160,65 +157,19 @@ export class TokenService {
   }
 
   /**
-   * A function that validates the supplied access token.
-   * Returns the user context if valid, throws an error if not.
-   *
-   * @param accessToken
-   * @param accessControl
-   */
-  async validateAccessToken(accessToken: string, accessControl?: AccessControlOptions): Promise<UserContext> {
-    const accessTokenPayload = await this.tokenService.validateAndDecodeAccessToken(accessToken);
-
-    // Control access to unverified users if required.
-    if (accessControl?.isVerified !== undefined){
-      if (accessTokenPayload.isVerified !== accessControl.isVerified) {
-        throw new AccessForbiddenError({
-          identifier: ErrorIdentifiers.AUTH_EMAIL_NOT_VERIFIED,
-          applicationMessage: accessTokenPayload.isVerified
-            ? "Only unverified accounts can perform this action."
-            : "You must verify your account before you can perform this action."
-        })
-      }
-    }
-
-    // RBAC check for users if required.
-    if (accessControl?.roles) {
-      let hasValidRole = false;
-
-      for (const role of accessControl.roles) {
-        if (accessTokenPayload.roles.includes(role)) {
-          hasValidRole = true;
-        }
-      }
-
-      if (!hasValidRole) {
-        throw new AccessForbiddenError({
-          applicationMessage: "You do not have the role required to perform this action."
-        })
-      }
-    }
-
-    return {
-      isVerified: accessTokenPayload.isVerified,
-      id: accessTokenPayload.sub,
-      roles: accessTokenPayload.roles
-    }
-  }
-
-  /**
    * Validate the custom auth claims of the token.
    * These are the gid and cid values.
    *
    * @param groupId
    * @param counterId
    */
-  async validateCustomAuthClaims(groupId: string, counterId: number) {
-    const isBlacklisted = await this.isTokenGroupBlacklisted(groupId);
+  async _validateCustomAuthClaims(groupId: string, counterId: number) {
+    const isBlacklisted = await this._isTokenGroupBlacklisted(groupId);
     if (isBlacklisted) {
       return false;
     }
 
-    const storedCounterId = await this.getTokenGroupCounterId(groupId);
+    const storedCounterId = await this._getTokenGroupCounterId(groupId);
     return counterId === storedCounterId;
   }
 
@@ -240,7 +191,7 @@ export class TokenService {
    * @param groupId
    * @private
    */
-  private async isTokenGroupBlacklisted(groupId: string): Promise<boolean> {
+  private async _isTokenGroupBlacklisted(groupId: string): Promise<boolean> {
     return await this.dataStoreService.getItem(`bl-${groupId}`) !== null;
   }
 
@@ -252,18 +203,18 @@ export class TokenService {
    * @param expiry
    * @private
    */
-  private async setTokenGroupCounterId(groupId: string, counterId: number, expiry: number): Promise<void> {
+  private async _setTokenGroupCounterId(groupId: string, counterId: number, expiry: number): Promise<void> {
     await this.dataStoreService.addItem(`cid-${groupId}`, counterId.toString(), {epochExpiry: expiry});
   }
 
   /**
-   * Fetch the counter ID for the supplied toke group.
+   * Fetch the counter ID for the supplied token group.
    * Will return null if the counter ID doesn't exist or is invalid.
    *
    * @param groupId
    * @private
    */
-  private async getTokenGroupCounterId(groupId: string): Promise<number|null> {
+  private async _getTokenGroupCounterId(groupId: string): Promise<number|null> {
     const counterIdIdString = await this.dataStoreService.getItem(`cid-${groupId}`);
     if (!counterIdIdString) {
       return null;

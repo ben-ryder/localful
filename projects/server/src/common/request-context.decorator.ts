@@ -6,7 +6,8 @@ import { Request } from "express";
  */
 export interface RequestUser {
   id: string;
-  scopes: string[]
+  isVerified: boolean;
+  permissions: string[]
 }
 
 /**

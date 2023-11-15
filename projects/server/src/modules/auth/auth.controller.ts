@@ -1,11 +1,8 @@
-import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service.js";
 import {LoginRequest, LogoutRequest, RefreshRequest} from "@localful/common";
-import {AuthGuard} from "./auth.guards.js";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
-import {UseAccessControl} from "./access-control.js";
-
 
 @Controller({
   path: "/auth",
@@ -63,34 +60,5 @@ export class AuthController {
       statusCode: HttpStatus.NOT_IMPLEMENTED,
       message: "Account verification has not been implemented yet"
     });
-  }
-
-  /**
-   * An endpoint which can be used to test if the use has a valid access token.
-   */
-  @Get("/check")
-  @UseGuards(AuthGuard)
-  async check() {
-    return null;
-  }
-
-  /**
-   * An endpoint which can be used to test if the user is verified.
-   */
-  @Get("/check/verified")
-  @UseGuards(AuthGuard)
-  @UseAccessControl({isVerified: true})
-  async checkVerified() {
-    return null;
-  }
-
-  /**
-   * An endpoint which can be used to test if the user is unverified.
-   */
-  @Get("/check/unverified")
-  @UseGuards(AuthGuard)
-  @UseAccessControl({isVerified: false})
-  async checkUnverified() {
-    return null;
   }
 }

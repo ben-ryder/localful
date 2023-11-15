@@ -2,16 +2,40 @@ import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
 import {TokenService} from "../../services/token/token.service.js";
 import {RequestWithContext, UserContext} from "../../common/request-context.decorator.js";
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error.js";
-import {ACCESS_CONTROL_METADATA_KEY, AccessControlOptions} from "./access-control.js";
 import {Socket} from "socket.io";
-import {Reflector} from "@nestjs/core";
+import {Permissions, RolePermissions, Roles} from "@localful/common";
+
+export interface AccessControlOptions {
+  /** A list of valid permissions **/
+  validPermissions: Permissions[],
+  /** The user context requesting this action **/
+  requestingUserContext: UserContext,
+  /** The target user id of the given action **/
+  targetUserId: string
+}
+
+/**
+ * Get the permissions associated with the given role.
+ * This function includes resolving all inherited permissions too.
+ *
+ * @param role
+ */
+function resolveRolePermissions(role: Roles): Permissions[] {
+  const permissionProfile = RolePermissions[role]
+  let permissions = permissionProfile.permissions
+
+  if (permissionProfile.inherit) {
+    permissions = permissions.concat(resolveRolePermissions(permissionProfile.inherit))
+  }
+
+  return permissions
+}
 
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private tokenService: TokenService,
-    private reflector: Reflector
+    private tokenService: TokenService
   ) {}
 
   async canActivate(
@@ -23,19 +47,23 @@ export class AuthGuard implements CanActivate {
       const accessToken = authorizationHeader.split(" ")[1];
 
       if (accessToken) {
-        const accessControl = this.reflector.getAllAndOverride<AccessControlOptions|undefined>(ACCESS_CONTROL_METADATA_KEY, [
-          context.getHandler(),
-          context.getClass(),
-        ]);
+        const tokenPayload = await this.tokenService.validateAndDecodeAccessToken(accessToken);
 
-        const userContext = await this.tokenService.validateAccessToken(accessToken, accessControl);
-        this.attachRequestContext(request, userContext);
-        return true;
+        if (tokenPayload) {
+          const userContext: UserContext = {
+            id: tokenPayload.sub,
+            isVerified: tokenPayload.isVerified,
+            permissions: resolveRolePermissions(tokenPayload.role)
+          }
+
+          this.attachRequestContext(request, userContext);
+          return true;
+        }
       }
     }
 
     throw new AccessUnauthorizedError({
-      message: "Request Access Denied"
+      message: "You are not authorized"
     })
   }
 
@@ -55,27 +83,38 @@ export class AuthGuard implements CanActivate {
 @Injectable()
 export class AuthGatewayGuard implements CanActivate {
   constructor(
-    private tokenService: TokenService,
-    private reflector: Reflector
+    private tokenService: TokenService
   ) {}
 
   async canActivate(
     context: ExecutionContext,
   ): Promise<boolean> {
     const socket = context.switchToWs().getClient<Socket>();
-    const accessToken = socket.handshake.auth.accessToken;
-    if (accessToken) {
-      const accessControl = this.reflector.getAllAndOverride<AccessControlOptions|undefined>(ACCESS_CONTROL_METADATA_KEY, [
-        context.getHandler(),
-        context.getClass(),
-      ]);
 
-      const userContext = await this.tokenService.validateAccessToken(accessToken, accessControl);
-      return true;
+    const accessToken = socket.handshake?.auth?.accessToken;
+    if (accessToken) {
+      const tokenPayload = await this.tokenService.validateAndDecodeAccessToken(accessToken);
+
+      if (tokenPayload) {
+        const userContext: UserContext = {
+          id: tokenPayload.sub,
+          isVerified: tokenPayload.isVerified,
+          permissions: resolveRolePermissions(tokenPayload.role)
+        }
+
+        this.attachSocketContext(socket, userContext);
+        return true;
+      }
     }
 
     throw new AccessUnauthorizedError({
       message: "Request Access Denied"
     })
+  }
+
+  attachSocketContext(socket: Socket, userContext: UserContext) {
+    // todo: add SocketWithContext type for this, like I do with RequestWithContext
+    // @ts-ignore
+    socket.user = userContext
   }
 }

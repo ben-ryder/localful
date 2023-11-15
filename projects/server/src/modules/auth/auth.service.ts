@@ -7,6 +7,7 @@ import {AccessForbiddenError} from "../../services/errors/access/access-forbidde
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error.js";
 import {UserRequestError} from "../../services/errors/base/user-request.error.js";
 import {DatabaseUserDto} from "../users/database/database-user.js";
+import {AccessControlOptions} from "./auth.guards.js";
 
 
 @Injectable()
@@ -17,10 +18,10 @@ export class AuthService {
   ) {}
 
   async login(email: string, password: string): Promise<LoginResponse> {
-    let user: DatabaseUserDto;
+    let databaseUserDto: DatabaseUserDto;
 
     try {
-       user = await this.usersService.getWithPasswordByEmail(email);
+      databaseUserDto = await this.usersService.getWithPasswordByEmail(email);
     }
     catch (e) {
        throw new AccessForbiddenError({
@@ -30,7 +31,7 @@ export class AuthService {
        });
     }
 
-    const passwordValid = await PasswordService.checkPassword(password, user.password);
+    const passwordValid = await PasswordService.checkPassword(password, databaseUserDto.password);
     if (!passwordValid) {
       throw new AccessForbiddenError({
        identifier: ErrorIdentifiers.AUTH_CREDENTIALS_INVALID,
@@ -39,8 +40,8 @@ export class AuthService {
      });
     }
 
-    const userDto = this.usersService.removePasswordFromUser(user);
-    const tokens = await this.tokenService.createNewTokenPair(user);
+    const userDto = this.usersService.removePasswordFromUser(databaseUserDto);
+    const tokens = await this.tokenService.createNewTokenPair(userDto);
 
     return {
       tokens: {
@@ -62,7 +63,7 @@ export class AuthService {
       });
     }
 
-    // As the token has been validated the supplied userId/sub value in the token can in theory trusted
+    // As the token has been validated the supplied userId/sub value in the token can be trusted in theory
     // If the user isn't found, the user service will throw an error.
     // todo: the user service throwing an error not returning null makes the error handling here unclear.
     const userDto = await this.usersService.get(tokenPayload.sub);
@@ -71,15 +72,38 @@ export class AuthService {
   }
 
   async logout(refreshToken: string) {
-    const payload = await this.tokenService.validateAndDecodeRefreshToken(refreshToken);
+    const tokenPayload = await this.tokenService.validateAndDecodeRefreshToken(refreshToken);
 
-    if (!payload) {
+    if (!tokenPayload) {
       throw new UserRequestError({
         identifier: ErrorIdentifiers.AUTH_TOKEN_INVALID,
         applicationMessage: "The refresh token supplied is either invalid or already expired."
       });
     }
 
-    await this.tokenService.blacklistTokenGroup(payload.gid, payload.exp);
+    await this.tokenService.blacklistTokenGroup(tokenPayload.gid, tokenPayload.exp);
+  }
+
+  /**
+   * A function that validates the supplied access token against
+   * Returns the user context if valid, throws an error if not.
+   *
+   * @param options
+   */
+  async confirmAccessControlRules(options: AccessControlOptions): Promise<void> {
+    for (const validPermission of options.validPermissions) {
+      if (options.requestingUserContext?.permissions.includes(validPermission)) {
+        if (validPermission.endsWith(":all")) {
+          return;
+        }
+        else if (options.requestingUserContext.id === options.targetUserId) {
+          return;
+        }
+      }
+    }
+
+    throw new AccessForbiddenError({
+      applicationMessage: "You do not have the permissions required to perform this action."
+    });
   }
 }

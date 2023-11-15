@@ -10,3 +10,8 @@ import {UsersModule} from "../users/users.module.js";
   providers: [AuthService],
 })
 export class AuthModule {}
+
+/**
+ * todo: should structure of module change?
+ * currently logic is a bit scattered between the guard, service, token service etc
+ */

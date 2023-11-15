@@ -1,6 +1,6 @@
 {
   "name": "@localful/server",
-  "version": "0.7.0",
+  "version": "0.1.0",
   "description": "A generic backend for local-first applications including content backup, cross-device sync and multi-user support.",
   "author": "Ben-Ryder <dev@benryder.me> (https://www.benryder.me)",
   "license": "AGPL-3.0-only",
@@ -21,7 +21,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
-    "@localful/common": "^0.1.0",
+    "@localful/common": "^0.1.2",
     "@nestjs/common": "^9.1.4",
     "@nestjs/core": "^9.1.4",
     "@nestjs/platform-express": "^9.1.4",

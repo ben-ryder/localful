@@ -7,7 +7,7 @@ export const TokenPayload = z.object({
   sub: z.string(),
   gid: z.string(),
   cid: z.number(),
-  exp: z.string(),
+  exp: z.number(),
 }).strict()
 export type TokenPayload = z.infer<typeof TokenPayload>;
 
