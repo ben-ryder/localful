@@ -2,16 +2,13 @@ import {PasswordService} from "../../services/password/password.service.js";
 import {UsersDatabaseService} from "./database/users.database.service.js";
 import {Injectable} from "@nestjs/common";
 import {
-    CreateUserRequest,
-    DatabaseUserDto,
-    GetUserResponse,
-    UpdateDatabaseUserDto,
-    UpdateUserRequest,
-    UpdateUserResponse,
+    CreateUserDto,
+    UpdateUserDto,
     UserDto
 } from "@localful/common";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
 import {UserContext} from "../../common/request-context.decorator.js";
+import {DatabaseUserDto} from "./database/database-user.js";
 
 
 @Injectable()
@@ -20,6 +17,7 @@ export class UsersService {
        private usersDatabaseService: UsersDatabaseService
     ) {}
 
+    // @todo: replace with auth system checks
     checkAccess(userContext: UserContext, userId: string): void {
         if (userContext?.id !== userId) {
             throw new AccessForbiddenError({
@@ -28,12 +26,12 @@ export class UsersService {
         }
     }
 
-    async get(userId: string): Promise<GetUserResponse> {
+    async get(userId: string): Promise<UserDto> {
         const user = await this.usersDatabaseService.get(userId);
         return this.removePasswordFromUser(user);
     }
 
-    async getWithAccessCheck(userContext: UserContext, userId: string): Promise<GetUserResponse> {
+    async getWithAccessCheck(userContext: UserContext, userId: string): Promise<UserDto> {
         this.checkAccess(userContext, userId);
         return this.get(userId);
     }
@@ -48,13 +46,12 @@ export class UsersService {
         return this.usersDatabaseService.getByEmail(email);
     }
 
-    async add(createUserDto: CreateUserRequest): Promise<UserDto> {
+    async add(createUserDto: CreateUserDto): Promise<UserDto> {
         const passwordHash = await PasswordService.hashPassword(createUserDto.password);
 
         const user = {
-            username: createUserDto.username,
             email: createUserDto.email,
-            encryptionSecret: createUserDto.encryptionSecret,
+            protectedEncryptionKey: createUserDto.protectedEncryptionKey,
             passwordHash
         }
 

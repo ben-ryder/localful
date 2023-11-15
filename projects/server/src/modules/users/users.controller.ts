@@ -2,7 +2,7 @@ import {ConfigService} from "../../services/config/config.js";
 import {UsersService} from "./users.service.js";
 import {TokenService} from "../../services/token/token.service.js";
 import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
-import {CreateUserRequest, UsersURLParams, UpdateUserRequest} from "@localful/common";
+import {CreateUserDto, UsersURLParams, UpdateUserDto} from "@localful/common";
 import {ErrorIdentifiers} from "@localful/common";
 import {RequestContext} from "../../common/request-context.decorator.js";
 import {AuthGuard} from "../auth/auth.guards.js";
@@ -23,7 +23,7 @@ export class UsersController {
 
   @Post()
   async add(
-    @Body(new ZodValidationPipe(CreateUserRequest)) createUserRequest: CreateUserRequest
+    @Body(new ZodValidationPipe(CreateUserDto)) createUserDto: CreateUserDto
   ) {
     if (!this.configService.config.app.registrationEnabled) {
       throw new AccessForbiddenError({
@@ -32,7 +32,7 @@ export class UsersController {
       })
     }
 
-    const newUser = await this.usersService.add(createUserRequest);
+    const newUser = await this.usersService.add(createUserDto);
     const tokens = await this.tokenService.createNewTokenPair(newUser);
 
     return {
@@ -52,10 +52,10 @@ export class UsersController {
   @UseGuards(AuthGuard)
   async update(
     @Param(new ZodValidationPipe(UsersURLParams)) params: UsersURLParams,
-    @Body(new ZodValidationPipe(UpdateUserRequest)) updateUserRequest: UpdateUserRequest,
+    @Body(new ZodValidationPipe(UpdateUserDto)) updateUserDto: UpdateUserDto,
     @RequestContext() context: RequestContext
   ) {
-    return await this.usersService.updateWithAccessCheck(context.user, params.userId, updateUserRequest);
+    return await this.usersService.updateWithAccessCheck(context.user, params.userId, updateUserDto);
   }
 
   @Delete("/:userId")
