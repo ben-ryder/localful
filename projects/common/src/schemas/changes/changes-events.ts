@@ -3,9 +3,9 @@
  * https://socket.io/docs/v4/typescript/
  */
 
-import {ChangesDto} from "./changes.js";
+import {ResourceChangesDto} from "./changes.js";
 
-export type ChangeEvent = (changes: ChangesDto) => void
+export type ChangeEvent = (changes: ResourceChangesDto) => void
 
 export interface ChangesEvents {
 	changes: ChangeEvent

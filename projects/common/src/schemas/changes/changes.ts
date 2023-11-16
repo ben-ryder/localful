@@ -14,8 +14,15 @@ export const ChangeDto = z.object({
 }).strict()
 export type ChangeDto = z.infer<typeof ChangeDto>;
 
-export const ChangesDto = z.object({
+export const ChangeDtoList = z.array(ChangeDto)
+export type ChangeDtoList = z.infer<typeof ChangeDtoList>
+
+/**
+ * A ChangeDtoList with explicit resourceId reference, required as some use cases like socket events
+ * can't rely on REST API URL relationships to determine the resourceId.
+ */
+export const ResourceChangesDto = z.object({
   resourceId: ResourceId,
-  changes: z.array(ChangeDto)
+  changes: ChangeDtoList
 })
-export type ChangesDto = z.infer<typeof ChangesDto>
+export type ResourceChangesDto = z.infer<typeof ResourceChangesDto>
