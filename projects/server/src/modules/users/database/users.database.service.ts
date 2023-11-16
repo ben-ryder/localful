@@ -1,5 +1,5 @@
 import {DatabaseService} from "../../../services/database/database.service.js";
-import {PostgresError, Row, RowList} from "postgres";
+import postgres, {Row, RowList} from "postgres";
 import {PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes.js";
 import {ErrorIdentifiers} from "@localful/common";
 import {Injectable} from "@nestjs/common";
@@ -52,7 +52,7 @@ export class UsersDatabaseService {
   }
 
   private static getDatabaseError(e: any) {
-    if (e instanceof PostgresError) {
+    if (e instanceof postgres.PostgresError) {
       if (e.code && e.code === PG_UNIQUE_VIOLATION) {
         if (e.constraint_name == "users_email_key") {
           return new ResourceRelationshipError({

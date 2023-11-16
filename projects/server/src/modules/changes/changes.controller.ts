@@ -1,12 +1,12 @@
 import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards} from "@nestjs/common";
 import {ChangesService} from "./changes.service.js";
-import {CreateChangesDto, ChangesQueryParams, ChangesURLParams} from "@localful/common";
+import {ChangeDtoList, ChangesQueryParams, ChangesURLParams} from "@localful/common";
 import {RequestContext} from "../../common/request-context.decorator.js";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
 import {AuthGuard} from "../auth/auth.guards.js";
 
 @Controller({
-  path: "/changes/:userId",
+  path: "/resources/:resourceId/changes",
   version: "1"
 })
 @UseGuards(AuthGuard)
@@ -17,12 +17,12 @@ export class ChangesController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  async create(
+  async createMany(
     @Param(new ZodValidationPipe(ChangesURLParams)) urlParams: ChangesURLParams,
-    @Body(new ZodValidationPipe(CreateChangesDto)) createChangesDto: CreateChangesDto,
+    @Body(new ZodValidationPipe(ChangeDtoList)) changeDtoList: ChangeDtoList,
     @RequestContext() context: RequestContext
   ) {
-    return await this.changesService.createMany(context?.user, urlParams.resourceId, createChangesDto);
+    return await this.changesService.createMany(context?.user, urlParams.resourceId, changeDtoList);
   }
 
   @Get()
@@ -32,13 +32,5 @@ export class ChangesController {
     @Query() queryParams: ChangesQueryParams
   ) {
     return await this.changesService.list(context?.user, urlParams.resourceId, queryParams);
-  }
-
-  @Delete()
-  async deleteChanges(
-    @Param(new ZodValidationPipe(ChangesURLParams)) urlParams: ChangesURLParams,
-    @RequestContext() context: RequestContext,
-  ) {
-    return await this.changesService.delete(context?.user, urlParams.resourceId);
   }
 }

@@ -13,7 +13,7 @@ export interface RequestUser {
 /**
  * The user context may be nothing in the case of an anonymous request, hence null is an option.
  */
-export type UserContext = RequestUser | null;
+export type UserContext = RequestUser;
 
 export interface RequestContext {
   user: UserContext

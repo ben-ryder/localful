@@ -14,9 +14,19 @@ export class ChangesDatabaseService {
   private static convertDatabaseDtoToDto(change: RawDatabaseChange): ChangeDto {
     return {
       id: change.id,
-      resourceId: change.resource_id,
       protectedData: change.protected_data,
       createdAt: change.created_at,
+    }
+  }
+
+  private static mapApplicationField(fieldName: keyof ChangeDto): keyof RawDatabaseChange {
+    switch (fieldName) {
+      case "createdAt":
+        return "created_at";
+      case "protectedData":
+        return "protected_data";
+      default:
+        return fieldName;
     }
   }
 
@@ -27,14 +37,14 @@ export class ChangesDatabaseService {
     })
   }
 
-  async createMany(changes: ChangeDto[]) {
+  async createMany(resourceId: string, changes: ChangeDto[]) {
     const sql = await this.databaseService.getSQL();
 
     try {
       for (const change of changes) {
         await sql`
         INSERT INTO changes(id, resource_id, protected_data, created_at)
-        VALUES (${change.id}, ${change.resourceId}, ${change.protectedData}, ${change.createdAt})
+        VALUES (${change.id}, ${resourceId}, ${change.protectedData}, ${change.createdAt})
        `;
       }
     }
@@ -43,21 +53,21 @@ export class ChangesDatabaseService {
     }
   }
 
-  async search(params: ChangesQueryParams): Promise<ChangeDto[]> {
+  async list(resourceId: string, params: ChangesQueryParams): Promise<ChangeDto[]> {
     const sql = await this.databaseService.getSQL();
 
-    // todo: built query based on params too.
+    // Default to only selecting id if no fields are supplied
+    const selectColumns: (keyof RawDatabaseChange)[] = params.fields
+      ? params.fields.map(ChangesDatabaseService.mapApplicationField)
+      : ["id"]
 
     let results: RawDatabaseChange[] = [];
     try {
-      if (params.ids && params.resourceIds) {
-        results = await sql<RawDatabaseChange[]>`SELECT * FROM changes WHERE resource_id IN ${sql(params.resourceIds)} AND id IN ${sql(params.ids)}`;
+      if (params.ids) {
+        results = await sql<RawDatabaseChange[]>`SELECT ${sql(selectColumns)} FROM changes WHERE resource_id = ${resourceId} AND id IN ${sql(params.ids)}`;
       }
-      else if (params.ids) {
-        results = await sql<RawDatabaseChange[]>`SELECT * FROM changes WHERE resource_id IN ${sql(params.resourceIds)} AND id IN ${sql(params.ids)}`;
-      }
-      else if (params.resourceIds) {
-        results = await sql<RawDatabaseChange[]>`SELECT * FROM changes WHERE resource_id = ${resourceId}`;
+      else {
+        results = await sql<RawDatabaseChange[]>`SELECT ${sql(selectColumns)} FROM changes WHERE resource_id = ${resourceId}`;
       }
     }
     catch (e: any) {

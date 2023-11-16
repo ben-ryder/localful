@@ -1,7 +1,7 @@
 import {Injectable} from "@nestjs/common";
 import {UsersService} from "../users/users.service.js";
 import {TokenService} from "../../services/token/token.service.js";
-import {LoginResponse, TokenPair, ErrorIdentifiers} from "@localful/common";
+import {LoginResponse, TokenPair, ErrorIdentifiers, Roles, RolePermissions, Permissions} from "@localful/common";
 import {PasswordService} from "../../services/password/password.service.js";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error.js";
@@ -110,5 +110,22 @@ export class AuthService {
     throw new AccessForbiddenError({
       applicationMessage: "You do not have the permissions required to perform this action."
     });
+  }
+
+  /**
+   * Get the permissions associated with the given role.
+   * This function includes resolving all inherited permissions too.
+   *
+   * @param role
+   */
+  static resolveRolePermissions(role: Roles): Permissions[] {
+    const permissionProfile = RolePermissions[role]
+    let permissions = permissionProfile.permissions
+
+    if (permissionProfile.inherit) {
+      permissions = permissions.concat(AuthService.resolveRolePermissions(permissionProfile.inherit))
+    }
+
+    return permissions
   }
 }

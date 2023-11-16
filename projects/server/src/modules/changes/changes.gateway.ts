@@ -7,58 +7,68 @@ import {
   SubscribeMessage,
   WebSocketGateway
 } from "@nestjs/websockets";
-import {ChangesSocketEvents, ChangesEventPayload} from "@localful/common";
-import {UsePipes} from "@nestjs/common";
+import {UseGuards, UsePipes} from "@nestjs/common";
+import {ChangesEvents, ResourceChangesDto} from "@localful/common";
 import {GatewayErrorFilter} from "../../services/errors/error.gateway-filter.js";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
-import {AuthService} from "../../services/auth/auth.service.js";
+import {AuthService} from "../auth/auth.service.js";
+import {TokenService} from "../../services/token/token.service.js";
+import {AuthGatewayGuard} from "../auth/auth.guards.js";
+import {SocketWithContext} from "../../common/socket-context.decorator.js";
+
 
 @WebSocketGateway()
 @UsePipes(
   GatewayErrorFilter
 )
+@UseGuards(AuthGatewayGuard)
 export class ChangesGateway implements OnGatewayConnection {
   constructor(
     private changesService: ChangesService,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
-  async handleConnection(socket: Socket) {
-    const currentUser = await this.authService.validateToken(socket.handshake.auth.token);
+  getSocketUser(socket: SocketWithContext) {
+    return socket.context?.user
+  }
+
+  async handleConnection(socket: SocketWithContext) {
+    const currentUser = this.getSocketUser(socket)
 
     /**
      * If the requesting user is valid, let them join their room to listen for changes.
      * If the user has no valid token, immediately disconnect the socket.
      */
     if (currentUser) {
-      socket.join(currentUser.userId);
+      socket.join(currentUser.id);
     }
     else {
       socket.disconnect();
     }
   }
 
-  @SubscribeMessage(ChangesSocketEvents.changes)
+  // todo: use types/keys from common package
+  @SubscribeMessage("changes")
   async onChanges(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody(new ZodValidationPipe(ChangesEventPayload)) payload: ChangesEventPayload
+    @ConnectedSocket() socket: SocketWithContext,
+    @MessageBody(new ZodValidationPipe(ResourceChangesDto)) resourceChangesDto: ResourceChangesDto
   ) {
-    const currentUser = await this.authService.validateToken(socket.handshake.auth.token);
+    // todo: need to validate socket/user on every event?
 
-    // The token may no longer be valid, in which case close the socket so the client has to
-    // re-supply a valid token.
+    const currentUser = this.getSocketUser(socket)
     if (!currentUser) {
-      socket.disconnect();
+      socket.disconnect()
       return;
     }
 
     // Immediately emit the change for other connected clients, which should
     // prevent synchronisation being delayed by database writes.
-    socket.to(currentUser.userId).emit(ChangesSocketEvents.changes, payload);
+    socket.to(currentUser.id).emit("changes", resourceChangesDto);
 
     // Add the change to the database
     // Failures here don't matter too much, due to the nature of local-first software
-    // the changes can always just be sent and backed up at a later stage.
-    await this.changesService._create(currentUser.userId, payload);
+    // the changes can always just be sent again at a later stage.
+    // todo: send failure ack to client?
+    await this.changesService.createMany(currentUser, resourceChangesDto.resourceId, resourceChangesDto.changes);
   }
 }

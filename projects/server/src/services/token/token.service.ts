@@ -1,6 +1,8 @@
 import {Injectable} from "@nestjs/common";
 
-import {sign, verify} from "jsonwebtoken";
+import jsonwebtoken from "jsonwebtoken";
+const {sign, verify} = jsonwebtoken
+
 import {ConfigService} from "../config/config.js";
 import {
   AccessTokenPayload,

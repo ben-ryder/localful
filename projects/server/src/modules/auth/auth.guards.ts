@@ -3,7 +3,8 @@ import {TokenService} from "../../services/token/token.service.js";
 import {RequestWithContext, UserContext} from "../../common/request-context.decorator.js";
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error.js";
 import {Socket} from "socket.io";
-import {Permissions, RolePermissions, Roles} from "@localful/common";
+import {Permissions} from "@localful/common";
+import {AuthService} from "./auth.service.js";
 
 export interface AccessControlOptions {
   /** A list of valid permissions, if the requesting user context matches the target user **/
@@ -14,23 +15,6 @@ export interface AccessControlOptions {
   requestingUserContext: UserContext,
   /** The target user id of the given action **/
   targetUserId: string
-}
-
-/**
- * Get the permissions associated with the given role.
- * This function includes resolving all inherited permissions too.
- *
- * @param role
- */
-function resolveRolePermissions(role: Roles): Permissions[] {
-  const permissionProfile = RolePermissions[role]
-  let permissions = permissionProfile.permissions
-
-  if (permissionProfile.inherit) {
-    permissions = permissions.concat(resolveRolePermissions(permissionProfile.inherit))
-  }
-
-  return permissions
 }
 
 
@@ -48,6 +32,7 @@ export class AuthGuard implements CanActivate {
     if (authorizationHeader) {
       const accessToken = authorizationHeader.split(" ")[1];
 
+      // todo: this is reused in
       if (accessToken) {
         const tokenPayload = await this.tokenService.validateAndDecodeAccessToken(accessToken);
 
@@ -55,7 +40,7 @@ export class AuthGuard implements CanActivate {
           const userContext: UserContext = {
             id: tokenPayload.sub,
             isVerified: tokenPayload.isVerified,
-            permissions: resolveRolePermissions(tokenPayload.role)
+            permissions: AuthService.resolveRolePermissions(tokenPayload.role)
           }
 
           this.attachRequestContext(request, userContext);
@@ -101,7 +86,7 @@ export class AuthGatewayGuard implements CanActivate {
         const userContext: UserContext = {
           id: tokenPayload.sub,
           isVerified: tokenPayload.isVerified,
-          permissions: resolveRolePermissions(tokenPayload.role)
+          permissions: AuthService.resolveRolePermissions(tokenPayload.role)
         }
 
         this.attachSocketContext(socket, userContext);
