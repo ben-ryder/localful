@@ -3,10 +3,8 @@ import {UsersService} from "./users.service.js";
 import {TokenService} from "../../services/token/token.service.js";
 import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
 import {CreateUserDto, UsersURLParams, UpdateUserDto} from "@localful/common";
-import {ErrorIdentifiers} from "@localful/common";
 import {RequestContext} from "../../common/request-context.decorator.js";
 import {AuthGuard} from "../auth/auth.guards.js";
-import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
 
 
@@ -25,13 +23,7 @@ export class UsersController {
   async add(
     @Body(new ZodValidationPipe(CreateUserDto)) createUserDto: CreateUserDto
   ) {
-    if (!this.configService.config.app.registrationEnabled) {
-      throw new AccessForbiddenError({
-        identifier: ErrorIdentifiers.USER_REGISTRATION_DISABLED,
-        applicationMessage: "User registration is currently disabled."
-      })
-    }
-
+    // Access control and registration enabled checks are done within the service.
     const newUser = await this.usersService.add(createUserDto);
     const tokens = await this.tokenService.createNewTokenPair(newUser);
 

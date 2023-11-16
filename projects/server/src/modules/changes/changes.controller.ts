@@ -1,9 +1,9 @@
 import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards} from "@nestjs/common";
 import {ChangesService} from "./changes.service.js";
-import {ChangeCreateDto, ChangesRetrieveQueryParams, ChangesURLParams} from "@localful/common";
+import {CreateChangesDto, ChangesQueryParams, ChangesURLParams} from "@localful/common";
 import {RequestContext} from "../../common/request-context.decorator.js";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
-import {AuthGuard} from "../../services/auth/auth.guard.js";
+import {AuthGuard} from "../auth/auth.guards.js";
 
 @Controller({
   path: "/changes/:userId",
@@ -18,35 +18,27 @@ export class ChangesController {
   @Post()
   @HttpCode(HttpStatus.OK)
   async create(
-    @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
-    @Body(new ZodValidationPipe(ChangeCreateDto)) newChanges: ChangeCreateDto,
+    @Param(new ZodValidationPipe(ChangesURLParams)) urlParams: ChangesURLParams,
+    @Body(new ZodValidationPipe(CreateChangesDto)) createChangesDto: CreateChangesDto,
     @RequestContext() context: RequestContext
   ) {
-    return await this.changesService.createWithAccessCheck(context?.user, params.userId, newChanges);
+    return await this.changesService.createMany(context?.user, urlParams.resourceId, createChangesDto);
   }
 
   @Get()
   async list(
-    @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
+    @Param(new ZodValidationPipe(ChangesURLParams)) urlParams: ChangesURLParams,
     @RequestContext() context: RequestContext,
-    @Query() query: ChangesRetrieveQueryParams
+    @Query() queryParams: ChangesQueryParams
   ) {
-    return await this.changesService.listWithAccessCheck(context?.user, params.userId, query.ids);
-  }
-
-  @Get("/ids")
-  async listIds(
-    @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
-    @RequestContext() context: RequestContext,
-  ) {
-    return await this.changesService.getIdsWithAccessCheck(context?.user, params.userId);
+    return await this.changesService.list(context?.user, urlParams.resourceId, queryParams);
   }
 
   @Delete()
   async deleteChanges(
-    @Param(new ZodValidationPipe(ChangesURLParams)) params: ChangesURLParams,
+    @Param(new ZodValidationPipe(ChangesURLParams)) urlParams: ChangesURLParams,
     @RequestContext() context: RequestContext,
   ) {
-    return await this.changesService.deleteAllWithAccessCheck(context?.user, params.userId);
+    return await this.changesService.delete(context?.user, urlParams.resourceId);
   }
 }

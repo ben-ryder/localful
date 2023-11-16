@@ -2,16 +2,15 @@ import {PasswordService} from "../../services/password/password.service.js";
 import {UsersDatabaseService} from "./database/users.database.service.js";
 import {Injectable} from "@nestjs/common";
 import {
-    CreateUserDto,
+    CreateUserDto, ErrorIdentifiers,
     UpdateUserDto,
     UserDto,
-    Permissions
 } from "@localful/common";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
 import {UserContext} from "../../common/request-context.decorator.js";
-import {DatabaseUpdateUserDto, DatabaseUserDto} from "./database/database-user.js";
+import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto} from "./database/database-user.js";
 import {AuthService} from "../auth/auth.service.js";
-import {UserRequestError} from "../../services/errors/base/user-request.error.js";
+import {ConfigService} from "../../services/config/config.js";
 
 
 @Injectable()
@@ -19,11 +18,12 @@ export class UsersService {
     constructor(
        private usersDatabaseService: UsersDatabaseService,
        public authService: AuthService,
+       public configService: ConfigService,
     ) {}
 
-    private async _UNSAFE_get(userId: string): Promise<UserDto> {
+    async _UNSAFE_get(userId: string): Promise<UserDto> {
         const user = await this.usersDatabaseService.get(userId);
-        return this.removePasswordFromUser(user);
+        return this.convertDatabaseDto(user);
     }
 
     async get(userContext: UserContext, userId: string): Promise<UserDto> {
@@ -37,27 +37,38 @@ export class UsersService {
         return this._UNSAFE_get(userId);
     }
 
-    private removePasswordFromUser(userWithPassword: DatabaseUserDto): UserDto {
+    convertDatabaseDto(userWithPassword: DatabaseUserDto): UserDto {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { passwordHash, ...userDto } = userWithPassword;
         return userDto;
     }
 
-    async getWithPasswordByEmail(email: string): Promise<DatabaseUserDto> {
+    async getDatabaseUser(email: string): Promise<DatabaseUserDto> {
         return this.usersDatabaseService.getByEmail(email);
     }
 
     async add(createUserDto: CreateUserDto): Promise<UserDto> {
-        const passwordHash = await PasswordService.hashPassword(createUserDto.password);
-
-        const user = {
-            email: createUserDto.email,
-            protectedEncryptionKey: createUserDto.protectedEncryptionKey,
-            passwordHash
+        // todo: add additional permission based access control? an anonymous role and user context would need adding
+        if (!this.configService.config.app.registrationEnabled) {
+            throw new AccessForbiddenError({
+                identifier: ErrorIdentifiers.USER_REGISTRATION_DISABLED,
+                applicationMessage: "User registration is currently disabled."
+            })
         }
 
-        const resultUser = await this.usersDatabaseService.create(user);
-        return this.removePasswordFromUser(resultUser);
+        const passwordHash = await PasswordService.hashPassword(createUserDto.password);
+
+        const databaseCreateUserDto: DatabaseCreateUserDto = {
+            displayName: createUserDto.displayName,
+            email: createUserDto.email,
+            passwordHash,
+            role: "user",
+            protectedEncryptionKey: createUserDto.protectedEncryptionKey,
+            protectedAdditionalData: createUserDto.protectedAdditionalData,
+        }
+
+        const databaseUser = await this.usersDatabaseService.create(databaseCreateUserDto);
+        return this.convertDatabaseDto(databaseUser);
     }
 
     private async _UNSAFE_update(userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
@@ -83,13 +94,13 @@ export class UsersService {
 
 
         const user = await this.usersDatabaseService.update(userId, databaseUpdateDto);
-        return this.removePasswordFromUser(user);
+        return this.convertDatabaseDto(user);
     }
 
     async update(userContext: UserContext, userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
         await this.authService.validateAccessControlRules({
-            userScopedPermissions: ["users:retrieve"],
-            globalScopedPermissions: ["users:retrieve:all"],
+            userScopedPermissions: ["users:update"],
+            globalScopedPermissions: ["users:update:all"],
             requestingUserContext: userContext,
             targetUserId: userId
         })

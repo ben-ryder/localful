@@ -21,7 +21,7 @@ export class AuthService {
     let databaseUserDto: DatabaseUserDto;
 
     try {
-      databaseUserDto = await this.usersService.getWithPasswordByEmail(email);
+      databaseUserDto = await this.usersService.getDatabaseUser(email);
     }
     catch (e) {
        throw new AccessForbiddenError({
@@ -40,7 +40,7 @@ export class AuthService {
      });
     }
 
-    const userDto = this.usersService.removePasswordFromUser(databaseUserDto);
+    const userDto = this.usersService.convertDatabaseDto(databaseUserDto);
     const tokens = await this.tokenService.createNewTokenPair(userDto);
 
     return {
@@ -66,7 +66,7 @@ export class AuthService {
     // As the token has been validated the supplied userId/sub value in the token can be trusted in theory
     // If the user isn't found, the user service will throw an error.
     // todo: the user service throwing an error not returning null makes the error handling here unclear.
-    const userDto = await this.usersService.get(tokenPayload.sub);
+    const userDto = await this.usersService._UNSAFE_get(tokenPayload.sub);
 
     return await this.tokenService.getRefreshedTokenPair(userDto, tokenPayload.gid);
   }

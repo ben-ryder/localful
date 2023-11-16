@@ -1,13 +1,12 @@
 import {DatabaseService} from "../../../services/database/database.service.js";
 import {PostgresError, Row, RowList} from "postgres";
 import {PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes.js";
-import {CreateUserDto} from "@localful/common";
 import {ErrorIdentifiers} from "@localful/common";
 import {Injectable} from "@nestjs/common";
 import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error.js";
 import {SystemError} from "../../../services/errors/base/system.error.js";
 import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error.js";
-import {DatabaseUpdateUserDto, DatabaseUserDto, RawDatabaseUser} from "./database-user.js";
+import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto, RawDatabaseUser} from "./database-user.js";
 
 
 @Injectable()
@@ -114,27 +113,14 @@ export class UsersDatabaseService {
     }
   }
 
-  async create(user: CreateUserDto): Promise<DatabaseUserDto> {
+  async create(user: DatabaseCreateUserDto): Promise<DatabaseUserDto> {
     const sql = await this.databaseService.getSQL();
-
-    /**
-     *       id: user.id,
-     *       displayName: user.display_name,
-     *       email: user.email,
-     *       passwordHash: user.password_hash,
-     *       isVerified: user.is_verified,
-     *       role: user.role,
-     *       protectedEncryptionKey: user.protected_encryption_key,
-     *       protectedAdditionalData: user.protected_additional_data,
-     *       createdAt: user.created_at,
-     *       updatedAt: user.updated_at
-     */
 
     let result: RawDatabaseUser[] = [];
     try {
       result = await sql<RawDatabaseUser[]>`
         INSERT INTO users(id, display_name, email, password_hash, is_verified, role , protected_encryption_key, protected_additional_data, created_at, updated_at) 
-        VALUES (DEFAULT, ${user.displayName}, ${user.email}, ${user.password}, DEFAULT, ${user.role}, ${user.protectedEncryptionKey}, ${user.protectedAdditionalData}, DEFAULT, DEFAULT)
+        VALUES (DEFAULT, ${user.displayName}, ${user.email}, ${user.passwordHash}, DEFAULT, ${user.role}, ${user.protectedEncryptionKey}, ${user.protectedAdditionalData}, DEFAULT, DEFAULT)
         RETURNING *;
        `;
     }

@@ -1,6 +1,6 @@
 import {ChangesDatabaseService} from "./database/changes.database.service.js";
 import {Injectable} from "@nestjs/common";
-import {ChangeDto, AccessControlScopes} from "@localful/common";
+import {ChangeDto, AccessControlScopes, ChangesQueryParams} from "@localful/common";
 import {UserContext} from "../../common/request-context.decorator.js";
 import {AuthService} from "../../services/auth/auth.service.js";
 
@@ -12,59 +12,31 @@ export class ChangesService {
     private authService: AuthService
   ) {}
 
-  async _create(userId: string, changes: ChangeDto[]) {
-    return this.changesDatabaseService.add(userId, changes);
+  private async _UNSAFE_createMany(changes: ChangeDto[]) {
+    return this.changesDatabaseService.createMany(changes);
   }
 
-  async createWithAccessCheck(userContext: UserContext, userId: string, changes: ChangeDto[]){
-    await this.authService.confirmAccessControlRules(
-      [
-        AccessControlScopes.CHANGES_CREATE_SELF,
-        AccessControlScopes.CHANGES_CREATE
-      ],
-      userContext, userId
-    );
+  async createMany(userContext: UserContext, changes: ChangeDto[]){
+    // todo: do access check against every resource in the change list
 
-    return this._create(userId, changes);
+    return this._UNSAFE_createMany(changes);
   }
 
-  async _list(userId: string, ids?: string[]) {
-    return this.changesDatabaseService.list(userId, ids);
+  async _UNSAFE_list(userId: string, params?: ChangesQueryParams) {
+    return this.changesDatabaseService.list(userId, ChangesQueryParams);
   }
 
-  async listWithAccessCheck(userContext: UserContext, userId: string, ids?: string[]){
-    await this.authService.confirmAccessControlRules(
-      [
-        AccessControlScopes.CHANGES_RETRIEVE_SELF,
-        AccessControlScopes.CHANGES_RETRIEVE
-      ],
-      userContext, userId
-    );
+  async list(userContext: UserContext, resourceId: string, params?: ChangesQueryParams){
+    // todo: do access check
 
-    return this._list(userId, ids);
+    return this._UNSAFE_list(resourceId, params);
   }
 
-  async _getIds(userId: string) {
-    return this.changesDatabaseService.getIds(userId);
+  async _UNSAFE_deleteAll(resourceId: string) {
+    return await this.changesDatabaseService.deleteAll(resourceId);
   }
 
-  async getIdsWithAccessCheck(userContext: UserContext, userId: string){
-    await this.authService.confirmAccessControlRules(
-      [
-        AccessControlScopes.CHANGES_RETRIEVE_SELF,
-        AccessControlScopes.CHANGES_RETRIEVE
-      ],
-      userContext, userId
-    );
-
-    return this._getIds(userId);
-  }
-
-  async _deleteAll(userId: string) {
-    return await this.changesDatabaseService.deleteAll(userId);
-  }
-
-  async deleteAllWithAccessCheck(userContext: UserContext, userId: string){
+  async delete(userContext: UserContext, resourceId: string){
     await this.authService.confirmAccessControlRules(
       [
         AccessControlScopes.CHANGES_DELETE_SELF,
