@@ -31,7 +31,7 @@ export class AuthService {
        });
     }
 
-    const passwordValid = await PasswordService.checkPassword(password, databaseUserDto.password);
+    const passwordValid = await PasswordService.checkPassword(password, databaseUserDto.passwordHash);
     if (!passwordValid) {
       throw new AccessForbiddenError({
        identifier: ErrorIdentifiers.AUTH_CREDENTIALS_INVALID,
@@ -90,15 +90,20 @@ export class AuthService {
    *
    * @param options
    */
-  async confirmAccessControlRules(options: AccessControlOptions): Promise<void> {
-    for (const validPermission of options.validPermissions) {
-      if (options.requestingUserContext?.permissions.includes(validPermission)) {
-        if (validPermission.endsWith(":all")) {
-          return;
-        }
-        else if (options.requestingUserContext.id === options.targetUserId) {
-          return;
-        }
+  async validateAccessControlRules(options: AccessControlOptions): Promise<void> {
+    for (const userPermission of options.userScopedPermissions) {
+      if (
+        options.requestingUserContext?.permissions.includes(userPermission) &&
+        options.requestingUserContext.id === options.targetUserId
+      ) {
+        return;
+      }
+    }
+    for (const globalPermission of options.globalScopedPermissions) {
+      if (
+        options.requestingUserContext?.permissions.includes(globalPermission)
+      ) {
+        return;
       }
     }
 

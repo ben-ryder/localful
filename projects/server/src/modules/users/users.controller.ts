@@ -45,7 +45,7 @@ export class UsersController {
   @Get("/:userId")
   @UseGuards(AuthGuard)
   async get(@Param(new ZodValidationPipe(UsersURLParams)) params: UsersURLParams, @RequestContext() context: RequestContext) {
-    return await this.usersService.getWithAccessCheck(context.user, params.userId);
+    return await this.usersService.get(context.user, params.userId);
   }
 
   @Patch("/:userId")
@@ -55,7 +55,7 @@ export class UsersController {
     @Body(new ZodValidationPipe(UpdateUserDto)) updateUserDto: UpdateUserDto,
     @RequestContext() context: RequestContext
   ) {
-    return await this.usersService.updateWithAccessCheck(context.user, params.userId, updateUserDto);
+    return await this.usersService.update(context.user, params.userId, updateUserDto);
   }
 
   @Delete("/:userId")
@@ -64,6 +64,6 @@ export class UsersController {
     @Param(new ZodValidationPipe(UsersURLParams)) params: UsersURLParams,
     @RequestContext() context: RequestContext
   ) {
-    return await this.usersService.deleteWithAccessCheck(context.user, params.userId);
+    return await this.usersService.delete(context.user, params.userId);
   }
 }

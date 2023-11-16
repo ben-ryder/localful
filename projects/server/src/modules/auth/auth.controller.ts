@@ -1,8 +1,9 @@
-import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response} from "@nestjs/common";
+import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service.js";
 import {LoginRequest, LogoutRequest, RefreshRequest} from "@localful/common";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
+import {AuthGuard} from "./auth.guards.js";
 
 @Controller({
   path: "/auth",
@@ -21,6 +22,7 @@ export class AuthController {
 
   @Post("/logout")
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
   async logout(
     @Body(new ZodValidationPipe(LogoutRequest)) logoutRequest: LogoutRequest
   ) {
@@ -29,6 +31,7 @@ export class AuthController {
 
   @Post("/refresh")
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
   async refresh(@Body(new ZodValidationPipe(RefreshRequest)) refreshRequest: RefreshRequest) {
     return await this.authService.refresh(refreshRequest.refreshToken);
   }
@@ -40,6 +43,7 @@ export class AuthController {
    * @param res
    */
   @Get("/verify")
+  @UseGuards(AuthGuard)
   async requestVerificationEmail(@Response() res: ExpressResponse) {
     // todo: implement /v1/auth/verify [GET]
     return res.status(HttpStatus.NOT_IMPLEMENTED).send({
@@ -54,6 +58,7 @@ export class AuthController {
    * @param res
    */
   @Post("/verify")
+  @UseGuards(AuthGuard)
   async verifyAccountEmail(@Response() res: ExpressResponse) {
     // todo: implement /v1/auth/verify [GET]
     return res.status(HttpStatus.NOT_IMPLEMENTED).send({

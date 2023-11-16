@@ -4,39 +4,40 @@ import {Injectable} from "@nestjs/common";
 import {
     CreateUserDto,
     UpdateUserDto,
-    UserDto
+    UserDto,
+    Permissions
 } from "@localful/common";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
 import {UserContext} from "../../common/request-context.decorator.js";
-import {DatabaseUserDto} from "./database/database-user.js";
+import {DatabaseUpdateUserDto, DatabaseUserDto} from "./database/database-user.js";
+import {AuthService} from "../auth/auth.service.js";
+import {UserRequestError} from "../../services/errors/base/user-request.error.js";
 
 
 @Injectable()
 export class UsersService {
     constructor(
-       private usersDatabaseService: UsersDatabaseService
+       private usersDatabaseService: UsersDatabaseService,
+       public authService: AuthService,
     ) {}
 
-    // @todo: replace with auth system checks
-    checkAccess(userContext: UserContext, userId: string): void {
-        if (userContext?.id !== userId) {
-            throw new AccessForbiddenError({
-                message: "Access forbidden to user"
-            })
-        }
-    }
-
-    async get(userId: string): Promise<UserDto> {
+    private async _UNSAFE_get(userId: string): Promise<UserDto> {
         const user = await this.usersDatabaseService.get(userId);
         return this.removePasswordFromUser(user);
     }
 
-    async getWithAccessCheck(userContext: UserContext, userId: string): Promise<UserDto> {
-        this.checkAccess(userContext, userId);
-        return this.get(userId);
+    async get(userContext: UserContext, userId: string): Promise<UserDto> {
+        await this.authService.validateAccessControlRules({
+            userScopedPermissions: ["users:retrieve"],
+            globalScopedPermissions: ["users:retrieve:all"],
+            requestingUserContext: userContext,
+            targetUserId: userId
+        })
+
+        return this._UNSAFE_get(userId);
     }
 
-    removePasswordFromUser(userWithPassword: DatabaseUserDto): UserDto {
+    private removePasswordFromUser(userWithPassword: DatabaseUserDto): UserDto {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { passwordHash, ...userDto } = userWithPassword;
         return userDto;
@@ -59,39 +60,55 @@ export class UsersService {
         return this.removePasswordFromUser(resultUser);
     }
 
-    async update(userId: string, updateUserDto: UpdateUserRequest): Promise<UserDto> {
-        const databaseUpdate: UpdateDatabaseUserDto = {};
+    private async _UNSAFE_update(userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
+        const databaseUpdateDto: DatabaseUpdateUserDto = {}
 
-        if (updateUserDto.username) {
-            databaseUpdate.username = updateUserDto.username;
-        }
-        if (updateUserDto.encryptionSecret) {
-            databaseUpdate.encryptionSecret = updateUserDto.encryptionSecret;
-        }
-        if (updateUserDto.password) {
-            // todo: make password change go via password reset
-            databaseUpdate.passwordHash = await PasswordService.hashPassword(updateUserDto.password);
+        // @todo: should validate that protectedEncryptionKey & protectedAdditionalData are updated if password is?
+        if (updateUserDto.displayName) {
+            databaseUpdateDto.displayName
         }
         if (updateUserDto.email) {
-            databaseUpdate.email = updateUserDto.email;
-            databaseUpdate.isVerified = false;
+            databaseUpdateDto.email = updateUserDto.email;
+            databaseUpdateDto.isVerified = false;
+        }
+        if (updateUserDto.protectedAdditionalData) {
+            databaseUpdateDto.protectedAdditionalData
+        }
+        if (updateUserDto.password) {
+            databaseUpdateDto.passwordHash = await PasswordService.hashPassword(updateUserDto.password);
+        }
+        if (updateUserDto.protectedEncryptionKey) {
+            updateUserDto.protectedEncryptionKey
         }
 
-        const user = await this.usersDatabaseService.update(userId, databaseUpdate);
+
+        const user = await this.usersDatabaseService.update(userId, databaseUpdateDto);
         return this.removePasswordFromUser(user);
     }
 
-    async updateWithAccessCheck(userContext: UserContext, userId: string, updateUserDto: UpdateUserRequest): Promise<UpdateUserResponse> {
-        this.checkAccess(userContext, userId);
-        return this.update(userId, updateUserDto);
+    async update(userContext: UserContext, userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
+        await this.authService.validateAccessControlRules({
+            userScopedPermissions: ["users:retrieve"],
+            globalScopedPermissions: ["users:retrieve:all"],
+            requestingUserContext: userContext,
+            targetUserId: userId
+        })
+
+        return this._UNSAFE_update(userId, updateUserDto);
     }
 
-    async delete(userId: string): Promise<void> {
+    private async _UNSAFE_delete(userId: string): Promise<void> {
         return this.usersDatabaseService.delete(userId);
     }
 
-    async deleteWithAccessCheck(userContext: UserContext, userId: string): Promise<void> {
-        this.checkAccess(userContext, userId);
-        return this.delete(userId);
+    async delete(userContext: UserContext, userId: string): Promise<void> {
+        await this.authService.validateAccessControlRules({
+            userScopedPermissions: ["users:delete"],
+            globalScopedPermissions: ["users:delete:all"],
+            requestingUserContext: userContext,
+            targetUserId: userId
+        })
+
+        return this._UNSAFE_delete(userId);
     }
 }

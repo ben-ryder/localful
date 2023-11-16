@@ -1,12 +1,13 @@
 import {DatabaseService} from "../../../services/database/database.service.js";
 import {PostgresError, Row, RowList} from "postgres";
 import {PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes.js";
-import {InternalDatabaseUserDto, DatabaseUserDto, CreateDatabaseUserDto, UpdateDatabaseUserDto} from "@localful/common";
+import {CreateUserDto} from "@localful/common";
 import {ErrorIdentifiers} from "@localful/common";
 import {Injectable} from "@nestjs/common";
 import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error.js";
 import {SystemError} from "../../../services/errors/base/system.error.js";
 import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error.js";
+import {DatabaseUpdateUserDto, DatabaseUserDto, RawDatabaseUser} from "./database-user.js";
 
 
 @Injectable()
@@ -15,31 +16,37 @@ export class UsersDatabaseService {
     private readonly databaseService: DatabaseService
   ) {}
 
-  private static mapApplicationField(fieldName: string): string {
+  private static mapApplicationField(fieldName: keyof DatabaseUserDto): keyof RawDatabaseUser {
     switch (fieldName) {
       case "passwordHash":
         return "password_hash";
-      case "encryptionSecret":
-        return "encryption_secret";
-      case "is_verified":
-        return "isVerified"
-      case "created_at":
-        return "createdAt";
-      case "updated_at":
-        return "updatedAt";
+      case "protectedEncryptionKey":
+        return "protected_encryption_key";
+      case "protectedAdditionalData":
+        return "protected_additional_data"
+      case "createdAt":
+        return "created_at";
+      case "updatedAt":
+        return "updated_at";
+      case "displayName":
+        return "display_name"
+      case "isVerified":
+        return "is_verified"
       default:
         return fieldName;
     }
   }
 
-  private static convertDatabaseDtoToDto(user: InternalDatabaseUserDto): DatabaseUserDto {
+  private static convertRawUserToDto(user: RawDatabaseUser): DatabaseUserDto {
     return {
       id: user.id,
-      username: user.username,
+      displayName: user.display_name,
       email: user.email,
       passwordHash: user.password_hash,
-      encryptionSecret: user.encryption_secret,
       isVerified: user.is_verified,
+      role: user.role,
+      protectedEncryptionKey: user.protected_encryption_key,
+      protectedAdditionalData: user.protected_additional_data,
       createdAt: user.created_at,
       updatedAt: user.updated_at
     }
@@ -48,16 +55,10 @@ export class UsersDatabaseService {
   private static getDatabaseError(e: any) {
     if (e instanceof PostgresError) {
       if (e.code && e.code === PG_UNIQUE_VIOLATION) {
-        if (e.constraint_name === "users_username_key") {
-          return new ResourceRelationshipError({
-            identifier: ErrorIdentifiers.USER_USERNAME_EXISTS,
-            applicationMessage: "The supplied username is already taken by another user."
-          })
-        }
-        else if (e.constraint_name == "users_email_key") {
+        if (e.constraint_name == "users_email_key") {
           return new ResourceRelationshipError({
             identifier: ErrorIdentifiers.USER_EMAIL_EXISTS,
-            applicationMessage: "The supplied email address is already taken by another user."
+            applicationMessage: "The supplied email address is already in use."
           })
         }
       }
@@ -72,16 +73,16 @@ export class UsersDatabaseService {
   async get(userId: string): Promise<DatabaseUserDto> {
     const sql = await this.databaseService.getSQL();
 
-    let result: InternalDatabaseUserDto[] = [];
+    let result: RawDatabaseUser[] = [];
     try {
-      result = await sql<InternalDatabaseUserDto[]>`SELECT * FROM users WHERE id = ${userId}`;
+      result = await sql<RawDatabaseUser[]>`SELECT * FROM users WHERE id = ${userId}`;
     }
     catch (e: any) {
       throw UsersDatabaseService.getDatabaseError(e);
     }
 
     if (result.length > 0) {
-      return UsersDatabaseService.convertDatabaseDtoToDto(result[0]);
+      return UsersDatabaseService.convertRawUserToDto(result[0]);
     }
     else {
       throw new ResourceNotFoundError({
@@ -94,16 +95,16 @@ export class UsersDatabaseService {
   async getByEmail(email: string): Promise<DatabaseUserDto> {
     const sql = await this.databaseService.getSQL();
 
-    let result: InternalDatabaseUserDto[] = [];
+    let result: RawDatabaseUser[] = [];
     try {
-      result = await sql<InternalDatabaseUserDto[]>`SELECT * FROM users WHERE email = ${email}`;
+      result = await sql<RawDatabaseUser[]>`SELECT * FROM users WHERE email = ${email}`;
     }
     catch (e: any) {
       throw UsersDatabaseService.getDatabaseError(e);
     }
 
     if (result.length > 0) {
-      return UsersDatabaseService.convertDatabaseDtoToDto(result[0]);
+      return UsersDatabaseService.convertRawUserToDto(result[0]);
     }
     else {
       throw new ResourceNotFoundError({
@@ -113,14 +114,27 @@ export class UsersDatabaseService {
     }
   }
 
-  async create(user: CreateDatabaseUserDto): Promise<DatabaseUserDto> {
+  async create(user: CreateUserDto): Promise<DatabaseUserDto> {
     const sql = await this.databaseService.getSQL();
 
-    let result: InternalDatabaseUserDto[] = [];
+    /**
+     *       id: user.id,
+     *       displayName: user.display_name,
+     *       email: user.email,
+     *       passwordHash: user.password_hash,
+     *       isVerified: user.is_verified,
+     *       role: user.role,
+     *       protectedEncryptionKey: user.protected_encryption_key,
+     *       protectedAdditionalData: user.protected_additional_data,
+     *       createdAt: user.created_at,
+     *       updatedAt: user.updated_at
+     */
+
+    let result: RawDatabaseUser[] = [];
     try {
-      result = await sql<InternalDatabaseUserDto[]>`
-        INSERT INTO users(id, username, email, password_hash, encryption_secret, is_verified, created_at, updated_at) 
-        VALUES (DEFAULT, ${user.username}, ${user.email}, ${user.passwordHash}, ${user.encryptionSecret}, DEFAULT, DEFAULT, DEFAULT)
+      result = await sql<RawDatabaseUser[]>`
+        INSERT INTO users(id, display_name, email, password_hash, is_verified, role , protected_encryption_key, protected_additional_data, created_at, updated_at) 
+        VALUES (DEFAULT, ${user.displayName}, ${user.email}, ${user.password}, DEFAULT, ${user.role}, ${user.protectedEncryptionKey}, ${user.protectedAdditionalData}, DEFAULT, DEFAULT)
         RETURNING *;
        `;
     }
@@ -129,7 +143,7 @@ export class UsersDatabaseService {
     }
 
     if (result.length > 0) {
-      return UsersDatabaseService.convertDatabaseDtoToDto(result[0]);
+      return UsersDatabaseService.convertRawUserToDto(result[0]);
     }
     else {
       throw new SystemError({
@@ -138,24 +152,24 @@ export class UsersDatabaseService {
     }
   }
 
-  async update(userId: string, updatedUser: UpdateDatabaseUserDto): Promise<DatabaseUserDto> {
+  async update(userId: string, databaseUpdateUserDto: DatabaseUpdateUserDto): Promise<DatabaseUserDto> {
     const sql = await this.databaseService.getSQL();
 
     // If there are no supplied fields to update, then just return the existing user.
-    if (Object.keys(updatedUser).length === 0) {
+    if (Object.keys(databaseUpdateUserDto).length === 0) {
       return this.get(userId);
     }
 
     // Process all fields
     // todo: this offers no protection against updating fields like id which should never be updated
     const updateObject: any = {};
-    for (const fieldName of Object.keys(updatedUser) as Array<keyof UpdateDatabaseUserDto>) {
-      updateObject[UsersDatabaseService.mapApplicationField(fieldName)] = updatedUser[fieldName];
+    for (const fieldName of Object.keys(databaseUpdateUserDto) as Array<keyof DatabaseUpdateUserDto>) {
+      updateObject[UsersDatabaseService.mapApplicationField(fieldName)] = databaseUpdateUserDto[fieldName];
     }
 
-    let result: InternalDatabaseUserDto[] = [];
+    let result: RawDatabaseUser[] = [];
     try {
-      result = await sql<InternalDatabaseUserDto[]>`
+      result = await sql<RawDatabaseUser[]>`
         UPDATE users
         SET ${sql(updateObject, ...Object.keys(updateObject))}
         WHERE id = ${userId}
@@ -167,7 +181,7 @@ export class UsersDatabaseService {
     }
 
     if (result.length > 0) {
-      return UsersDatabaseService.convertDatabaseDtoToDto(result[0]);
+      return UsersDatabaseService.convertRawUserToDto(result[0]);
     }
     else {
       throw new SystemError({

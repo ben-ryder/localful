@@ -6,8 +6,10 @@ import {Socket} from "socket.io";
 import {Permissions, RolePermissions, Roles} from "@localful/common";
 
 export interface AccessControlOptions {
-  /** A list of valid permissions **/
-  validPermissions: Permissions[],
+  /** A list of valid permissions, if the requesting user context matches the target user **/
+  userScopedPermissions: Permissions[],
+  /** A list of valid permissions regardless of requesting user matching target user **/
+  globalScopedPermissions: Permissions[],
   /** The user context requesting this action **/
   requestingUserContext: UserContext,
   /** The target user id of the given action **/
