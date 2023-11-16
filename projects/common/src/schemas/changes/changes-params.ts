@@ -1,17 +1,14 @@
 import {z} from "zod";
+import {ResourceId} from "../resources/resources.js";
+import {ChangeDto, ChangeId} from "./changes.js";
+
+export const ChangesURLParams = z.object({
+  resourceId: ResourceId,
+}).strict();
+export type ChangesURLParams = z.infer<typeof ChangesURLParams>;
 
 export const ChangesQueryParams = z.object({
-  ids: z.array(
-    z.string().uuid()
-  )
-    .max(100, "You can't request more than 100 changes at a time.")
-    .optional(),
-  resourceIds: z.array(
-    z.string().uuid()
-  )
-    .max(10, "You can't request more than 10 resources at a time.")
-    .optional(),
-  idOnly: z.boolean().optional()
+  ids: z.array(ChangeId).optional(),
+  fields: z.array(ChangeDto.keyof()).optional()
 }).strict();
-
 export type ChangesQueryParams = z.infer<typeof ChangesQueryParams>;

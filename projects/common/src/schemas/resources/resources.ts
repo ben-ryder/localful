@@ -1,9 +1,13 @@
 import {z} from "zod";
 import {Entity} from "../entity.js";
 
+export const ResourceId = z.string()
+	.min(1, "A resource id must be at least 1 character.")
+	.max(40, "A resource id must be less than 40 characters.")
+
 export const ResourceFields = z.object({
 	// id is generated locally so must be set within the fields and not be inherited from Entity.
-	id: z.string().uuid('id must be uuid format'),
+	id: ResourceId,
 	protectedEncryptionKey: z.string().min(1, "protectedEncryptionKey must be at least 1 character."),
 	protectedAdditionalData: z.string().optional(),
 }).strict()

@@ -3,7 +3,7 @@
  * https://socket.io/docs/v4/typescript/
  */
 
-import {ChangeDto, ChangesDto} from "./changes.js";
+import {ChangesDto} from "./changes.js";
 
 export type ChangeEvent = (changes: ChangesDto) => void
 
