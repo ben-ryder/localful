@@ -25,10 +25,10 @@
   },
   "homepage": "https://github.com/Ben-Ryder/localful#readme",
   "devDependencies": {
-    "@commitlint/cli": "^17.1.2",
-    "@commitlint/config-conventional": "^17.1.0",
-    "concurrently": "^7.4.0",
-    "husky": "^8.0.1"
+    "@commitlint/cli": "^18.4.2",
+    "@commitlint/config-conventional": "^18.4.2",
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3"
   },
   "engines": {
     "node": "18"

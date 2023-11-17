@@ -4,19 +4,16 @@
   ],
   "rules": {
     "type-enum": [2, "always", [
-      "build",
-      "chore",
-      "ci",
-      "deps",
+      "release",
+      "revert",
       "docs",
+      "tests",
       "feat",
       "fix",
+      "tools",
+      "wip",
       "refactor",
-      "revert",
-      "style",
-      "test",
-      "release",
-      "wip"
+      "style"
     ]]
   }
 }
