@@ -1,6 +1,6 @@
 import {PasswordService} from "../../services/password/password.service.js";
 import {UsersDatabaseService} from "./database/users.database.service.js";
-import {Injectable} from "@nestjs/common";
+import {forwardRef, Inject, Injectable} from "@nestjs/common";
 import {
     CreateUserDto, ErrorIdentifiers,
     UpdateUserDto,
@@ -17,6 +17,7 @@ import {ConfigService} from "../../services/config/config.js";
 export class UsersService {
     constructor(
        private usersDatabaseService: UsersDatabaseService,
+       @Inject(forwardRef(() => AuthService))
        public authService: AuthService,
        public configService: ConfigService,
     ) {}

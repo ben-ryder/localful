@@ -9,11 +9,7 @@
   "homepage": "https://github.com/Ben-Ryder/localful",
   "bugs": "https://github.com/Ben-Ryder/localful/issues",
   "license": "AGPL-3.0-only",
-  "type": "module",
-  "exports": {
-    "types": "./build/src/index.d.ts",
-    "default": "./build/src/index.js"
-  },
+  "main": "build/src/index.js",
   "scripts": {
     "build": "rimraf ./build && tsc",
     "prepublishOnly": "npm run build",
@@ -30,7 +26,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@localful/common": "^0.1.0",
+    "@localful/common": "../common",
     "dotenv": "^16.3.1",
     "postgres": "^3.4.3"
   },

@@ -13,7 +13,7 @@ import {
 import {DataStoreService} from "../data-store/data-store.service.js";
 import {v4 as createUUID} from "uuid";
 import {SystemError} from "../errors/base/system.error.js";
-import ms from "ms";
+import ms, {StringValue} from "ms";
 
 
 @Injectable()
@@ -31,7 +31,7 @@ export class TokenService {
    */
   private _parseTokenExpiry(expiryString: string) {
     const currentTime = new Date().getTime();
-    const timeToExpiry = ms(expiryString);
+    const timeToExpiry = ms(expiryString as StringValue);
     return currentTime + timeToExpiry;
   }
 

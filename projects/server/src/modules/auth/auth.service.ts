@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {forwardRef, Inject, Injectable} from "@nestjs/common";
 import {UsersService} from "../users/users.service.js";
 import {TokenService} from "../../services/token/token.service.js";
 import {LoginResponse, TokenPair, ErrorIdentifiers, Roles, RolePermissions, Permissions} from "@localful/common";
@@ -13,6 +13,7 @@ import {AccessControlOptions} from "./auth.guards.js";
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     private tokenService: TokenService
   ) {}

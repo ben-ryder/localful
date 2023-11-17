@@ -1,7 +1,7 @@
 import {INestApplication} from "@nestjs/common";
 import {agent, SuperAgentTest} from "supertest";
 
-import {resetTestData} from "./database-scripts.js";
+import {resetTestData} from "@localful/testing";
 import {createApp} from "../src/create-app.js";
 import {DatabaseService} from "../src/services/database/database.service.js";
 import {ConfigService} from "../src/services/config/config.js";

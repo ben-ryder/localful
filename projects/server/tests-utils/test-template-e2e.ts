@@ -1,5 +1,5 @@
 import {TestHelper} from "./test-helper";
-import {seedProfiles} from "./test-data";
+import {testUsers} from "@localful/testing";
 
 
 describe("Short Description - /v1/path [METHOD]",() => {
@@ -19,7 +19,7 @@ describe("Short Description - /v1/path [METHOD]",() => {
   describe("Happy Paths", () => {
 
     test("Given CONTEXT, When ACTION, Then RESULT", async () => {
-      const accessToken = await testHelper.getUserAccessToken(seedProfiles[0].userId, []);
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id, []);
 
       const {body, statusCode} = await testHelper.client
         .post("/v1/ROUTE")

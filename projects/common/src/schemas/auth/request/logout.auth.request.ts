@@ -1,5 +1,5 @@
 import {z} from "zod";
-import isJWT from "validator/es/lib/isJWT.js";
+import isJWT from "validator/lib/isJWT.js";
 
 export const LogoutRequest = z.object({
     refreshToken: z.string()
