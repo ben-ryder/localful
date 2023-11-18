@@ -14,7 +14,6 @@ export * from "./schemas/auth/permissions";
 export * from "./schemas/auth/request/login.auth.request";
 export * from "./schemas/auth/request/logout.auth.request";
 export * from "./schemas/auth/request/refresh.auth.request";
-export * from "./schemas/auth/request/reset.auth.request";
 export * from "./schemas/auth/request/verify.auth.request";
 export * from "./schemas/auth/response/login.auth.response";
 

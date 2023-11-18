@@ -3,8 +3,7 @@ import isJWT from "validator/lib/isJWT";
 
 export const LogoutRequest = z.object({
     refreshToken: z.string()
-      // @ts-ignore
-      .refine(isJWT, {message: "Refresh token must be a JWT"})
+      .refine(isJWT, {message: "refreshToken must be a JWT"})
 }).strict();
 
 export type LogoutRequest = z.infer<typeof LogoutRequest>;
