@@ -1,13 +1,13 @@
 import {forwardRef, Inject, Injectable} from "@nestjs/common";
-import {UsersService} from "../users/users.service.js";
-import {TokenService} from "../../services/token/token.service.js";
+import {UsersService} from "../users/users.service";
+import {TokenService} from "../../services/token/token.service";
 import {LoginResponse, TokenPair, ErrorIdentifiers, Roles, RolePermissions, Permissions} from "@localful/common";
-import {PasswordService} from "../../services/password/password.service.js";
-import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error.js";
-import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error.js";
-import {UserRequestError} from "../../services/errors/base/user-request.error.js";
-import {DatabaseUserDto} from "../users/database/database-user.js";
-import {AccessControlOptions} from "./auth.guards.js";
+import {PasswordService} from "../../services/password/password.service";
+import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
+import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
+import {UserRequestError} from "../../services/errors/base/user-request.error";
+import {DatabaseUserDto} from "../users/database/database-user";
+import {AccessControlOptions} from "./auth.guards";
 
 
 @Injectable()

@@ -1,4 +1,4 @@
-import {TestHelper} from "../../../../tests-utils/test-helper.js";
+import {TestHelper} from "../../../../tests-utils/test-helper";
 
 
 describe("Changes List - /v1/changes [GET]",() => {

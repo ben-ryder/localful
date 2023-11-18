@@ -3,16 +3,16 @@ import {Injectable} from "@nestjs/common";
 import jsonwebtoken from "jsonwebtoken";
 const {sign, verify} = jsonwebtoken
 
-import {ConfigService} from "../config/config.js";
+import {ConfigService} from "../config/config";
 import {
   AccessTokenPayload,
   RefreshTokenPayload,
   TokenPair,
   UserDto
 } from "@localful/common";
-import {DataStoreService} from "../data-store/data-store.service.js";
+import {DataStoreService} from "../data-store/data-store.service";
 import {v4 as createUUID} from "uuid";
-import {SystemError} from "../errors/base/system.error.js";
+import {SystemError} from "../errors/base/system.error";
 import ms, {StringValue} from "ms";
 
 

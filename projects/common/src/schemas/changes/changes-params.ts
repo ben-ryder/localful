@@ -1,6 +1,6 @@
 import {z} from "zod";
-import {ResourceId} from "../resources/resources.js";
-import {ChangeDto, ChangeId} from "./changes.js";
+import {ResourceId} from "../resources/resources";
+import {ChangeDto, ChangeId} from "./changes";
 
 export const ChangesURLParams = z.object({
   resourceId: ResourceId,

@@ -1,10 +1,10 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
-import {TokenService} from "../../services/token/token.service.js";
-import {RequestWithContext, UserContext} from "../../common/request-context.decorator.js";
-import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error.js";
+import {TokenService} from "../../services/token/token.service";
+import {RequestWithContext, UserContext} from "../../common/request-context.decorator";
+import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
 import {Socket} from "socket.io";
 import {Permissions} from "@localful/common";
-import {AuthService} from "./auth.service.js";
+import {AuthService} from "./auth.service";
 
 export interface AccessControlOptions {
   /** A list of valid permissions, if the requesting user context matches the target user **/

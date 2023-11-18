@@ -1,4 +1,4 @@
-import { ConfigService } from "../config/config.js";
+import { ConfigService } from "../config/config";
 import { Injectable } from "@nestjs/common";
 import Mailgun, {MailgunClientOptions} from "mailgun.js";
 import formData from "form-data";

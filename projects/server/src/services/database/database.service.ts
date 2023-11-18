@@ -1,4 +1,4 @@
-import { ConfigService } from "../config/config.js";
+import { ConfigService } from "../config/config";
 import postgres, { Sql } from "postgres";
 import { Injectable } from "@nestjs/common";
 

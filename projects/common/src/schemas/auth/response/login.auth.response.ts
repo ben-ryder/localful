@@ -1,5 +1,5 @@
-import {TokenPair} from "../tokens.js";
-import {UserDto} from "../../users/users.js";
+import {TokenPair} from "../tokens";
+import {UserDto} from "../../users/users";
 
 export interface LoginResponse {
   tokens: TokenPair;

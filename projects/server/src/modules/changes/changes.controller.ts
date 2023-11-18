@@ -1,9 +1,9 @@
 import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards} from "@nestjs/common";
-import {ChangesService} from "./changes.service.js";
+import {ChangesService} from "./changes.service";
 import {ChangeDtoList, ChangesQueryParams, ChangesURLParams} from "@localful/common";
-import {RequestContext} from "../../common/request-context.decorator.js";
-import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
-import {AuthGuard} from "../auth/auth.guards.js";
+import {RequestContext} from "../../common/request-context.decorator";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe";
+import {AuthGuard} from "../auth/auth.guards";
 
 @Controller({
   path: "/resources/:resourceId/changes",

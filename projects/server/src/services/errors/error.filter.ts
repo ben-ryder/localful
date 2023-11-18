@@ -4,8 +4,8 @@ import {
   ArgumentsHost, HttpException, HttpStatus,
 } from "@nestjs/common";
 import { Response } from "express";
-import { BaseError } from "./base/base.error.js";
-import { fallbackMapping, errorHttpMapping } from "./error-http-mappings.js";
+import { BaseError } from "./base/base.error";
+import { fallbackMapping, errorHttpMapping } from "./error-http-mappings";
 import {ErrorIdentifiers} from "@localful/common";
 
 @Catch(BaseError, HttpException)
@@ -57,6 +57,8 @@ export class ErrorFilter implements ExceptionFilter {
         identifier = errorHttpMapping[errorName].identifier;
       }
     }
+
+    // todo: add logging/alerting on errors?
 
     return res.status(httpCode).send({
       identifier: identifier,

@@ -3,7 +3,7 @@
  * https://socket.io/docs/v4/typescript/
  */
 
-import {ResourceDto} from "./resources.js";
+import {ResourceDto} from "./resources";
 
 export type CreateResourceEvent = () => ResourceDto;
 

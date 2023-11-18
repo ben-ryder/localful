@@ -1,14 +1,20 @@
 import {z} from "zod";
-import {Entity} from "../entity.js";
-import {Roles} from "../auth/permissions.js";
+import {Entity} from "../entity";
+import {Roles} from "../auth/permissions";
 
 export const UserFields = z.object({
-	displayName: z.string().min(1, "displayName must be a least 1 character."),
+	displayName: z.string()
+		.min(1, "displayName must be at least 1 character.")
+		.max(50, "displayName can't be over 50 characters."),
 	email: z.string().email("email must be... an email."),
-	password: z.string().min(12, "password must be at least 12 characters."),
+	password: z.string()
+		.min(12, "password must be at least 12 characters.")
+		.max(100, "password can't be over 100 characters."),
 	isVerified: z.boolean(),
 	role: Roles,
-	protectedEncryptionKey: z.string().min(1, "protectedEncryptionKey must be at least 1 character."),
+	protectedEncryptionKey: z.string()
+		.min(1, "protectedEncryptionKey must be at least 1 character.")
+		.max(255, "protectedEncryptionKey can't be over 255 characters."),
 	protectedAdditionalData: z.string().optional(),
 }).strict()
 export type UserFields = z.infer<typeof UserFields>;

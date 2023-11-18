@@ -11,7 +11,6 @@ export interface TestInvalidDataTypesConfig {
   },
   auth: {
     userId: string,
-    scopes: string[]
   },
   testHelper: TestHelper
 }
@@ -23,7 +22,7 @@ export function testInvalidDataTypes(config: TestInvalidDataTypesConfig) {
       [config.testFieldKey]: testCase
     };
 
-    const accessToken = await config.testHelper.getUserAccessToken(config.auth.userId, config.auth.scopes);
+    const accessToken = await config.testHelper.getUserAccessToken(config.auth.userId);
 
     const {body, statusCode} = await config.testHelper.client[config.req.clientMethod](config.req.endpoint)
       .set("Authorization", `Bearer ${accessToken}`)

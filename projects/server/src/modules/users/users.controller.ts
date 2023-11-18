@@ -1,11 +1,11 @@
-import {ConfigService} from "../../services/config/config.js";
-import {UsersService} from "./users.service.js";
-import {TokenService} from "../../services/token/token.service.js";
+import {ConfigService} from "../../services/config/config";
+import {UsersService} from "./users.service";
+import {TokenService} from "../../services/token/token.service";
 import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
 import {CreateUserDto, UsersURLParams, UpdateUserDto} from "@localful/common";
-import {RequestContext} from "../../common/request-context.decorator.js";
-import {AuthGuard} from "../auth/auth.guards.js";
-import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
+import {RequestContext} from "../../common/request-context.decorator";
+import {AuthGuard} from "../auth/auth.guards";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
 
 @Controller({

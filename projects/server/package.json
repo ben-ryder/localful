@@ -17,7 +17,11 @@
     "test:e2e": "jest '.*.e2e.test.ts' --runInBand",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "db:init": "psql postgres -f ./scripts/setup.sql && npm run db:init:test-data",
+    "db:dump": "pg_dump localful > ./backup/localful.sql",
+    "db:restore": "psql localful < ./backup/localful.sql",
+    "db:init:test-data": "ts-node tests/utils/database-init-cli.ts"
   },
   "dependencies": {
     "@localful/common": "../common",

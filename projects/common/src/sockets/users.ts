@@ -1,4 +1,4 @@
-import {UsersEvents} from "../schemas/users/users-events.js";
+import {UsersEvents} from "../schemas/users/users-events";
 
 interface UsersServerToClientEvents extends UsersEvents {}
 

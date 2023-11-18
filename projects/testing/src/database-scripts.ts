@@ -1,4 +1,4 @@
-import {testUsers} from "./data/test-data.js";
+import {testUsers} from "./data/test-data";
 import {Sql} from "postgres";
 
 export interface ScriptOptions {

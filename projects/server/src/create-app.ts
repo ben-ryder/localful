@@ -1,8 +1,8 @@
 import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module.js";
+import { AppModule } from "./app.module";
 import {NestApplicationOptions, VersioningType} from "@nestjs/common";
-import {ErrorFilter} from "./services/errors/error.filter.js";
-import {ConfigService} from "./services/config/config.js";
+import {ErrorFilter} from "./services/errors/error.filter";
+import {ConfigService} from "./services/config/config";
 
 
 export async function createApp(options?: NestApplicationOptions) {

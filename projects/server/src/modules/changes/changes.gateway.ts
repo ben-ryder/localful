@@ -1,4 +1,4 @@
-import {ChangesService} from "./changes.service.js";
+import {ChangesService} from "./changes.service";
 import {Socket} from "socket.io";
 import {
   ConnectedSocket,
@@ -9,12 +9,12 @@ import {
 } from "@nestjs/websockets";
 import {UseGuards, UsePipes} from "@nestjs/common";
 import {ChangesEvents, ResourceChangesDto} from "@localful/common";
-import {GatewayErrorFilter} from "../../services/errors/error.gateway-filter.js";
-import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
-import {AuthService} from "../auth/auth.service.js";
-import {TokenService} from "../../services/token/token.service.js";
-import {AuthGatewayGuard} from "../auth/auth.guards.js";
-import {SocketWithContext} from "../../common/socket-context.decorator.js";
+import {GatewayErrorFilter} from "../../services/errors/error.gateway-filter";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe";
+import {AuthService} from "../auth/auth.service";
+import {TokenService} from "../../services/token/token.service";
+import {AuthGatewayGuard} from "../auth/auth.guards";
+import {SocketWithContext} from "../../common/socket-context.decorator";
 
 
 @WebSocketGateway()

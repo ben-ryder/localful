@@ -1,4 +1,4 @@
-import {ConfigService} from "../../services/config/config.js";
+import {ConfigService} from "../../services/config/config";
 import {Controller, Get} from "@nestjs/common";
 import {InfoDto} from "@localful/common";
 

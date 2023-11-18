@@ -30,13 +30,13 @@ export type DatabaseUpdateUserDto = z.infer<typeof DatabaseUpdateUserDto>
 
 export interface RawDatabaseUser {
 	id: string
-	display_name: string
-	email: string
-	password_hash: string
-	is_verified: boolean
-	protected_encryption_key: string
-	protected_additional_data: string
 	created_at: string
 	updated_at: string
+	email: string
+	password_hash: string
+	display_name: string
+	is_verified: boolean
 	role: Roles
+	protected_encryption_key: string
+	protected_additional_data: string
 }

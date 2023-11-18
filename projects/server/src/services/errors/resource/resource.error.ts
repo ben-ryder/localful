@@ -1,4 +1,4 @@
-import {UserRequestError} from "../base/user-request.error.js";
+import {UserRequestError} from "../base/user-request.error";
 
 /**
  * A subset of UserError specifically for resource related errors

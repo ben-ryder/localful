@@ -1,12 +1,12 @@
-import {DatabaseService} from "../../../services/database/database.service.js";
+import {DatabaseService} from "../../../services/database/database.service";
 import postgres, {Row, RowList} from "postgres";
-import {PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes.js";
+import {PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes";
 import {ErrorIdentifiers} from "@localful/common";
 import {Injectable} from "@nestjs/common";
-import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error.js";
-import {SystemError} from "../../../services/errors/base/system.error.js";
-import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error.js";
-import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto, RawDatabaseUser} from "./database-user.js";
+import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error";
+import {SystemError} from "../../../services/errors/base/system.error";
+import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error";
+import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto, RawDatabaseUser} from "./database-user";
 
 
 @Injectable()
@@ -120,7 +120,7 @@ export class UsersDatabaseService {
     try {
       result = await sql<RawDatabaseUser[]>`
         INSERT INTO users(id, display_name, email, password_hash, is_verified, role , protected_encryption_key, protected_additional_data, created_at, updated_at) 
-        VALUES (DEFAULT, ${user.displayName}, ${user.email}, ${user.passwordHash}, DEFAULT, ${user.role}, ${user.protectedEncryptionKey}, ${user.protectedAdditionalData}, DEFAULT, DEFAULT)
+        VALUES (DEFAULT, ${user.displayName}, ${user.email}, ${user.passwordHash}, DEFAULT, ${user.role}, ${user.protectedEncryptionKey}, ${user.protectedAdditionalData || null}, DEFAULT, DEFAULT)
         RETURNING *;
        `;
     }

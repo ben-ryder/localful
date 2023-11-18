@@ -1,4 +1,4 @@
-import {TestUserEntity} from "../schemas/test-user.dto.js";
+import {TestUserEntity} from "../schemas/test-user.dto";
 
 
 export const testEnvironmentVars = {

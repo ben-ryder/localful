@@ -1,5 +1,5 @@
 import {ChangeDto} from "@localful/common";
-import {ChangesListener} from "../common/changes-listener.js";
+import {ChangesListener} from "../common/changes-listener";
 
 
 export class BrowserSyncClient<DocType> {

@@ -1,4 +1,4 @@
-import {ResourcesEvents} from "../schemas/resources/resources-events.js";
+import {ResourcesEvents} from "../schemas/resources/resources-events";
 
 interface ResourcesServerToClientEvents extends ResourcesEvents {}
 

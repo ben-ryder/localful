@@ -1,8 +1,8 @@
-import {DatabaseService} from "../../../services/database/database.service.js";
+import {DatabaseService} from "../../../services/database/database.service";
 import {Injectable} from "@nestjs/common";
 import {ChangeDto, ChangesQueryParams} from "@localful/common";
-import {SystemError} from "../../../services/errors/base/system.error.js";
-import {RawDatabaseChange} from "./database-change.js";
+import {SystemError} from "../../../services/errors/base/system.error";
+import {RawDatabaseChange} from "./database-change";
 
 
 @Injectable()

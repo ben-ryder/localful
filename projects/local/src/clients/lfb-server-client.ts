@@ -13,8 +13,8 @@ import {
   ChangesSocketEvents, ProfileUpdateDto, ProfileDto
 } from "@localful/common";
 import {io, Socket} from "socket.io-client";
-import {LocalStore} from "../storage/local-store.js";
-import {ChangesListener} from "../common/changes-listener.js";
+import {LocalStore} from "../storage/local-store";
+import {ChangesListener} from "../common/changes-listener";
 
 export interface QueryOptions {
   url: string,

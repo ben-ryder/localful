@@ -2,9 +2,10 @@ import {INestApplication} from "@nestjs/common";
 import {agent, SuperAgentTest} from "supertest";
 
 import {resetTestData} from "@localful/testing";
-import {createApp} from "../src/create-app.js";
-import {DatabaseService} from "../src/services/database/database.service.js";
-import {ConfigService} from "../src/services/config/config.js";
+import {createApp} from "../src/create-app";
+import {DatabaseService} from "../src/services/database/database.service";
+import {TokenService} from "../src/services/token/token.service";
+import {UsersService} from "../src/modules/users/users.service";
 
 
 export class TestHelper {
@@ -18,8 +19,6 @@ export class TestHelper {
     this.app = await createApp({logger: false})
     await this.app.init();
 
-    const configService = await this.app.get(ConfigService);
-
     // Setup supertest agent for test requests
     const httpServer = this.app.getHttpServer();
     this.client = agent(httpServer);
@@ -29,15 +28,14 @@ export class TestHelper {
    * Return an API access token for the given user
    *
    * @param userId
-   * @param scopes
    */
-  async getUserAccessToken(userId: string, scopes: string[]): Promise<string> {
-    const configService = this.app.get(ConfigService);
-    const iss = configService.config.auth.issuer;
-    const aud = configService.config.auth.audience;
+  async getUserAccessToken(userId: string): Promise<string> {
+    const tokenService = this.app.get(TokenService);
+    const userService = this.app.get(UsersService);
+    const user = await userService._UNSAFE_get(userId)
+    const tokenPair = await tokenService.createNewTokenPair(user);
 
-    // @todo: replace with real logic again
-    return "accessToken"
+    return tokenPair.accessToken
   }
 
   /**

@@ -1,4 +1,4 @@
-import {ChangesEvents} from "../schemas/changes/changes-events.js";
+import {ChangesEvents} from "../schemas/changes/changes-events";
 
 interface ChangesServerToClientEvents extends ChangesEvents {}
 

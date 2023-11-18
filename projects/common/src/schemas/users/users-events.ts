@@ -3,7 +3,7 @@
  * https://socket.io/docs/v4/typescript/
  */
 
-import {UserDto} from "./users.js";
+import {UserDto} from "./users";
 
 export type UpdateUserEvent = () => UserDto;
 

@@ -1,9 +1,9 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
-import {AuthService} from "./auth.service.js";
+import {AuthService} from "./auth.service";
 import {LoginRequest, LogoutRequest, RefreshRequest} from "@localful/common";
-import {ZodValidationPipe} from "../../common/zod-validation.pipe.js";
-import {AuthGuard} from "./auth.guards.js";
+import {ZodValidationPipe} from "../../common/zod-validation.pipe";
+import {AuthGuard} from "./auth.guards";
 
 @Controller({
   path: "/auth",
@@ -22,7 +22,6 @@ export class AuthController {
 
   @Post("/logout")
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard)
   async logout(
     @Body(new ZodValidationPipe(LogoutRequest)) logoutRequest: LogoutRequest
   ) {
@@ -31,7 +30,6 @@ export class AuthController {
 
   @Post("/refresh")
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard)
   async refresh(@Body(new ZodValidationPipe(RefreshRequest)) refreshRequest: RefreshRequest) {
     return await this.authService.refresh(refreshRequest.refreshToken);
   }

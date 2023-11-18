@@ -1,8 +1,8 @@
 import {forwardRef, Module} from "@nestjs/common";
-import {ServicesModule} from "../../services/services.module.js";
-import {UsersController} from "./users.controller.js";
-import {UsersService} from "./users.service.js";
-import {UsersDatabaseService} from "./database/users.database.service.js";
+import {ServicesModule} from "../../services/services.module";
+import {UsersController} from "./users.controller";
+import {UsersService} from "./users.service";
+import {UsersDatabaseService} from "./database/users.database.service";
 import {AuthModule} from "../auth/auth.module";
 
 

@@ -1,4 +1,4 @@
-import { ResourceError } from "./resource.error.js";
+import { ResourceError } from "./resource.error";
 
 /**
  * For when a resource relationship is invalid.

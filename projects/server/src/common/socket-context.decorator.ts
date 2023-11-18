@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 import { Socket } from "socket.io";
-import {RequestContext} from "./request-context.decorator.js";
+import {RequestContext} from "./request-context.decorator";
 
 /**
  * There is no absolute guarantee that the context will

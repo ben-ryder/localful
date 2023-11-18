@@ -1,7 +1,7 @@
 import {Redis} from "ioredis";
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "../config/config.js";
-import {SystemError} from "../errors/base/system.error.js";
+import { ConfigService } from "../config/config";
+import {SystemError} from "../errors/base/system.error";
 
 export interface CacheOptions {
   epochExpiry: number;

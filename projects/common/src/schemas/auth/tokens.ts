@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {Roles} from "./permissions.js";
+import {Roles} from "./permissions";
 
 export const TokenPayload = z.object({
   iss: z.string(),

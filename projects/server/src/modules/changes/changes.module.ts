@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
-import {ChangesService} from "./changes.service.js";
-import {ChangesController} from "./changes.controller.js";
-import {ChangesGateway} from "./changes.gateway.js";
-import {ServicesModule} from "../../services/services.module.js";
-import {ChangesDatabaseService} from "./database/changes.database.service.js";
+import {ChangesService} from "./changes.service";
+import {ChangesController} from "./changes.controller";
+import {ChangesGateway} from "./changes.gateway";
+import {ServicesModule} from "../../services/services.module";
+import {ChangesDatabaseService} from "./database/changes.database.service";
 import {AuthModule} from "../auth/auth.module";
 
 

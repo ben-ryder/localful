@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
-import {ConfigService} from "./config/config.js";
-import {DatabaseService} from "./database/database.service.js";
-import {DataStoreService} from "./data-store/data-store.service.js";
-import {EmailService} from "./email/email.service.js";
-import {PasswordService} from "./password/password.service.js";
-import {TokenService} from "./token/token.service.js";
+import {ConfigService} from "./config/config";
+import {DatabaseService} from "./database/database.service";
+import {DataStoreService} from "./data-store/data-store.service";
+import {EmailService} from "./email/email.service";
+import {PasswordService} from "./password/password.service";
+import {TokenService} from "./token/token.service";
 
 
 @Module({

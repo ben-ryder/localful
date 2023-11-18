@@ -4,6 +4,7 @@ import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-ba
 import {testMissingField} from "../../../../tests-utils/common-expects/test-missing-field";
 import {testMalformedData} from "../../../../tests-utils/common-expects/test-malformed-data";
 import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
+import {testUsers} from "@localful/testing";
 
 
 // A default user which can be reused in multiple data to save a bit of copy-pasting.
@@ -11,7 +12,7 @@ import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-
 const defaultTestUser = Object.freeze({
   username: "test-new-user",
   email: "testnew@example.com",
-  password: "testnewpassword",
+  password: "testtesttest",
   encryptionSecret: "secret"
 });
 
@@ -135,19 +136,6 @@ describe("Add User - /v1/users [POST]",() => {
   })
 
   describe("None Unique Data", () => {
-    test("When using an existing username, the request should fail", async () => {
-      const newUser = {
-        ...defaultTestUser,
-        username: testUsers[0].username
-      }
-
-      const {body, statusCode} = await testHelper.client
-        .post("/v1/users")
-        .send(newUser);
-
-      expectBadRequest(body, statusCode, ErrorIdentifiers.USER_USERNAME_EXISTS);
-    })
-
     test("When using an existing email, the request should fail", async () => {
       const newUser = {
         ...defaultTestUser,
@@ -218,7 +206,7 @@ describe("Add User - /v1/users [POST]",() => {
 
   describe("Required Fields", () => {
     test("When not supplying a username, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
@@ -230,7 +218,7 @@ describe("Add User - /v1/users [POST]",() => {
     })
 
     test("When not supplying an email, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
@@ -242,7 +230,7 @@ describe("Add User - /v1/users [POST]",() => {
     })
 
     test("When not supplying a password, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
@@ -254,7 +242,7 @@ describe("Add User - /v1/users [POST]",() => {
     })
 
     test("When not supplying an encryptionSecret, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
@@ -318,11 +306,24 @@ describe("Add User - /v1/users [POST]",() => {
 
       expectBadRequest(body, statusCode);
     })
+
+    test("When passing a role field, the request should fail", async () => {
+      const newUser = {
+        ...defaultTestUser,
+        role: "admin"
+      }
+
+      const {body, statusCode} = await testHelper.client
+        .post("/v1/users")
+        .send(newUser);
+
+      expectBadRequest(body, statusCode);
+    })
   })
 
   describe("Invalid Data", () => {
     test("When supplying invalid JSON data, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
       await testMalformedData({
         clientFunction: testHelper.client.post.bind(testHelper.client),
@@ -334,10 +335,14 @@ describe("Add User - /v1/users [POST]",() => {
     describe("When not supplying username as a string, the request should fail", () => {
       testInvalidDataTypes({
         testHelper: testHelper,
-        clientMethod: "post",
-        user: testUsers[0],
-        endpoint: "/v1/users",
-        data: defaultTestUser,
+        req: {
+          clientMethod: "post",
+          endpoint: "/v1/users",
+          initialData: defaultTestUser
+        },
+        auth: {
+          userId: testUsers[0].id
+        },
         testFieldKey: "username",
         testCases: [1, 1.5, true, null, undefined, {test: "yes"}, [1, 2]]
       })
@@ -346,10 +351,14 @@ describe("Add User - /v1/users [POST]",() => {
     describe("When not supplying email as a string, the request should fail", () => {
         testInvalidDataTypes({
           testHelper: testHelper,
-          clientMethod: "post",
-          user: testUsers[0],
-          endpoint: "/v1/users",
-          data: defaultTestUser,
+          req: {
+            clientMethod: "post",
+            endpoint: "/v1/users",
+            initialData: defaultTestUser
+          },
+          auth: {
+            userId: testUsers[0].id
+          },
           testFieldKey: "email",
           testCases: [1, 1.5, true, null, undefined, {test: "yes"}, [1, 2]]
         })
@@ -358,10 +367,14 @@ describe("Add User - /v1/users [POST]",() => {
     describe("When not supplying password as a string, the request should fail", () => {
       testInvalidDataTypes({
         testHelper: testHelper,
-        clientMethod: "post",
-        user: testUsers[0],
-        endpoint: "/v1/users",
-        data: defaultTestUser,
+        req: {
+          clientMethod: "post",
+          endpoint: "/v1/users",
+          initialData: defaultTestUser
+        },
+        auth: {
+          userId: testUsers[0].id
+        },
         testFieldKey: "password",
         testCases: [1, 1.5, true, null, undefined, {test: "yes"}, [1, 2]]
       })
@@ -370,10 +383,14 @@ describe("Add User - /v1/users [POST]",() => {
     describe("When not supplying encryptionSecret as a string, the request should fail", () => {
       testInvalidDataTypes({
         testHelper: testHelper,
-        clientMethod: "post",
-        user: testUsers[0],
-        endpoint: "/v1/users",
-        data: defaultTestUser,
+        req: {
+          clientMethod: "post",
+          endpoint: "/v1/users",
+          initialData: defaultTestUser
+        },
+        auth: {
+          userId: testUsers[0].id
+        },
         testFieldKey: "encryptionSecret",
         testCases: [1, 1.5, true, null, undefined, {test: "yes"}, [1, 2]]
       })

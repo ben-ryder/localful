@@ -1,4 +1,4 @@
-import { DecryptError, EncryptError } from "../errors/errors.js";
+import { DecryptError, EncryptError } from "../errors/errors";
 
 const INITIALIZATION_VECTOR_LENGTH = 12;
 const SALT_LENGTH = 16;

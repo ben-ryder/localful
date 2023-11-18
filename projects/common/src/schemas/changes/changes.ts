@@ -1,14 +1,14 @@
 import {z} from "zod";
-import {ResourceId} from "../resources/resources.js";
+import {ResourceId} from "../resources/resources";
 
 export const ChangeId = z.string()
   .min(1, "A change id must be at least 1 character.")
-  .max(40, "A change id must be less than 40 characters.")
+  .max(40, "A change id can't go over 40 characters.")
 
 export const ChangeDto = z.object({
   id: ChangeId,
   protectedData: z.string()
-    .min(1, "The protectedData must be at least 1 character."),
+    .min(1, "protectedData must be at least 1 character."),
   createdAt: z.string()
     .datetime({message: "createdAt must be UTC timestamp"}),
 }).strict()

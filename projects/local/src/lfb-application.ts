@@ -1,10 +1,10 @@
-import {LocalStore} from "./storage/local-store.js";
+import {LocalStore} from "./storage/local-store";
 import * as A from "@automerge/automerge";
 import {ChangeDto} from "@localful/common";
-import {LFBClient} from "./clients/lfb-server-client.js";
-import {BrowserSyncClient} from "./clients/browser-sync-client.js";
-import {NoEncryptionKeyError} from "./errors/errors.js";
-import {EncryptionHelper} from "./encryption/encryption-helper.js";
+import {LFBClient} from "./clients/lfb-server-client";
+import {BrowserSyncClient} from "./clients/browser-sync-client";
+import {NoEncryptionKeyError} from "./errors/errors";
+import {EncryptionHelper} from "./encryption/encryption-helper";
 
 /**
  * A listener callback fired whenever a change is made to the document.
