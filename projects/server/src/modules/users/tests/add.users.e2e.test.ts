@@ -4,13 +4,12 @@ import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-ba
 import {testMissingField} from "../../../../tests-utils/common-expects/test-missing-field";
 import {testMalformedData} from "../../../../tests-utils/common-expects/test-malformed-data";
 import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
-import {testUsers} from "@localful/testing";
+import {testUsers} from "../../../../tests-utils/test-data";
 
 
 // A default user which can be reused in multiple data to save a bit of copy-pasting.
 // Uses Object.freeze to ensure no test can modify it
 const defaultTestUser = Object.freeze({
-  username: "test-new-user",
   email: "testnew@example.com",
   password: "testtesttest",
   encryptionSecret: "secret"
@@ -40,7 +39,6 @@ describe("Add User - /v1/users [POST]",() => {
       expect(body).toEqual(expect.objectContaining({
         user: {
           id: expect.any(String),
-          username: defaultTestUser.username,
           email: defaultTestUser.email,
           isVerified: false,
           encryptionSecret: defaultTestUser.encryptionSecret,
@@ -70,7 +68,6 @@ describe("Add User - /v1/users [POST]",() => {
       expect(body).toEqual(expect.objectContaining({
         user: {
           id: expect.any(String),
-          username: newUser.username,
           email: newUser.email,
           isVerified: false,
           encryptionSecret: newUser.encryptionSecret,
@@ -82,57 +79,55 @@ describe("Add User - /v1/users [POST]",() => {
       }))
     })
 
-    test("When using a username that's 1 character, the new user should be added & returned", async () => {
-      const newUser = {
-        ...defaultTestUser,
-        username: "a"
-      }
+    // test("When using a username that's 1 character, the new user should be added & returned", async () => {
+    //   const newUser = {
+    //     ...defaultTestUser,
+    //     username: "a"
+    //   }
+    //
+    //   const {body, statusCode} = await testHelper.client
+    //     .post("/v1/users")
+    //     .send(newUser);
+    //
+    //   expect(statusCode).toEqual(201);
+    //   expect(body).toEqual(expect.objectContaining({
+    //     user: {
+    //       id: expect.any(String),
+    //       email: newUser.email,
+    //       isVerified: false,
+    //       encryptionSecret: newUser.encryptionSecret,
+    //       createdAt: expect.any(String),
+    //       updatedAt: expect.any(String)
+    //     },
+    //     accessToken: expect.any(String),
+    //     refreshToken: expect.any(String)
+    //   }))
+    // })
 
-      const {body, statusCode} = await testHelper.client
-        .post("/v1/users")
-        .send(newUser);
-
-      expect(statusCode).toEqual(201);
-      expect(body).toEqual(expect.objectContaining({
-        user: {
-          id: expect.any(String),
-          username: newUser.username,
-          email: newUser.email,
-          isVerified: false,
-          encryptionSecret: newUser.encryptionSecret,
-          createdAt: expect.any(String),
-          updatedAt: expect.any(String)
-        },
-        accessToken: expect.any(String),
-        refreshToken: expect.any(String)
-      }))
-    })
-
-    test("When using a username that's 20 characters, the new user should be added & returned", async () => {
-      const newUser = {
-        ...defaultTestUser,
-        username: "qwertyuiopasdfghjklz"
-      }
-
-      const {body, statusCode} = await testHelper.client
-        .post("/v1/users")
-        .send(newUser);
-
-      expect(statusCode).toEqual(201);
-      expect(body).toEqual(expect.objectContaining({
-        user: {
-          id: expect.any(String),
-          username: newUser.username,
-          email: newUser.email,
-          isVerified: false,
-          encryptionSecret: newUser.encryptionSecret,
-          createdAt: expect.any(String),
-          updatedAt: expect.any(String)
-        },
-        accessToken: expect.any(String),
-        refreshToken: expect.any(String)
-      }))
-    })
+    // test("When using a username that's 20 characters, the new user should be added & returned", async () => {
+    //   const newUser = {
+    //     ...defaultTestUser,
+    //     username: "qwertyuiopasdfghjklz"
+    //   }
+    //
+    //   const {body, statusCode} = await testHelper.client
+    //     .post("/v1/users")
+    //     .send(newUser);
+    //
+    //   expect(statusCode).toEqual(201);
+    //   expect(body).toEqual(expect.objectContaining({
+    //     user: {
+    //       id: expect.any(String),
+    //       email: newUser.email,
+    //       isVerified: false,
+    //       encryptionSecret: newUser.encryptionSecret,
+    //       createdAt: expect.any(String),
+    //       updatedAt: expect.any(String)
+    //     },
+    //     accessToken: expect.any(String),
+    //     refreshToken: expect.any(String)
+    //   }))
+    // })
   })
 
   describe("None Unique Data", () => {
@@ -177,46 +172,22 @@ describe("Add User - /v1/users [POST]",() => {
       expectBadRequest(body, statusCode)
     })
 
-    test("When supplying an empty username, the request should fail", async () => {
-      const newUser = {
-        ...defaultTestUser,
-        username: ""
-      }
-
-      const {body, statusCode} = await testHelper.client
-        .post("/v1/users")
-        .send(newUser);
-
-      expectBadRequest(body, statusCode)
-    })
-
-    test("When using a username that's too long, the request should fail", async () => {
-      const newUser = {
-        ...defaultTestUser,
-        username: "this-is-a-username-which-is-over-the-maximum"
-      }
-
-      const {body, statusCode} = await testHelper.client
-        .post("/v1/users")
-        .send(newUser);
-
-      expectBadRequest(body, statusCode)
-    })
+    // @todo: add max length to email schema and re-add this test
+    // test("When using a email that's too long, the request should fail", async () => {
+    //   const newUser = {
+    //     ...defaultTestUser,
+    //     email: "this-is-a-username-which-is-over-the-maximum"
+    //   }
+    //
+    //   const {body, statusCode} = await testHelper.client
+    //     .post("/v1/users")
+    //     .send(newUser);
+    //
+    //   expectBadRequest(body, statusCode)
+    // })
   })
 
   describe("Required Fields", () => {
-    test("When not supplying a username, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
-
-      await testMissingField({
-        clientFunction: testHelper.client.post.bind(testHelper.client),
-        accessToken: accessToken,
-        endpoint: "/v1/users",
-        data: defaultTestUser,
-        testFieldKey: "username"
-      })
-    })
-
     test("When not supplying an email, the request should fail", async () => {
       const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
@@ -329,22 +300,6 @@ describe("Add User - /v1/users [POST]",() => {
         clientFunction: testHelper.client.post.bind(testHelper.client),
         accessToken: accessToken,
         endpoint: "/v1/users"
-      })
-    })
-
-    describe("When not supplying username as a string, the request should fail", () => {
-      testInvalidDataTypes({
-        testHelper: testHelper,
-        req: {
-          clientMethod: "post",
-          endpoint: "/v1/users",
-          initialData: defaultTestUser
-        },
-        auth: {
-          userId: testUsers[0].id
-        },
-        testFieldKey: "username",
-        testCases: [1, 1.5, true, null, undefined, {test: "yes"}, [1, 2]]
       })
     })
 

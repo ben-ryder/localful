@@ -58,10 +58,14 @@ export class DataStoreService {
   }
 
   async getItem(key: string) {
+    this.checkStatus();
+
     return this.redis.get(key);
   }
 
   async purge() {
+    this.checkStatus();
+
     await this.redis.flushall();
   }
 

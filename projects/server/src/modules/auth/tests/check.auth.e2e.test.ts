@@ -2,6 +2,7 @@ import {sign} from "jsonwebtoken";
 import {ConfigService} from "../../../services/config/config";
 import {TestHelper} from "../../../../tests-utils/test-helper";
 import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
+import {testUsers} from "../../../../tests-utils/test-data";
 
 
 describe("Check Auth",() => {
@@ -18,7 +19,7 @@ describe("Check Auth",() => {
   });
 
   test("When authenticated, the request should succeed", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
     const {statusCode} = await testHelper.client
       .get("/v1/auth/check")

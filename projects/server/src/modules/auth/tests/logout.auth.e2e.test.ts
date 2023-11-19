@@ -1,9 +1,9 @@
 import {ConfigService} from "../../../services/config/config";
 import {sign} from "jsonwebtoken";
-import {ErrorIdentifiers} from "@localful/common";
 import {TestHelper} from "../../../../tests-utils/test-helper";
 import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
 import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
+import {testUsers} from "../../../../tests-utils/test-data";
 
 // todo: add data that revoked tokens actually are revoked and no longer work (when some are expired and some not)!!!!!
 
@@ -23,7 +23,7 @@ describe("Logout Auth",() => {
 
   describe("Success Cases", () => {
     test("When a valid refresh token a supplied, all tokens should be revoked", async () => {
-      const {refreshToken, accessToken} = await testHelper.getUserTokens(testUsers[0]);
+      const {refreshToken, accessToken} = await testHelper.getUserTokens(testUsers[0].id);
 
       // Revoke the tokens, check that request succeeded
       const {statusCode: revokeStatusCode, body} = await testHelper.client
@@ -103,10 +103,11 @@ describe("Logout Auth",() => {
     describe("When not supplying refreshToken as a string, the request should fail", () => {
       testInvalidDataTypes({
         testHelper: testHelper,
-        clientMethod: "post",
-        user: testUsers[0],
-        endpoint: "/v1/auth/logout",
-        data: {},
+        req: {
+          clientMethod: "post",
+          endpoint: "/v1/auth/logout",
+          initialData: {}
+        },
         testFieldKey: "refreshToken",
         testCases: [1, 1.5, true, {test: "yes"}, [1, 2]]
       })

@@ -9,7 +9,7 @@ export interface TestInvalidDataTypesConfig {
     endpoint: string,
     initialData: object,
   },
-  auth: {
+  auth?: {
     userId: string,
   },
   testHelper: TestHelper
@@ -22,11 +22,13 @@ export function testInvalidDataTypes(config: TestInvalidDataTypesConfig) {
       [config.testFieldKey]: testCase
     };
 
-    const accessToken = await config.testHelper.getUserAccessToken(config.auth.userId);
+    const req = config.testHelper.client[config.req.clientMethod](config.req.endpoint)
+    if (config.auth) {
+      const accessToken = await config.testHelper.getUserAccessToken(config.auth.userId);
+      req.set("Authorization", `Bearer ${accessToken}`)
+    }
 
-    const {body, statusCode} = await config.testHelper.client[config.req.clientMethod](config.req.endpoint)
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send(testData);
+    const {body, statusCode} = await req.send(testData);
 
     expectBadRequest(body, statusCode);
   })

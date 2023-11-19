@@ -5,7 +5,7 @@ import {TestHelper} from "../../../../tests-utils/test-helper";
 import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
 import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
 import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
-
+import {testUsers} from "../../../../tests-utils/test-data";
 
 
 describe("Refresh Auth",() => {
@@ -23,7 +23,7 @@ describe("Refresh Auth",() => {
 
   describe("Success Cases", () => {
     test("When supplying a valid refreshToken, an accessToken and refreshToken should be returned", async () => {
-      const { refreshToken } = await testHelper.getUserTokens(testUsers[0]);
+      const { refreshToken } = await testHelper.getUserTokens(testUsers[0].id);
 
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/refresh")
@@ -41,7 +41,7 @@ describe("Refresh Auth",() => {
 
   describe("Token Revocation", () => {
     test("After a successful refresh, the previous refreshToken should be invalid", async () => {
-      const { refreshToken } = await testHelper.getUserTokens(testUsers[0]);
+      const { refreshToken } = await testHelper.getUserTokens(testUsers[0].id);
 
       // Call a refresh to get new access & refresh token
       const {statusCode} = await testHelper.client
@@ -113,10 +113,11 @@ describe("Refresh Auth",() => {
     describe("When not supplying refreshToken as a string, the request should fail", () => {
       testInvalidDataTypes({
         testHelper: testHelper,
-        clientMethod: "post",
-        user: testUsers[0],
-        endpoint: "/v1/auth/refresh",
-        data: {},
+        req: {
+          clientMethod: "post",
+          endpoint: "/v1/auth/refresh",
+          initialData: {},
+        },
         testFieldKey: "refreshToken",
         testCases: [1, 1.5, true, null, undefined, {test: "yes"}, [1, 2]]
       })

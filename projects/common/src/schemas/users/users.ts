@@ -15,7 +15,7 @@ export const UserFields = z.object({
 	protectedEncryptionKey: z.string()
 		.min(1, "protectedEncryptionKey must be at least 1 character.")
 		.max(255, "protectedEncryptionKey can't be over 255 characters."),
-	protectedAdditionalData: z.string().optional(),
+	protectedAdditionalData: z.string().nullish(),
 }).strict()
 export type UserFields = z.infer<typeof UserFields>;
 

@@ -22,9 +22,12 @@ describe("Info Module",() => {
       const {body, statusCode} = await testHelper.client.get("/v1/info");
 
       expect(statusCode).toEqual(200);
-      expect(body).toEqual(expect.objectContaining({
-        version: expect.any(String)
-      }));
+      expect(body).toEqual({
+        version: expect.any(String),
+        registrationEnabled: expect.any(Boolean)
+      });
     })
+
+    // @todo: test that registrationEnabled matches the current config?
   })
 })

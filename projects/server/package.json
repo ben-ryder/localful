@@ -18,13 +18,13 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "db:init": "psql postgres -f ./scripts/setup.sql && npm run db:init:test-data",
+    "db:init": "psql postgres -f ./scripts/setup.sql && npm run db:init:data",
     "db:dump": "pg_dump localful > ./backup/localful.sql",
     "db:restore": "psql localful < ./backup/localful.sql",
-    "db:init:test-data": "ts-node tests/utils/database-init-cli.ts"
+    "db:init:data": "ts-node tests-utils/cli.ts"
   },
   "dependencies": {
-    "@localful/common": "../common",
+    "@localful/common": "^0.1.7",
     "@nestjs/common": "^10.2.9",
     "@nestjs/core": "^10.2.9",
     "@nestjs/platform-express": "^10.2.9",

@@ -4,6 +4,7 @@ import {testMissingField} from "../../../../tests-utils/common-expects/test-miss
 import {testMalformedData} from "../../../../tests-utils/common-expects/test-malformed-data";
 import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
 import {ErrorIdentifiers} from "@localful/common"
+import {testUsers} from "../../../../tests-utils/test-data";
 
 
 describe("Login Auth",() => {
@@ -24,7 +25,7 @@ describe("Login Auth",() => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/login")
         .send({
-          username: testUsers[0].username,
+          email: testUsers[0].email,
           password: testUsers[0].serverPassword
         });
 
@@ -32,15 +33,26 @@ describe("Login Auth",() => {
       expect(body).toEqual(expect.objectContaining({
         user: {
           id: testUsers[0].id,
-          username: testUsers[0].username,
           email: testUsers[0].email,
+          displayName: testUsers[0].displayName,
           isVerified: testUsers[0].isVerified,
-          encryptionSecret: testUsers[0].encryptionSecret,
+          role: testUsers[0].role,
+          protectedEncryptionKey: testUsers[0].protectedEncryptionKey,
+          protectedAdditionalData: testUsers[0].protectedAdditionalData,
           createdAt: testUsers[0].createdAt,
           updatedAt: testUsers[0].updatedAt
         },
-        accessToken: expect.any(String),
-        refreshToken: expect.any(String),
+        tokens: {
+          accessToken: expect.any(String),
+          refreshToken: expect.any(String),
+        }
+      }))
+
+      // Check no password data is included in fetches user
+      // todo: should this be a separate test?
+      expect(body).not.toEqual(expect.objectContaining({
+        passwordHash: testUsers[0].passwordHash,
+        password: testUsers[0].serverPassword
       }))
     })
   })
@@ -50,7 +62,7 @@ describe("Login Auth",() => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/login")
         .send({
-          username: "random username",
+          email: "random@example.com",
           password: "random password"
         });
 
@@ -61,18 +73,18 @@ describe("Login Auth",() => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/login")
         .send({
-          username: testUsers[0].username,
+          email: testUsers[0].email,
           password: "random password"
         });
 
       expectForbidden(body, statusCode, ErrorIdentifiers.AUTH_CREDENTIALS_INVALID)
     })
 
-    test("When supplying a correct password but wrong username, the request should fail", async () => {
+    test("When supplying a correct password but wrong email, the request should fail", async () => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/login")
         .send({
-          username: "randomuser",
+          email: "randomuser@example.com",
           password: testUsers[0].serverPassword
         });
 
@@ -81,30 +93,24 @@ describe("Login Auth",() => {
   })
 
   describe("Required Fields", () => {
-    test("When not supplying a username, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
-
+    test("When not supplying an email, the request should fail", async () => {
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
-        accessToken: accessToken,
         endpoint: "/v1/auth/login",
         data: {
-          username: testUsers[0].username,
+          email: testUsers[0].email,
           password: testUsers[0].serverPassword
         },
-        testFieldKey: "username"
+        testFieldKey: "email"
       })
     })
 
     test("When not supplying a password, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
-
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
-        accessToken: accessToken,
         endpoint: "/v1/auth/login",
         data: {
-          username: testUsers[0].username,
+          email: testUsers[0].email,
           password: testUsers[0].serverPassword
         },
         testFieldKey: "password"
@@ -114,7 +120,7 @@ describe("Login Auth",() => {
 
   describe("Invalid Data", () => {
     test("When supplying invalid JSON data, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
       await testMalformedData({
         clientFunction: testHelper.client.post.bind(testHelper.client),
@@ -123,16 +129,17 @@ describe("Login Auth",() => {
       })
     })
 
-    describe("When not supplying username as a string, the request should fail", () => {
+    describe("When not supplying email as a string, the request should fail", () => {
       testInvalidDataTypes({
         testHelper: testHelper,
-        clientMethod: "post",
-        user: testUsers[0],
-        endpoint: "/v1/auth/login",
-        data: {
-          password: "test-password"
+        req: {
+          clientMethod: "post",
+          endpoint: "/v1/auth/login",
+          initialData: {
+            password: "test-password"
+          }
         },
-        testFieldKey: "username",
+        testFieldKey: "email",
         testCases: [1, 1.5, true, null, {test: "yes"}, [1, 2]]
       })
     })
@@ -140,11 +147,12 @@ describe("Login Auth",() => {
     describe("When not supplying password as a string, the request should fail", () => {
       testInvalidDataTypes({
         testHelper: testHelper,
-        clientMethod: "post",
-        user: testUsers[0],
-        endpoint: "/v1/auth/login",
-        data: {
-          username: "testuser"
+        req: {
+          clientMethod: "post",
+          endpoint: "/v1/auth/login",
+          initialData: {
+            email: testUsers[0].email,
+          }
         },
         testFieldKey: "password",
         testCases: [1, 1.5, true, null, {test: "yes"}, [1, 2]]
