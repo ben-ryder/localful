@@ -8,7 +8,7 @@ This project includes:
 - A local library (currently web only) which...
   - Integrates with the Localful server.
   - Provides an opinionated user account setup and authentication system (that still supports local-only app usage).
-  - Implements a client-side encryption system, which you can learn more about in the **[encryption specification](./docs/local/encryption/specification.md)**.
+  - Implements a client-side encryption system, which you can learn more about in the **[encryption specification](./docs/local/encryption/specification-v2.md)**.
   - Implements local storage via IndexDB and localStorage
   - Implements local synchronisation (between browser windows & tabs) via BroadcastChannel.
 
