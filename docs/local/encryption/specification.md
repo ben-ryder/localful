@@ -1,5 +1,5 @@
-# Localful Encryption Specification - `v2`
-This document contains the `v2` specification which described how the Localful project achieves client-side encryption.  
+# Localful Encryption Specification - `v1`
+This document contains the `v1` specification which described how the Localful project achieves client-side encryption.  
 It also describes how user credentials are processed before being passed to the server, if server functionality is enabled.  
 
 There are references to the client-server architecture, security and data structures of Localful too, but the primary focus is on the specific cryptographic methods used on device.  
@@ -15,33 +15,32 @@ day this is a side project I've made to learn and solve my own needs.
 ---
 
 ## Introduction
+Localful works by creating vaults and then creating resources, changes and blobs within that vault.  
+Encryption happens at a vault level, so all resources, changes and blobs within a vault are encrypted using
+the same key, but a different vault and its content is encrypted using a different key.
+
 TODO
-- Add context about Localful and the required functionality that influences this spec.
+- Add more context about Localful and the required functionality that influences this spec.
 - What is the purpose of this encryption? What is the threat model etc
 
 ## Summary
-**Encryption Password & Master Key**
-- When first using Localful users supply an `encryption password`. This password and a random salt are used to derive a `master unlock key`.
-- A random `master encryption key` is generated and encrypted with the `master unlock key` which produces a `protected master encryption key`.
-- The `protected master encryption key` includes the random salt used in key derivation and the IV value used when encrypting the key.
-- The `master encryption key` and `master unlock key` are only ever stored in memory, `protected master encryption key` is saved to device storage and can be uploaded to the server.
+**Vault Encryption**
+- When setting up a vault, users supply an `encryption password`. This password and a random salt are used to derive a `vault unlock key`.
+- A random `vault encryption key` is generated and encrypted with the `vault unlock key` which produces a `protected vault encryption key`.
+- The `protected vault encryption key` includes the random salt used in key derivation and the IV value used when encrypting the key.
+- The `vault encryption key` and `vault unlock key` are only ever stored in memory, `protected vault encryption key` is saved to local storage and can be uploaded to the server.
+- All vault content including resources, changes and blobs will then be encrypted using `vault encryption key`.
+- To allow Localful to work effectively, some data is not encrypted:
+  - Content ids and timestamps.
+  - Relationships such as the resource a change belongs to, what vault resources and blobs belong to etc.
+  - The **vault name is not encrypted**. This is to allow for a user-friendly way of identifying vaults prior to decryption.
 
-![A high-level diagram of the encryption password and master encryption key system described above.](./diagrams/encryption-password.png)
-
----
-
-**Resource Encryption**
-- When a resource needs to be encrypted, a `resource encryption key` is randomly generated and is encrypted with the `master encryption key` to produce a `protected resource encryption key`.
-- The `resource encryption key` is only ever stored in memory, and the `protected resource encryption key` is persisted to the device and can be uploaded to the server.
-- The `resource encryption key` is used to encrypt the resource and the resulting encrypted data is persisted to the device and can be uploaded to the server.
-- As all data (including keys) are only stored encrypted, a user must decrypt `protected master encryption key` using `encryption password` every time they use the app to access resources.
-
-![A high-level diagram of the resource encryption system described above.](./diagrams/resource-encryption.png)
+![A diagram of vault encryption.](./diagrams/vault-encryption.png)
 
 ---
 
 **Server Password**
-- The server credentials (`account email` and `account password`) are totally separate to the `encryption password` in order to easily support local-only uses.
+- The server credentials (`account email` and `account password`) are totally separate to any vault encryption in order to easily support local-only uses.
 - The `account password` is used to derive an `account key`, where `account email` and an app specific `app salt` are combined as the salt for the KDF function.
 - The `account key` is then split in half, where the second half becomes the `server password`.
 - The `server password` is then used in server authentication along with `account email`.
@@ -54,7 +53,7 @@ TODO
 ### Key Derivation
 - `Argon2id` is used for key derivation, configured with `64 MiB` of memory, 3 iterations and 4 parallelism.
 - For `encryption password`:
-  - a 256 bit `master unlock key` is derived.
+  - a 256 bit `vault unlock key` is derived.
   - a random salt value is used.
 - For `account password`:
   - a 512 bit `account key` is derived
@@ -62,12 +61,11 @@ TODO
   - The `account key` is split into a 256 bit secret value (currently unused) and a 256 bit `server password`.
 
 ### Encryption
-- `master encryption key` and all `resource encryption keys` are randomly generated 256-bit keys.
 - `AES-GCM-256` is used for encrypting keys and resources, with randomly generated IV values.
 
 ### Encrypted Data Format
 All encrypted data is stored as a string in the format `<spec>:<metadata>:<ciphertext>`:
-- `<spec>` is just the Localful encryption spec version used (`v2`).
+- `<spec>` is just the Localful encryption spec version used (`v1`).
 - `<metadata>` is base64 encoded and includes the IV value used in encryption and possibly the salt value if appropriate.
 - `<ciphertext>` is a base64 encoded version of the encrypted data.
 
