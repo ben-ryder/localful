@@ -3,7 +3,7 @@
  * https://socket.io/docs/v4/typescript/
  */
 
-import {ResourceChangesDto} from "./changes";
+import {ResourceChangesDto} from "./versions";
 
 export type ChangeEvent = (changes: ResourceChangesDto) => void
 

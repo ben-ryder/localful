@@ -45,42 +45,55 @@ CREATE TABLE IF NOT EXISTS users (
     display_name VARCHAR(50) NOT NULL,
     is_verified BOOLEAN NOT NULL DEFAULT FALSE,
     role user_role NOT NULL DEFAULT 'user',
-    protected_encryption_key VARCHAR(255) NOT NULL,
-    protected_additional_data TEXT,
     CONSTRAINT email_unique UNIQUE (email),
     CONSTRAINT users_pk PRIMARY KEY (id)
 );
 CREATE TRIGGER update_user_timestamps BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_table_timestamps();
 
 /**
-    Resources Table
+    Vaults Table
     -----------
-    Used to store resources.
+    Used to store vaults.
  */
-CREATE TABLE IF NOT EXISTS resources (
-    id VARCHAR(40) NOT NULL,
-    protected_encryption_key VARCHAR(255) NOT NULL,
-    protected_additional_data TEXT,
+CREATE TABLE IF NOT EXISTS vaults (
+    id UUID NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    name VARCHAR(100) NOT NULL,
+    protected_encryption_key VARCHAR(255) NOT NULL,
+    protected_data TEXT,
     owner_id UUID NOT NULL,
-    CONSTRAINT resources_pk PRIMARY KEY (id),
-    CONSTRAINT resource_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT vaults_pk PRIMARY KEY (id),
+    CONSTRAINT vaults_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 /**
-    Changes Table
+    Content Table
     -----------
-    Used to store all the changes.
+    Used to store content items.
  */
-CREATE TABLE IF NOT EXISTS changes (
-    id VARCHAR(40) NOT NULL,
-    resource_id VARCHAR(40) NOT NULL,
-    protected_data TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS content (
+    id UUID NOT NULL,
+    type VARCHAR(50) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
-    CONSTRAINT changes_pk PRIMARY KEY (id),
-    CONSTRAINT change_resource FOREIGN KEY (resource_id) REFERENCES resources(id) ON DELETE CASCADE,
-    CONSTRAINT unique_resource_change UNIQUE (resource_id, id)
+    protected_data TEXT,
+    vault_id UUID NOT NULL,
+    CONSTRAINT content_pk PRIMARY KEY (id),
+    CONSTRAINT content_vault FOREIGN KEY (vault_id) REFERENCES vaults(id) ON DELETE CASCADE
+);
+
+/**
+    Content Versions Table
+    -----------
+    Used to store content versions.
+ */
+CREATE TABLE IF NOT EXISTS content_versions (
+    id UUID NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    protected_data TEXT,
+    content_id UUID NOT NULL,
+    CONSTRAINT content_versions_pk PRIMARY KEY (id),
+    CONSTRAINT content_versions_content FOREIGN KEY (content_id) REFERENCES content(id) ON DELETE CASCADE
 );
 
 -- Grant privileges to lfb user after everything is created

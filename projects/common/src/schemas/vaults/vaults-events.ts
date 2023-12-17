@@ -5,7 +5,8 @@
 
 import {EntityEvent} from "../common/events";
 
-export interface UsersEvents {
-	'users:update': EntityEvent,
-	'user:delete': EntityEvent
+export interface VaultsEvents {
+	'vaults:create': EntityEvent,
+	'vaults:update': EntityEvent,
+	'vaults:delete': EntityEvent
 }
