@@ -3,10 +3,11 @@
  * https://socket.io/docs/v4/typescript/
  */
 
-import {EntityEvent} from "../common/events";
+import {EntityEvent, EntityIdPayload} from "../common/events";
+import {VaultDto} from "./vaults";
 
 export interface VaultsEvents {
-	'vaults:create': EntityEvent,
-	'vaults:update': EntityEvent,
-	'vaults:delete': EntityEvent
+	'vaults:create': EntityEvent<VaultDto>,
+	'vaults:update': EntityEvent<VaultDto>,
+	'vaults:delete': EntityEvent<EntityIdPayload>
 }

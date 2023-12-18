@@ -1,6 +1,6 @@
 import {z} from "zod";
-import {Entity} from "../entity";
 import {Roles} from "../auth/permissions";
+import {CreatedAtField, createIdField, UpdatedAtField} from "../common/fields";
 
 export const UserFields = z.object({
 	displayName: z.string()
@@ -15,7 +15,11 @@ export const UserFields = z.object({
 }).strict()
 export type UserFields = z.infer<typeof UserFields>;
 
-export const UserEntity = Entity.merge(UserFields).strict()
+export const UserEntity = UserFields.extend({
+	id: createIdField(),
+	createdAt: CreatedAtField,
+	updatedAt: UpdatedAtField
+}).strict()
 export type UserEntity = z.infer<typeof UserEntity>;
 
 export const UserDto = UserEntity
@@ -24,7 +28,7 @@ export const UserDto = UserEntity
 export type UserDto = z.infer<typeof UserDto>;
 
 export const CreateUserDto = UserFields
-	.omit({isVerified: true, isAdmin: true, role: true})
+	.omit({isVerified: true, role: true})
 	.strict()
 export type CreateUserDto = z.infer<typeof CreateUserDto>;
 

@@ -1,23 +1,23 @@
 import {z} from "zod";
-import {Entity} from "../entity";
-import {ProtectedDataField} from "../common/fields";
+import {CreatedAtField, createIdField, ProtectedDataField} from "../common/fields";
 
-export const ContentVersionFields = z.object({
+export const VersionFields = z.object({
+  contentId: createIdField("contentId"),
+  createdAt: CreatedAtField,
+  deviceIdentifier: z.string()
+    .min(1, "deviceIdentifier must be at least 1 character.")
+    .max(20, "deviceIdentifier can't be over 20 characters."),
   protectedData: ProtectedDataField,
 }).strict()
-export type ContentVersionFields = z.infer<typeof ContentVersionFields>;
+export type VersionFields = z.infer<typeof VersionFields>;
 
-export const ContentVersionEntity = Entity
-  .merge(ContentVersionFields).strict()
-export type ContentVersionEntity = z.infer<typeof ContentVersionEntity>;
+export const VersionEntity = VersionFields.extend({
+  id: createIdField()
+}).strict()
+export type VersionEntity = z.infer<typeof VersionEntity>;
 
-export const ContentVersionDto = ContentVersionEntity;
-export type ContentVersionDto = z.infer<typeof ContentVersionDto>;
+export const VersionDto = VersionEntity;
+export type VersionDto = z.infer<typeof VersionDto>;
 
-export const CreateContentVersionDto = ContentVersionFields
-export type CreateContentVersionDto = z.infer<typeof CreateContentVersionDto>;
-
-export const UpdateContentVersionDto = ContentVersionFields
-  .omit({type: true})
-  .strict()
-export type UpdateContentVersionDto = z.infer<typeof UpdateContentVersionDto>;
+export const CreateVersionDto = VersionFields
+export type CreateVersionDto = z.infer<typeof CreateVersionDto>;

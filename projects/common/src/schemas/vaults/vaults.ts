@@ -1,11 +1,10 @@
 import {z} from "zod";
-import {EntityUpdatable} from "../entity";
-import {ProtectedDataField} from "../common/fields";
+import {CreatedAtField, createIdField, ProtectedDataField, UpdatedAtField} from "../common/fields";
 
 export const VaultFields = z.object({
 	name: z.string()
 		.min(1, "name must be at least 1 character.")
-		.max(100, "protectedEncryptionKey can't be over 100 characters."),
+		.max(100, "name can't be over 100 characters."),
 	protectedEncryptionKey: z.string()
 		.min(1, "protectedEncryptionKey must be at least 1 character.")
 		.max(255, "protectedEncryptionKey can't be over 255 characters."),
@@ -13,8 +12,11 @@ export const VaultFields = z.object({
 }).strict()
 export type VaultFields = z.infer<typeof VaultFields>;
 
-export const VaultEntity = EntityUpdatable
-	.merge(VaultFields).strict()
+export const VaultEntity = VaultFields.extend({
+	id: createIdField(),
+	createdAt: CreatedAtField,
+	updatedAt: UpdatedAtField,
+}).strict()
 export type VaultEntity = z.infer<typeof VaultEntity>;
 
 export const VaultDto = VaultEntity;
@@ -24,5 +26,6 @@ export const CreateVaultDto = VaultFields
 export type CreateVaultDto = z.infer<typeof CreateVaultDto>;
 
 export const UpdateVaultDto = VaultFields
+	.pick({name: true, protectedData: true})
 	.strict()
 export type UpdateVaultDto = z.infer<typeof UpdateVaultDto>;

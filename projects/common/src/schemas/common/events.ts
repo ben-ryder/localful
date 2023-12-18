@@ -1,6 +1,6 @@
 
-export interface EntityEventPayload {
+export interface EntityIdPayload {
 	id: string
 }
 
-export type EntityEvent = () => EntityEventPayload
+export type EntityEvent<T> = () => T

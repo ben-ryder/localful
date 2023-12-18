@@ -1,9 +1,9 @@
 import {UsersEvents} from "../schemas/users/users-events";
 
-interface UsersServerToClientEvents extends UsersEvents {}
+export interface UsersServerToClientEvents extends UsersEvents {}
 
-interface UsersClientToServerEvents {}
+export interface UsersClientToServerEvents {}
 
-interface UsersInterServerEvents {}
+export interface UsersInterServerEvents {}
 
-interface UsersSocketData {}
+export interface UsersSocketData {}

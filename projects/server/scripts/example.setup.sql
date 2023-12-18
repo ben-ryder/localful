@@ -74,9 +74,8 @@ CREATE TABLE IF NOT EXISTS vaults (
  */
 CREATE TABLE IF NOT EXISTS content (
     id UUID NOT NULL,
-    type VARCHAR(50) NOT NULL,
+    type VARCHAR(20) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
-    protected_data TEXT,
     vault_id UUID NOT NULL,
     CONSTRAINT content_pk PRIMARY KEY (id),
     CONSTRAINT content_vault FOREIGN KEY (vault_id) REFERENCES vaults(id) ON DELETE CASCADE
@@ -90,6 +89,7 @@ CREATE TABLE IF NOT EXISTS content (
 CREATE TABLE IF NOT EXISTS content_versions (
     id UUID NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
+    device_identifier VARCHAR(50) NOT NULL,
     protected_data TEXT,
     content_id UUID NOT NULL,
     CONSTRAINT content_versions_pk PRIMARY KEY (id),

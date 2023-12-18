@@ -1,13 +1,11 @@
 
 export * from "./errors/error-identifiers";
 
-export * from "./schemas/entity";
-
 export * from "./schemas/info";
 
 export * from "./schemas/users/users";
-export * from "./schemas/users/users-events.js"
-export * from "./schemas/users/users-params.js"
+export * from "./schemas/users/users-events"
+export * from "./schemas/users/users-params"
 
 export * from "./schemas/auth/tokens";
 export * from "./schemas/auth/permissions";
@@ -17,14 +15,19 @@ export * from "./schemas/auth/request/refresh.auth.request";
 export * from "./schemas/auth/request/verify.auth.request";
 export * from "./schemas/auth/response/login.auth.response";
 
-export * from "./schemas/resources/resources.js"
-export * from "./schemas/resources/resources-events.js"
-export * from "./schemas/resources/resources-params.js"
+export * from "./schemas/vaults/vaults"
+export * from "./schemas/vaults/vaults-events"
+export * from "./schemas/vaults/vaults-params"
 
-export * from "./schemas/changes/changes.js"
-export * from "./schemas/changes/changes-events.js"
-export * from "./schemas/changes/changes-params.js"
+export * from "./schemas/content/content"
+export * from "./schemas/content/content-events"
+export * from "./schemas/content/content-params"
 
-export * from "./sockets/users.js"
-export * from "./sockets/resources.js"
-export * from "./sockets/changes.js"
+export * from "./schemas/versions/versions"
+export * from "./schemas/versions/versions-events"
+export * from "./schemas/versions/versions-params"
+
+export * from "./sockets/users"
+export * from "./sockets/vaults"
+export * from "./sockets/content"
+export * from "./sockets/versions"
