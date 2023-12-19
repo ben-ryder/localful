@@ -7,6 +7,7 @@ export const ContentFields = z.object({
 		.min(1, "type must be at least 1 character.")
 		.max(20, "type can't be over 20 characters."),
 	createdAt: CreatedAtField,
+	isDeleted: z.boolean().optional()
 }).strict()
 export type ContentFields = z.infer<typeof ContentFields>;
 

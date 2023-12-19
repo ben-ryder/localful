@@ -7,7 +7,9 @@ export const VersionFields = z.object({
   deviceIdentifier: z.string()
     .min(1, "deviceIdentifier must be at least 1 character.")
     .max(20, "deviceIdentifier can't be over 20 characters."),
-  protectedData: ProtectedDataField,
+  // Data is nullable because it will be removed once the version is deleted.
+  protectedData: ProtectedDataField.nullable(),
+  isDeleted: z.boolean().optional()
 }).strict()
 export type VersionFields = z.infer<typeof VersionFields>;
 
