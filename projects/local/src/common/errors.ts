@@ -1,12 +1,12 @@
-export interface ToolkitErrorOptions {
+export interface LocalfulErrorOptions {
     message?: string;
     originalError?: any;
 }
 
-export class ToolkitError extends Error {
+export class LocalfulError extends Error {
     originalError: any;
 
-    constructor(options?: ToolkitErrorOptions) {
+    constructor(options?: LocalfulErrorOptions) {
         if (options?.message) {
             super(options.message);
         }
@@ -18,15 +18,15 @@ export class ToolkitError extends Error {
     }
 }
 
-export class NoServerError extends ToolkitError {}
+export class NoServerError extends LocalfulError {}
 
 // Encryption Errors
-export class EncryptionError extends ToolkitError {}
+export class EncryptionError extends LocalfulError {}
 export class EncryptError extends EncryptionError {}
 export class DecryptError extends EncryptionError {}
 
 // API Client Errors
-export class APIClientError extends ToolkitError {}
+export class APIClientError extends LocalfulError {}
 export class NoEncryptionKeyError extends APIClientError {}
 
 export interface RequestErrorOptions {

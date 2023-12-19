@@ -1,16 +1,16 @@
 // Main
-export * from "./lfb-application";
+export * from "./local";
 
 // Clients
-export * from "./clients/lfb-server-client";
+export * from "./clients/server-client";
 export * from "./clients/browser-sync-client";
 
 // Storage
-export * from "./storage/db";
-export * from "./storage/local-store";
+export * from "./storage/application-database";
+export * from "./storage/storage";
 
 // Encryption
 export * from './encryption/encryption-helper.js';
 
 // Errors
-export * from './errors/errors.js';
+export * from './common/errors';

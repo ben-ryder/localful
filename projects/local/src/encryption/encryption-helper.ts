@@ -1,4 +1,4 @@
-import { DecryptError, EncryptError } from "../errors/errors";
+import { DecryptError, EncryptError } from "../common/errors";
 
 const INITIALIZATION_VECTOR_LENGTH = 12;
 const SALT_LENGTH = 16;
