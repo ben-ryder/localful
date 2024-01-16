@@ -2,14 +2,24 @@
 A server and client toolkit for developing local-first apps with versionsed content, client-side encryption, cross-device sync and multiple users. 
 
 ## What is "versioned content"?
-Versionsed content is content that is stored and managed using immutable versions, meaning that everytime you edit content a new version is created.
-This very simplicitic storage method provides support for content history and allows for a basic form of concurrent and "offline" editing, where multiple versions
-can be created simultaneously and synced later without fear of conflicts.  
-Versioned content doesn't give you any advanced conflict-resolution or replication features that you might get with a CRDT like [Automerge](), or tools like [pouchdb]() etc, but ....
 
-**Doesn't creating a new version every time duplicate a lot of data?**  
-Yes absolutley, however this issues can be reduced by automatically deleting old versions that are either older than a period of time, or if a given number of versions already exist.  
-This downside of potentially sotring 
+### Basics
+Versionsed content is content that is stored and managed using immutable versions, meaning that every time you edit content a new version is created which contains all content data.
+This very simplicitic storage method allows for content history and a basic form of offline and concurrent editing, as multiple versions
+can be created simultaneously and synced later without fear of conflicts.  
+
+### A focus on simplicity
+This system sacrifices advanced conflict resolution and replication features you might get with a storage system like CRDTs or distributed databases for something that is simple and easy to reason about.  
+
+These missing features make versioned content most suited to use cases where the focus is on a single user editing content and potentially wanting to sync these changes between devices, and not on situations that require real-time collaboration between many users, where the complexity that CRDTs and distributed database systems often expose starts to be required.
+
+### Network and Storage Costs
+The main disadvantage with creating a new version for each content edit is higher storage and network costs.  
+The network cost will always be higher than many alternatives, however storage use can be kept under control by automatically deleting old versions based on when they were created and/or if there are over a given number of versions already.  
+
+The frequency of version creation (and therfore the number of versions) can also be reduced by not implementing features such as automatic saving into your application, or by implementing this by only creating a 
+new version of content after a period of inactivity. This would prevent creating a new content version every time the user types a character for example, which would quickly become unmanagable.  
+
 
 ## What does this project include?
 This project includes:
