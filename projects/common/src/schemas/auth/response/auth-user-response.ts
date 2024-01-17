@@ -1,7 +1,7 @@
 import {TokenPair} from "../tokens";
 import {UserDto} from "../../users/users";
 
-export interface LoginResponse {
+export interface AuthUserResponse {
   tokens: TokenPair;
   user: UserDto;
 }

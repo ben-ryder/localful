@@ -29,8 +29,10 @@ export class UsersController {
 
     return {
       user: newUser,
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken
+      tokens: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken
+      }
     };
   }
 
