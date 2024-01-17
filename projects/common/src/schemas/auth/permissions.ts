@@ -17,9 +17,18 @@ import {z} from "zod"
  */
 export const Permissions = z.enum([
 	// Scopes limited to the current users content
-	"changes:create",
-	"changes:retrieve",
-	"changes:delete",
+	"vaults:create",
+	"vaults:retrieve",
+	"vaults:update",
+	"vaults:delete",
+
+	"content:create",
+	"content:retrieve",
+	"content:delete",
+
+	"versions:create",
+	"versions:retrieve",
+	"versions:delete",
 
 	"users:create",
 	"users:retrieve",
@@ -27,10 +36,18 @@ export const Permissions = z.enum([
 	"users:delete",
 
 	// Special 'admin' scopes giving access to all content,
-	"changes:create:all",
-	"changes:retrieve:all",
-	"changes:update:all",
-	"changes:delete:all",
+	"vaults:create:all",
+	"vaults:retrieve:all",
+	"vaults:update:all",
+	"vaults:delete:all",
+
+	"content:create:all",
+	"content:retrieve:all",
+	"content:delete:all",
+
+	"versions:create:all",
+	"versions:retrieve:all",
+	"versions:delete:all",
 
 	"users:create:all",
 	"users:retrieve:all",
@@ -65,9 +82,18 @@ export type RolePermissions = {
 export const RolePermissions: RolePermissions = {
 	user: {
 		permissions: [
-			"changes:create",
-			"changes:retrieve",
-			"changes:delete",
+			"vaults:create",
+			"vaults:retrieve",
+			"vaults:update",
+			"vaults:delete",
+
+			"content:create",
+			"content:retrieve",
+			"content:delete",
+
+			"versions:create",
+			"versions:retrieve",
+			"versions:delete",
 
 			"users:create",
 			"users:retrieve",
@@ -78,10 +104,18 @@ export const RolePermissions: RolePermissions = {
 	admin: {
 		inherit: "user",
 		permissions: [
-			"changes:create:all",
-			"changes:retrieve:all",
-			"changes:update:all",
-			"changes:delete:all",
+			"vaults:create:all",
+			"vaults:retrieve:all",
+			"vaults:update:all",
+			"vaults:delete:all",
+
+			"content:create:all",
+			"content:retrieve:all",
+			"content:delete:all",
+
+			"versions:create:all",
+			"versions:retrieve:all",
+			"versions:delete:all",
 
 			"users:create:all",
 			"users:retrieve:all",

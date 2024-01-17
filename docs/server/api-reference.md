@@ -1,17 +1,19 @@
 # Server Reference
-A reference of all REST API endpoints and websockets provided by the app.
+An overview of the REST API provided by the Localful server.
+
 
 ## Errors
 Any errors will be returned with the appropriate status code and the following JSON data:
 
 ```js
 {
-  "statusCode": 404, // interger: representing the error status code.
-  "message": "An error occured." // string: a message detailing the error.
+  "statusCode": 404, // a copy of the HTTP status code.
+  "identifier": "RESOURCE_NOT_FOUND", // an itentiifer for the specific error.
+  "message": "An error occured." // a message explaining the error.
 }
 ```
 
-## REST API Reference
+## API Reference
 
 ### Base
 - `/ [GET]`
@@ -31,16 +33,14 @@ Any errors will be returned with the appropriate status code and the following J
 - `/v1/auth/check [POST]`
 - `/v1/auth/verify [GET, POST]`
 
-### Resources
-- `/v1/resources [POST]`
-- `/v1/resources/:id [GET, PATCH, DELETE]`
+### Vaults
+- `/v1/vaults [GET, POST]`
+- `/v1/vaults/:id [GET, PATCH, DELETE]`
 
-### Changes
-- `/v1/resources/:id/changes [GET, POST]`
+#### Content
+- `/v1/content [GET, POST]`
+- `/v1/content/:id [GET, DELETE]`
 
-## Websockets Reference
-- `changes`
-  - The client can send this event when the user makes changes.
-  - The server will relay the event to other clients and persist them to the server.
-  - Users can only subscribe to their own changes.
-  - Users can also subscribe to specific resources rather than all their changes.
+#### Content Versions
+- `/v1/versions [GET, POST]`
+- `/v1/versions/:id [GET, DELETE]`

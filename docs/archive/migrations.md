@@ -3,14 +3,13 @@
 Migrations may be required in the following situations:
 - Upgrades to the encryption spec such as the KDF function or encryption method used.
 - Rotating encryption keys.
-- Reducing the number of resource changes stored in the event of a dramatic performance slow down.
 
 ## ⚠️ Migration Risk ⚠️
 All the migrations described here are potentially destructive actions and have the ability to cause data corruption, data lost and devices becoming out of sync.  
 It is suggested that all these migrations need to be manual triggered user actions, and it would be up to the user to manage some of the risks involved
 in such migrations by exporting content, ensuring only one device is in active use etc before performing any migrations with guidance from the app itself.
 
-How applications manage stale resources after migrations or out of date keys is not a solved problem for Localful yet,
+How applications manage stale content after migrations or out of date keys is not a solved problem for Localful yet,
 this would have to be decided and handled on an app specific basis.
 
 ## Resource & Change Migrations
