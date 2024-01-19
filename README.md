@@ -1,4 +1,6 @@
 # Localful
+There are lots of tools to help you to develop local-first web apps, however these often require a fundermental shift in how you think about and build your apps, and how you store and manage data....
+
 A client toolkit and optional server for developing local-first web apps with versioned content, client-side encryption, cross-device sync and cloud storage. 
 
 ## ❓ What is "versioned content"?
