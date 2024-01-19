@@ -1,9 +1,11 @@
 # Localful
-There are lots of tools to help you to develop local-first web apps, however these often require a fundermental shift in how you think about and build your apps, and how you store and manage data....
+There are lots of tools to help you develop local-first software, however these often require building around CRDTs, eventual consistency, conflict resolution and other concepts 
+which fundementally change how you build apps, and how you store and manage data.  
+These concepts are incredibly powerful and useful when needed, but introduce a world of compexity when they're not.  
 
-A client toolkit and optional server for developing local-first web apps with versioned content, client-side encryption, cross-device sync and cloud storage. 
+Localful is built to provide many of the great advantages of local-first software while focussing on simplicity, interoperability and longevity.  
 
-## ❓ What is "versioned content"?
+## ❓ How does it work?
 Versioned content is content that is stored and managed using immutable versions, meaning that every time you edit content a new version is created which contains all data required to represent that content.
 This very simplistic storage method allows for version history and a basic form of concurrent editing, as multiple versions
 can be created simultaneously and synced later without fear of conflicts as each version is distinct and immutable.
