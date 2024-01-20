@@ -19,16 +19,15 @@ required to send and store more data. This makes Localful most suited to use cas
 - There is no requirement for automagically resolving or merging changes. If a user creates two or more content versions simultaneously, all versions are synced between all devices and a last-write-wins method is used to select the
 most recent version as the current state of the content.
 
-
 ## 🛠️ What does this project include?
-This project includes:
+- A Javascript SDK library (currently web only) which...
+  - Implements local persistence via IndexDB, currently built using [Dexie.js](https://dexie.org/). This means you can use Dexie libraries like [useLiveQuery](https://dexie.org/docs/Tutorial/React) to get reactive queries in your application.
+  - Implements client-side encryption, which you can learn more about in the **[encryption specification](./docs/local/encryption/specification.md)**.
+  - Provides the ability to define your data schema via [Zod](https://zod.dev/) and also write migrations to update your schema and content data.
+  - Provides functionality to integrate with the server and manage local content.
 - A self-hostable Node.js server which...
   - Provides cloud storage and cross-device synchronisation via a HTTP API and Websockets.
   - Implements a user and authentication system, allowing multiple users to sign up and use the same server (new user registration can be disabled if required)
-- A Javascript SDK library (currently web only) which...
-  - Provides functionality to integrate with the server and manage local content.
-  - Implements client-side encryption, which you can learn more about in the **[encryption specification](./docs/local/encryption/specification.md)**.
-  - Implements local persistence via IndexDB.
 
 To learn when this project may or may not be useful to you, check out the **[use cases docs](./docs/use-cases.md)**.  
 You can also take a look at **[minimal and real-world example apps](./docs/examples.md)**.
