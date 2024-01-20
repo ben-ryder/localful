@@ -37,7 +37,7 @@ You can also take a look at **[minimal and real-world example apps](./docs/examp
 What does it mean to say that Localful focuses on simplicity, interoperability and longevity?
 
 - **Simplicity**: There is no need for complex algorithms to handle things like eventual consistency, conflict resolution etc. This makes your application predictable and easy to reason about for developers and more importantly, for **users**.
-- **Interoperability**: The server implements a straightforward HTTP API and Websocket system and each version contains all content data. This means you don't have to rely on special specifications and protocols that may only be useful as long as maintained implementation exist, and the simplicity of the data storage method makes it easily compatible with anywhere you want to interact with that data.
+- **Interoperability**: The server implements a straightforward HTTP API and Websocket system and each version contains all content data. This means you don't have to rely on special specifications and protocols that may only be useful as long as maintained implementation exist, and you can consume and write data easily using any technology.
 - **Longevity**: Storing content on the client and server as versions that contain all content data means you are not committing to using a specialised storage format that could prove hard to migrate away from in the future and/or requires implementations for everywhere you want to access that data. 
 
 ### 📉 Reducing Network and Storage Costs
