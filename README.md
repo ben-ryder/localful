@@ -1,36 +1,38 @@
 # Localful
-There are lots of tools to help you develop local-first software, however these often require building around CRDTs, eventual consistency, conflict resolution and other concepts 
+There are lots of tools and libraries to help you develop local-first web applications, however these often require building around CRDTs, eventual consistency, conflict resolution and other concepts 
 which fundementally change how you build apps, and how you store and manage data.  
-These concepts are incredibly powerful and useful when needed, but introduce a world of compexity when they're not.  
+These concepts are incredibly powerful and useful when needed, but introduce a world of compexity when your use case doesn't require them.
 
-Localful is built with a focus on simplicity, interoperability and longevity. It provides features such as local data storage, client-side encryption, cross-device sync and cloud storage without introducing lots of technical compelxity.
+Localful provides a practical "good enough" way of building local-first web apps, with a focus on simplicity, interoperability and longevity
 
 ## ❓ How does it work?
-Localful works by using "versioned content", which is content that is stored and managed using immutable versions.  
-This means that every time a user edits content, a new version is created which contains all data required to represent that content.
-This very simplistic storage method allows for version history and a basic form of concurrent editing, as multiple versions
-can be created simultaneously and synced later without fear of conflicts as each version is distinct and immutable.
+Localful works by creating immutable versions of content, where each version contains all data required to represent that content.  
 
-There are no built-in conflict resolution features that you might get with more advanced systems that utilise CRDTs or distributed databases, and you also pay a much higher storage and network cost as you are
-required to send and store more data. This makes Localful most suited to use cases where:
-- The focus is on a single user editing their own content
-- Users still want to back up their content to the cloud and sync it between their own devices, but instant real-time collaboration between users and devices isn't a huge priority
-- The content being created is generally not super large, and edits don't need to be tracked at the most granular level possible
-- There is no requirement for automagically resolving or merging changes. If a user creates two or more content versions simultaneously, all versions are synced between all devices and a last-write-wins method is used to select the
+There is a much higher storage and network cost to persist and send these versions, but this very simplistic storage method allows for
+version history and a basic form of concurrent editing, as multiple versions can be created simultaneously and synced later without fear
+of conflicts as each version is distinct and immutable.  
+If a user creates two or more content versions simultaneously, all versions are synced between all devices and a last-write-wins method is used to select the
 most recent version as the current state of the content.
+
+These tradeofs makes Localful most suited to use cases where:
+- The focus is on a single user editing their own content
+- Users still want to back up their content to the cloud and sync it between their own devices, but instant real-time collaboration between users and devices isn't critical to your apps experience
+- The content being created is generally not super large, and edits don't need to be tracked at the most granular level possible
+- There is no requirement for automagically resolving or merging changes.
 
 ## 🛠️ What does this project include?
 - A Javascript SDK library (currently web only) which...
-  - Implements local persistence via IndexDB, currently built using [Dexie.js](https://dexie.org/). This means you can use Dexie libraries like [useLiveQuery](https://dexie.org/docs/Tutorial/React) to get reactive queries in your application.
+  - Implements local persistence via IndexDB
+    - Define and validate your content schema using [Zod](https://zod.dev/)
+    - Primative support for data and schema migrations
+    - Reactive queries via [RxJS observables](https://rxjs.dev/).
   - Implements client-side encryption, which you can learn more about in the **[encryption specification](./docs/local/encryption/specification.md)**.
-  - Provides the ability to define your data schema via [Zod](https://zod.dev/) and also write migrations to update your schema and content data.
-  - Provides functionality to integrate with the server and manage local content.
+  - Provides functionality to integrate with the server, including user management and content syncronisation.
 - A self-hostable Node.js server which...
   - Provides cloud storage and cross-device synchronisation via a HTTP API and Websockets.
   - Implements a user and authentication system, allowing multiple users to sign up and use the same server (new user registration can be disabled if required)
 
-To learn when this project may or may not be useful to you, check out the **[use cases docs](./docs/use-cases.md)**.  
-You can also take a look at **[minimal and real-world example apps](./docs/examples.md)**.
+Want to drive straight in? You can view some **[minimal and real-world example apps](./docs/examples.md)**.
 
 ## 🌱 A focus on simplicity, interoperability and longevity
 What does it mean to say that Localful focuses on simplicity, interoperability and longevity?
