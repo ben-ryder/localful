@@ -1,13 +1,4 @@
-## Content Basics
-Every time you edit content a new versions is created. A version contains all data associated with that content, and a version can only be created or deleted.  
 
-## Version History and Deleted Data
-- Vaults can either be "local" or "cloud". A local vault only exists on a single device, and cloud vaults are saved to the server and are synced between devices.
-- To delete a vault, you must delete both the cloud vault and manually delete the vault from **all** devices.
-- When content or a content version is deleted, the data is nullified and an `isDeleted` flag is set to true. If connected to a server, this deletion is
-  sent to the server, and on a successful response the device can then fully remove the local data.
-- An `isDeleted` flag is required as otherwise devices wouldn't be able to identity the difference between deleted data
-  and data that just doesn't exist on the server yet.
 
 ## Concurrent Edits
 If two devices edit different pieces of content, new versions can be created and synced fine, but there are
