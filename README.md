@@ -1,5 +1,5 @@
 # Localful
-Tools for building single-user local-first web apps with a focus on simplicity, interoperability and longevity.  
+Tools for building local-first web apps with a focus on simplicity, interoperability and longevity.  
 
 **Features:**
 - Local-first storage using IndexDB.
@@ -8,15 +8,17 @@ Tools for building single-user local-first web apps with a focus on simplicity, 
 - Basic querying and filtering of data.
 - Built-in reactivity for data fetching via [RxJS Observables](https://rxjs.dev/).
 - Client-side encryption, including locally in IndexDB.
-- Self-hostable server for data backup and syncronisation.
+- Self-hostable server for data backup and syncronisation
+- User and authentication system. 
+- 
 
 **Quick Links:**
-- Why I built Localful
-- Documentation
-- Quick Start
-- Examples
+- [Why I built Localful]()
+- [Documentation](./docs/README.md)
+- [Quick Start](./docs/quick-start.md)
+- [Examples](./docs/examples.md)
 - [Encryption Specification](./docs/local/encryption/specification.md)
-- Roadmap
+- [Roadmap](./docs/roadmap.md)
 
 ## Overview
 Localful works by storing data in immutable versions, where each edit a user makes creates a new version.  
