@@ -8,7 +8,7 @@ Tools for building local-first web apps with a focus on simplicity, interoperabi
 - Migration support for schemas and data.
 - Basic local queries with support with filtering, ordering, grouping etc.
 - Built-in reactivity for local data fetching via [RxJS Observables](https://rxjs.dev/).
-- Self-hostable server for data backup and synchronisation.
+- Self-hostable Node.js server for account creation, data backup and cross-device synchronisation.
 - Built-in user and authentication system for server and local sign-up/login.
 
 **Quick Links:**
@@ -19,7 +19,7 @@ Tools for building local-first web apps with a focus on simplicity, interoperabi
 - [Encryption Specification](./docs/local/encryption/specification.md)
 - [Roadmap](./docs/roadmap.md)
 
-## Overview
+## 🤔 Overview
 Localful works by storing data in immutable versions, where each edit a user makes creates a new version.  
 This very simplistic storage method allows for version history and a basic form of concurrent editing, as multiple versions can be created simultaneously and synced without fear of conflicts as each version is distinct and immutable. All versions are synced between all devices and a last-write-wins method is used to select the most recent version as the current state of the data.
 
