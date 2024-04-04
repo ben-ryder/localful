@@ -1,5 +1,5 @@
 # Localful
-Tools for building local-first web apps with a focus on simplicity, interoperability and longevity.  
+Full-stack tooling for building local-first web apps with a focus on simplicity, interoperability and longevity.  
 
 **Features:**
 - Local-first storage using IndexDB.
@@ -8,8 +8,7 @@ Tools for building local-first web apps with a focus on simplicity, interoperabi
 - Migration support for schemas and data.
 - Basic local queries with support with filtering, ordering, grouping etc.
 - Built-in reactivity for local data fetching via [RxJS Observables](https://rxjs.dev/).
-- Self-hostable Node.js server for account creation, data backup and cross-device synchronisation.
-- Built-in user and authentication system for server and local sign-up/login.
+- Self-hostable Node.js server for account creation, data storage and cross-device synchronisation.
 
 **Quick Links:**
 - [Why I built Localful]()
@@ -30,7 +29,7 @@ This system makes Localful most suited to use cases where:
 - The data being created is generally not super large, as creating new versions for every edit does increase storage and network costs.
 - Data edits don't need to be tracked at the most granular level possible.
 
-Multi-user collaboration features may come in the future, but the fundamental approach of Localful right now means it will never be very suitable for this use case.  
+Multi-user collaboration features may come in the future, but the fundamental approach of Localful right now means it will likely never be as suitable for this use case as other tooling.  
 
 ## ❤️ Contributions
 Feel free to suggest features, give feedback, suggest improvements, raise bugs, open PRs and anything else.
