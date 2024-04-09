@@ -1,7 +1,29 @@
-# Localful
-Full-stack tooling for building local-first web apps with a focus on simplicity, interoperability and longevity.  
+<div align="center">
+  <h1>Localful</h1>
+  <p>Full-stack tooling for building local-first web apps with a focus on simplicity, interoperability and longevity.</p>
+    <a href="./docs/use-cases.md">Use Cases</a> |
+  <a href="./docs/quick-start.md">Quick Start</a> |
+  <a href="./docs/readme.md">Documentation</a> |
+  <a href="./docs/examples.md">Examples</a> |
+  <a href="./docs/local/encryption/specification.md">Encryption Spec</a> |
+  <a href="./docs/roadmap.md">Roadmap</a>
+</div>
 
-**Features:**
+## Why?
+
+- **Simplicity**  
+
+  Pellentesque habitant morbi tristique senectus et netus. Curabitur est gravida et libero vitae dictum. A communi observantia non est recedendum.
+  
+- **Interoperability**  
+
+  Pellentesque habitant morbi tristique senectus et netus. Curabitur est gravida et libero vitae dictum. A communi observantia non est recedendum.
+
+- **Longevity**  
+
+  Pellentesque habitant morbi tristique senectus et netus. Curabitur est gravida et libero vitae dictum. A communi observantia non est recedendum.  
+
+## Key Features
 - Local-first storage using IndexDB.
 - Client-side encryption, including locally in IndexDB.
 - Schema definitions using [Zod](https://zod.dev/).
@@ -10,29 +32,11 @@ Full-stack tooling for building local-first web apps with a focus on simplicity,
 - Built-in reactivity for local data fetching via [RxJS Observables](https://rxjs.dev/).
 - Self-hostable Node.js server for account creation, data storage and cross-device synchronisation.
 
-**Quick Links:**
-- [Why I built Localful]()
-- [Documentation](./docs/README.md)
-- [Quick Start](./docs/quick-start.md)
-- [Examples](./docs/examples.md)
-- [Encryption Specification](./docs/local/encryption/specification.md)
-- [Roadmap](./docs/roadmap.md)
+## Contributions
 
-## 🤔 Overview
-Localful works by storing data in immutable versions, where each edit a user makes creates a new version.  
-This very simplistic storage method allows for version history and a basic form of concurrent editing, as multiple versions can be created simultaneously and synced without fear of conflicts as each version is distinct and immutable. All versions are synced between all devices and a last-write-wins method is used to select the most recent version as the current state of the data.
-
-This system makes Localful most suited to use cases where:
-- There is no requirement for automagically resolving or merging concurrent changes.
-- You want to back up data to a central server and sync it between devices.
-- The focus is on a single user editing their own content and instant real-time collaboration between users and devices isn't required.
-- The data being created is generally not super large, as creating new versions for every edit does increase storage and network costs.
-- Data edits don't need to be tracked at the most granular level possible.
-
-Multi-user collaboration features may come in the future, but the fundamental approach of Localful right now means it will likely never be as suitable for this use case as other tooling.  
-
-## ❤️ Contributions
 Feel free to suggest features, give feedback, suggest improvements, raise bugs, open PRs and anything else.
 
-## 📃 License
+## License
+
 This project is released under the [GNU AGPLv3 license](LICENSE.txt).
+
