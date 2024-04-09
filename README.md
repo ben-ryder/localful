@@ -13,15 +13,15 @@
 
 - **Simplicity**  
 
-  Pellentesque habitant morbi tristique senectus et netus. Curabitur est gravida et libero vitae dictum. A communi observantia non est recedendum.
+  Software should be simple. Localful doesn't use CRDTs or an advanced distributed database, it accepts the tradeoffs and limitations of a simpler system using immutable versions to store and syncronise data.
   
 - **Interoperability**  
 
-  Pellentesque habitant morbi tristique senectus et netus. Curabitur est gravida et libero vitae dictum. A communi observantia non est recedendum.
+  Your data is yours and should be avaliable without vendor or technology lock-in. Keeping things simple by using immutable versions and HTTP APIs means less reliance on any specific library, langauge or implementation. 
 
 - **Longevity**  
 
-  Pellentesque habitant morbi tristique senectus et netus. Curabitur est gravida et libero vitae dictum. A communi observantia non est recedendum.  
+  If you don't need to manage lots of complexity and build with interoperability in mind, then you can be confident that your application will survive and your data stays accessible.
 
 ## Key Features
 - Local-first storage using IndexDB.
