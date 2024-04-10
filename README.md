@@ -13,15 +13,15 @@
 
 - **Simplicity**  
 
-  Software should be simple. Localful doesn't use CRDTs or an advanced distributed database, it accepts the tradeoffs and limitations of a simpler system using immutable versions to store and syncronise data.
+  Software should be simple. Localful doesn't use CRDTs or an advanced distributed database, it accepts the tradeoffs and limitations of a simpler system using immutable versions to store and syncronise data. This allows you to easily understand what's going on and how, so you can spend less time thinking and more time making.
   
 - **Interoperability**  
 
-  Your data is yours and should be avaliable without vendor or technology lock-in. Keeping things simple by using immutable versions and HTTP APIs means less reliance on any specific library, langauge or implementation. 
+  Your data is yours and should be avaliable without vendor or technology lock-in. Keeping things simple means less reliance on any specific library, langauge or implementation. While Localful is currently focussed on web apps, you could integrate with the server in any langauge using standard HTTP requests, Websockets and without having to rely on any specific database engine.
 
 - **Longevity**  
 
-  If you don't need to manage lots of complexity and build with interoperability in mind, then you can be confident that your application will survive and your data stays accessible.
+  If you don't need to manage lots of complexity and build with interoperability in mind, then you can be confident that your application will be easier to manage in the long term and your data will stay avaliable. If you do decide to migrate in the future, you won't need to spend days figuring out how to extract your data.
 
 ## Key Features
 - Local-first storage using IndexDB.
