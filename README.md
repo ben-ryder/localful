@@ -1,3 +1,13 @@
+---
+
+<div align="center">
+<p><b>⚠️ Under Active Development ⚠️</b></p>
+<p>This project is early in development and not yet ready for general use.</p>
+<p>Expect bugs, missing docs, incomplete features etc!</p>
+</div>
+
+---
+
 <div align="center">
   <h1>Localful</h1>
   <p>Full-stack tooling for building local-first web apps with a focus on simplicity, interoperability and longevity.</p>
