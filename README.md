@@ -2,8 +2,8 @@
 
 <div align="center">
 <p><b>⚠️ Under Active Development ⚠️</b></p>
-<p>This project is early in development and not yet ready for general use.</p>
-<p>Expect bugs, missing docs, incomplete features etc!</p>
+<p>This project is early in development and not yet ready for general use.<br>
+Expect bugs, missing docs, incomplete features etc!</p>
 </div>
 
 ---
