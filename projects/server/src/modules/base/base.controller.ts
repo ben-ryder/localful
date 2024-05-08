@@ -6,7 +6,7 @@ import {ErrorIdentifiers} from "@localful/common";
 export class BaseController {
   getWelcomeMessage() {
     return {
-      message: "Welcome to the Local-First Server API. For docs see https://github.com/ben-ryder/local-first-server."
+      message: "Welcome to the Localful server. For docs see https://github.com/ben-ryder/localful."
     };
   }
 

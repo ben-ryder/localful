@@ -1,6 +1,5 @@
 import {TestHelper} from "../../../../tests-utils/test-helper";
 
-
 describe("Base Module",() => {
   const testHelper = new TestHelper();
 

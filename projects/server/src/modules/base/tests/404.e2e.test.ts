@@ -1,7 +1,6 @@
 import {TestHelper} from "../../../../tests-utils/test-helper";
 import {expectNotFound} from "../../../../tests-utils/common-expects/expect-not-found";
 
-
 describe("Generic 404 Response",() => {
   const testHelper = new TestHelper();
 
