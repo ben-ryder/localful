@@ -15,45 +15,45 @@ day this is a side project I've made to learn and solve my own needs.
 ---
 
 ## Introduction
-Localful works by creating vaults and then creating resources, changes and blobs within that vault.  
-Encryption happens at a vault level, so all resources, changes and blobs within a vault are encrypted using
-the same key, but a different vault and its content is encrypted using a different key.
+Localful works by creating databases which can contain data entities and data blobs.  
+Encryption happens at a database level, so all data within a given database will be encrypted using
+the same encryption key.
 
 TODO
 - Add more context about Localful and the required functionality that influences this spec.
 - What is the purpose of this encryption? What is the threat model etc
 
 ## Summary
-**Vault Encryption**
-- When setting up a vault, users supply an `encryption password`. This password and a random salt are used to derive a `vault unlock key`.
-- A random `vault encryption key` is generated and encrypted with the `vault unlock key` which produces a `protected vault encryption key`.
-- The `protected vault encryption key` includes the random salt used in key derivation and the IV value used when encrypting the key.
-- The `vault encryption key` and `vault unlock key` are only ever stored in memory, `protected vault encryption key` is saved to local storage and can be uploaded to the server.
-- All vault content including resources, changes and blobs will then be encrypted using `vault encryption key`.
+
+### Database Encryption
+- When setting up a database on a local device, users supply an `unlock password`. This password and a random salt are used to derive a `database unlock key`.
+- A random `database encryption key` is generated and encrypted with the `datbase unlock key` which produces a `protected database encryption key`.
+- The `protected database encryption key` includes the random salt used in key derivation and the IV value used when encrypting the key.
+- The `database encryption key` and `database unlock key` are only ever stored unencrypted in memory, `protected database encryption key` is saved to local storage and can be uploaded to the server.
+- All database content will then be encrypted using the `database encryption key`.
 - To allow Localful to work effectively, some data is not encrypted:
-  - Content ids and timestamps.
-  - Relationships such as the resource a change belongs to, what vault resources and blobs belong to etc.
-  - The **vault name is not encrypted**. This is to allow for a user-friendly way of identifying vaults prior to decryption.
+  - ids, timestamps and metadata. Metadata includes the Localful and schema version of content, and if the content is deleted.
+  - Relationships which includes what database content belongs to, what content a version belongs to, the type of data stored in a blob etc
+  - The **database name is not encrypted**. This is so databases can be identified by users prior to decryption.
+  - The **device name is not encrypted**. This is set by the user each time they set up a new device and is saved to data entity versions so users can identify which device a version was created on. It it also used by the client and server during data syncronisation, hence why it needs to be unencrypted.
 
 ![A diagram of vault encryption.](./diagrams/vault-encryption.png)
 
----
-
-**Server Password**
-- The server credentials (`account email` and `account password`) are totally separate to any vault encryption in order to easily support local-only uses.
+## Server Password
+- The server credentials (`account email` and `account password`) are totally separate to any database encryption in order to easily support local-only uses.
 - The `account password` is used to derive an `account key`, where `account email` and an app specific `app salt` are combined as the salt for the KDF function.
 - The `account key` is then split in half, where the second half becomes the `server password`.
 - The `server password` is then used in server authentication along with `account email`.
-- The first half of the split `account key` has no current purpose, but may in future functionality.
+- The first half of the split `account key` has no current purpose, but may in future versions of Localful for something like creating an account level encryption key or similar.
 
 ![A high-level diagram of the server password system described above.](./diagrams/server-password-derivation.png)
 
 ## Implementation Details
 
 ### Key Derivation
-- `Argon2id` is used for key derivation, configured with `64 MiB` of memory, 3 iterations and 4 parallelism.
+- `PBKDF2` is used for key derivation, configured with `100000` iterations.
 - For `encryption password`:
-  - a 256 bit `vault unlock key` is derived.
+  - a 256 bit `database unlock key` is derived.
   - a random salt value is used.
 - For `account password`:
   - a 512 bit `account key` is derived
@@ -66,8 +66,8 @@ TODO
 ### Encrypted Data Format
 All encrypted data is stored as a string in the format `<spec>:<metadata>:<ciphertext>`:
 - `<spec>` is just the Localful encryption spec version used (`v1`).
-- `<metadata>` is base64 encoded and includes the IV value used in encryption and possibly the salt value if appropriate.
-- `<ciphertext>` is a base64 encoded version of the encrypted data.
+- `<metadata>` is a base64 encoded JSON string and includes the IV value used during encryption and the salt value if required.
+- `<ciphertext>` is a base64 encoded string of the encrypted data.
 
 ### Javascript Libraries
 - Argon2id is implemented using [argon2-browser](https://www.npmjs.com/package/argon2-browser).
@@ -76,10 +76,11 @@ All encrypted data is stored as a string in the format `<spec>:<metadata>:<ciphe
 
 ## Possible Improvements
 - How would the specification in use and encryption method be updated once deployed in a real application? This is partly covered in the migration docs but could be made clearer here.
-- Consider using `XChaCha20+Poly1305` for encryption? (Using [libsodium-wrappers](https://www.npmjs.com/package/libsodium-wrappers)?)
-- Server uses traditional password system. Could use Secure Remote Password (SRP) protocol instead?
+- Consider using `Argon2id` for key derivation, configured with `64 MiB` of memory, 3 iterations and 4 parallelism.
+- Consider using `XChaCha20+Poly1305` for encryption (Using [libsodium-wrappers](https://www.npmjs.com/package/libsodium-wrappers)?)
+- Server uses traditional password system. Could use Secure Remote Password (SRP) protocol be used instead?
 - Salt used in `account key` derivation is not random, but should at least unique across users & apps. Should a truly random `salt` value be used instead?
   - I would then have to upload this to the server or make the user store two secrets.
-  - If stored on server, would need an API route to retrieve this on sign in. This route would have to be public or protected by 2FA? This would be like Standard Notes
+  - If stored on server, this would need an API route to retrieve this on sign in. This route would have to be public or protected by 2FA? This would be like Standard Notes
   - If user needs two secrets, this would be like 1Password's two-secret system.
   - Any dramatic complexity added to sign up would have to be implemented in all applications using Localful.
