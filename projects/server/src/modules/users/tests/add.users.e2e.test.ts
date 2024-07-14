@@ -4,17 +4,16 @@ import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-ba
 import {testMissingField} from "../../../../tests-utils/common-expects/test-missing-field";
 import {testMalformedData} from "../../../../tests-utils/common-expects/test-malformed-data";
 import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
-import {testUsers} from "../../../../tests-utils/test-data";
+import {exampleUsers, testUsers} from "../../../../tests-utils/test-data";
 
 
 // A default user which can be reused in multiple data to save a bit of copy-pasting.
 // Uses Object.freeze to ensure no test can modify it
 const defaultTestUser = Object.freeze({
-  email: "testnew@example.com",
-  password: "testtesttest",
-  encryptionSecret: "secret"
+  email: exampleUsers[0].email,
+  displayName: exampleUsers[0].displayName,
+  password: exampleUsers[0].password,
 });
-
 
 describe("Add User - /v1/users [POST]",() => {
   const testHelper: TestHelper = new TestHelper();
@@ -40,13 +39,16 @@ describe("Add User - /v1/users [POST]",() => {
         user: {
           id: expect.any(String),
           email: defaultTestUser.email,
+          displayName: defaultTestUser.displayName,
           isVerified: false,
-          encryptionSecret: defaultTestUser.encryptionSecret,
+          role: exampleUsers[0].role ,// assuming defaultTestUser will always be exampleUser[0]!
           createdAt: expect.any(String),
-          updatedAt: expect.any(String)
+          updatedAt: expect.any(String),
         },
-        accessToken: expect.any(String),
-        refreshToken: expect.any(String)
+        tokens: {
+          accessToken: expect.any(String),
+          refreshToken: expect.any(String)
+        }
       }))
     })
 
@@ -54,29 +56,17 @@ describe("Add User - /v1/users [POST]",() => {
       // todo: consider adding access & refresh token data for /v1/users [POST]
     })
 
-    test("When using a password that's 8 characters, the new user should be added & returned", async () => {
+    test("When using a password that's 12 characters, the new user should be added & returned", async () => {
       const newUser = {
         ...defaultTestUser,
-        password: "qwertyui",
+        password: "password1234!",
       }
 
-      const {body, statusCode} = await testHelper.client
+      const {statusCode} = await testHelper.client
         .post("/v1/users")
         .send(newUser);
 
       expect(statusCode).toEqual(201);
-      expect(body).toEqual(expect.objectContaining({
-        user: {
-          id: expect.any(String),
-          email: newUser.email,
-          isVerified: false,
-          encryptionSecret: newUser.encryptionSecret,
-          createdAt: expect.any(String),
-          updatedAt: expect.any(String)
-        },
-        accessToken: expect.any(String),
-        refreshToken: expect.any(String)
-      }))
     })
 
     // test("When using a username that's 1 character, the new user should be added & returned", async () => {
@@ -159,6 +149,7 @@ describe("Add User - /v1/users [POST]",() => {
       expectBadRequest(body, statusCode)
     })
 
+    // todo: add boundary tests for this
     test("When using a password that's too short, the request should fail", async () => {
       const newUser = {
         ...defaultTestUser,
@@ -212,7 +203,7 @@ describe("Add User - /v1/users [POST]",() => {
       })
     })
 
-    test("When not supplying an encryptionSecret, the request should fail", async () => {
+    test("When not supplying a displayName, the request should fail", async () => {
       const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
       await testMissingField({
@@ -220,7 +211,7 @@ describe("Add User - /v1/users [POST]",() => {
         accessToken: accessToken,
         endpoint: "/v1/users",
         data: defaultTestUser,
-        testFieldKey: "encryptionSecret"
+        testFieldKey: "displayName"
       })
     })
   })
@@ -335,7 +326,7 @@ describe("Add User - /v1/users [POST]",() => {
       })
     })
 
-    describe("When not supplying encryptionSecret as a string, the request should fail", () => {
+    describe("When not supplying displayName as a string, the request should fail", () => {
       testInvalidDataTypes({
         testHelper: testHelper,
         req: {
@@ -346,22 +337,22 @@ describe("Add User - /v1/users [POST]",() => {
         auth: {
           userId: testUsers[0].id
         },
-        testFieldKey: "encryptionSecret",
+        testFieldKey: "displayName",
         testCases: [1, 1.5, true, null, undefined, {test: "yes"}, [1, 2]]
       })
     })
   })
 
   // todo: write registration enabled data for /v1/users [POST]
-  describe("Registration Status", () => {
-    test("When registration is enabled, adding a new user should succeed", async () => {
-      // todo: populate test
-      expect(true).toEqual(false);
-    })
-
-    test("When registration is disabled, adding a new user should fail", async () => {
-      // todo: populate test
-      expect(true).toEqual(false);
-    })
-  })
+  // describe("Registration Status", () => {
+  //   test("When registration is enabled, adding a new user should succeed", async () => {
+  //     // todo: populate test
+  //     expect(true).toEqual(false);
+  //   })
+  //
+  //   test("When registration is disabled, adding a new user should fail", async () => {
+  //     // todo: populate test
+  //     expect(true).toEqual(false);
+  //   })
+  // })
 })

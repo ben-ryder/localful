@@ -9,7 +9,7 @@ export const VersionsURLParams = z.object({
 export type VersionsURLParams = z.infer<typeof VersionsURLParams>;
 
 export const VersionsParams = ResourceListingParams.extend({
-  devices: z.array(VersionEntity.shape.deviceIdentifier).optional(),
+  devices: z.array(VersionEntity.shape.deviceName).optional(),
   contentIds: z.array(VersionEntity.shape.contentId).optional(),
   ids: z.array(VersionEntity.shape.id).optional()
 }).strict();

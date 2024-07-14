@@ -1,11 +1,10 @@
 # Localful - Server
-The Localful server is developed using [NestJS](https://nestjs.com/) (Node.js/Express) and provides a REST API and websocket
-support for syncing changes between devices, backing up content and managing user profiles.  
-The server itself does not handle user management, but it designed to integrate with third party identity services.
+The Localful server is developed using [NestJS](https://nestjs.com/) (Node.js/Express) and provides an HTTP API and websocket
+server for syncing content between devices, backing up content to the server and managing user accounts.
 
 ## Before you begin
-- [PostgreSQL](https://www.postgresql.org/) is required to run the database.
-- A third party identify service such as [Logto](https://logto.io/) must be setup to handle user management and authentication. For the requirements this provider must meet, check the [authentication docs](../../docs/archive/authentication-rbac.md).
+- [PostgreSQL](https://www.postgresql.org/) is required to run the database. You must also set up the database as per the example in `scripts/example.setup.sql`.
+- Redis
 
 
 ## Setting up the app

@@ -3,6 +3,7 @@ import {TestHelper} from "../../../../tests-utils/test-helper";
 import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
 import {expectForbidden} from "../../../../tests-utils/common-expects/expect-forbidden";
 import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
+import {exampleUsers, testUsers} from "../../../../tests-utils/test-data";
 
 
 describe("Get User - /v1/users/:id [GET]",() => {
@@ -25,7 +26,7 @@ describe("Get User - /v1/users/:id [GET]",() => {
   })
 
   test("When authorized as the user to get, the response should succeed and return the user", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
     const {body, statusCode} = await testHelper.client
       .get(`/v1/users/${testUsers[0].id}`)
@@ -33,12 +34,12 @@ describe("Get User - /v1/users/:id [GET]",() => {
 
     const expectedUser = {
       id: testUsers[0].id,
-      username: testUsers[0].username,
       email: testUsers[0].email,
-      encryptionSecret: testUsers[0].encryptionSecret,
+      displayName: testUsers[0].displayName,
       isVerified: testUsers[0].isVerified,
+      role: testUsers[0].role,
       createdAt: testUsers[0].createdAt,
-      updatedAt: testUsers[0].updatedAt
+      updatedAt: testUsers[0].updatedAt,
     };
 
     expect(statusCode).toEqual(200);
@@ -46,7 +47,7 @@ describe("Get User - /v1/users/:id [GET]",() => {
   })
 
   test("When authorized as a different user to the one to get, the request should fail", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
     const {body, statusCode} = await testHelper.client
       .get(`/v1/users/${testUsers[1].id}`)
@@ -55,8 +56,9 @@ describe("Get User - /v1/users/:id [GET]",() => {
     expectForbidden(body, statusCode);
   })
 
+  // todo: reword to call out that 404 is not expected here and why?
   test("When fetching a user that doesn't exist, the request should fail", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
     const {body, statusCode} = await testHelper.client
       .get("/v1/users/82f7d7a4-e094-4f15-9de0-5b5621376714")
@@ -66,7 +68,7 @@ describe("Get User - /v1/users/:id [GET]",() => {
   })
 
   test("When passing an invalid ID, the request should fail", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
     const {body, statusCode} = await testHelper.client
       .get("/v1/users/invalid")

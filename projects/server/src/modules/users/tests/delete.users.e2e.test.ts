@@ -3,6 +3,7 @@ import {TestHelper} from "../../../../tests-utils/test-helper";
 import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
 import {expectForbidden} from "../../../../tests-utils/common-expects/expect-forbidden";
 import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
+import {testUsers} from "../../../../tests-utils/test-data";
 
 
 describe("Delete User - /v1/users/:id [DELETE]",() => {
@@ -25,7 +26,7 @@ describe("Delete User - /v1/users/:id [DELETE]",() => {
   })
 
   test("When authorized as the user to delete, the request & deletion should succeed", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
     // Make the delete request
     const {statusCode: deleteStatusCode} = await testHelper.client
@@ -43,7 +44,7 @@ describe("Delete User - /v1/users/:id [DELETE]",() => {
   })
 
   test("When authorized as a different user to the one to delete, the request should fail", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
     const {body, statusCode} = await testHelper.client
       .delete("/v1/users/82f7d7a4-e094-4f15-9de0-5b5621376714")
@@ -53,7 +54,7 @@ describe("Delete User - /v1/users/:id [DELETE]",() => {
   })
 
   test("When attempting to delete a none existent user, the request should fail", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
     const {body, statusCode} = await testHelper.client
       .delete("/v1/users/82f7d7a4-e094-4f15-9de0-5b5621376714")
@@ -63,7 +64,7 @@ describe("Delete User - /v1/users/:id [DELETE]",() => {
   })
 
   test("When passing an invalid user ID, the request should fail", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0]);
+    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
 
     const {body, statusCode} = await testHelper.client
       .delete("/v1/users/invalid")

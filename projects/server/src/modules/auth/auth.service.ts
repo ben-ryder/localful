@@ -1,7 +1,7 @@
 import {forwardRef, Inject, Injectable} from "@nestjs/common";
 import {UsersService} from "../users/users.service";
 import {TokenService} from "../../services/token/token.service";
-import {LoginResponse, TokenPair, ErrorIdentifiers, Roles, RolePermissions, Permissions} from "@localful/common";
+import {AuthUserResponse, TokenPair, ErrorIdentifiers, Roles, RolePermissions, Permissions} from "@localful/common";
 import {PasswordService} from "../../services/password/password.service";
 import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
 import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
@@ -18,7 +18,7 @@ export class AuthService {
     private tokenService: TokenService
   ) {}
 
-  async login(email: string, password: string): Promise<LoginResponse> {
+  async login(email: string, password: string): Promise<AuthUserResponse> {
     let databaseUserDto: DatabaseUserDto;
 
     try {

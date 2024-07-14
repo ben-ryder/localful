@@ -64,8 +64,6 @@ export class UsersService {
             email: createUserDto.email,
             passwordHash,
             role: "user",
-            protectedEncryptionKey: createUserDto.protectedEncryptionKey,
-            protectedAdditionalData: createUserDto.protectedAdditionalData,
         }
 
         const databaseUser = await this.usersDatabaseService.create(databaseCreateUserDto);
@@ -75,24 +73,17 @@ export class UsersService {
     private async _UNSAFE_update(userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
         const databaseUpdateDto: DatabaseUpdateUserDto = {}
 
-        // @todo: should validate that protectedEncryptionKey & protectedAdditionalData are updated if password is?
         if (updateUserDto.displayName) {
-            databaseUpdateDto.displayName
+            databaseUpdateDto.displayName = updateUserDto.displayName;
         }
+        // todo: don't allow email and password updates? Require this to go via verification email?
         if (updateUserDto.email) {
             databaseUpdateDto.email = updateUserDto.email;
             databaseUpdateDto.isVerified = false;
         }
-        if (updateUserDto.protectedAdditionalData) {
-            databaseUpdateDto.protectedAdditionalData
-        }
         if (updateUserDto.password) {
             databaseUpdateDto.passwordHash = await PasswordService.hashPassword(updateUserDto.password);
         }
-        if (updateUserDto.protectedEncryptionKey) {
-            updateUserDto.protectedEncryptionKey
-        }
-
 
         const user = await this.usersDatabaseService.update(userId, databaseUpdateDto);
         return this.convertDatabaseDto(user);

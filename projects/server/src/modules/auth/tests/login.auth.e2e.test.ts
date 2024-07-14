@@ -37,8 +37,6 @@ describe("Login Auth",() => {
           displayName: testUsers[0].displayName,
           isVerified: testUsers[0].isVerified,
           role: testUsers[0].role,
-          protectedEncryptionKey: testUsers[0].protectedEncryptionKey,
-          protectedAdditionalData: testUsers[0].protectedAdditionalData,
           createdAt: testUsers[0].createdAt,
           updatedAt: testUsers[0].updatedAt
         },

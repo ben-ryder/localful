@@ -4,7 +4,6 @@ import {InfoDto} from "@localful/common";
 
 
 @Controller({
-  version: "1",
   path: "/info"
 })
 export class InfoController {

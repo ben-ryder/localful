@@ -24,7 +24,7 @@
     "db:init:data": "ts-node tests-utils/cli.ts"
   },
   "dependencies": {
-    "@localful/common": "^0.1.7",
+    "@localful/common": "file:../common",
     "@nestjs/common": "^10.2.9",
     "@nestjs/core": "^10.2.9",
     "@nestjs/platform-express": "^10.2.9",

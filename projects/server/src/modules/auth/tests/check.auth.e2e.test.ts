@@ -37,7 +37,7 @@ describe("Check Auth",() => {
 
   test("When supplying an incorrectly signed accessToken, the request should fail", async () => {
     const accessToken = sign(
-      {userId: testUsers[0].id, type: "accessToken"},
+      {type: "accessToken", userId: testUsers[0].id, role: testUsers[0].role},
       "qethwrthwrthr",
       {expiresIn: "1hr"}
     );
@@ -61,7 +61,7 @@ describe("Check Auth",() => {
     const configService = testHelper.app.get(ConfigService);
 
     const accessToken = sign(
-      {userId: testUsers[0].id, type: "accessToken"},
+      {type: "accessToken", userId: testUsers[0].id, role: testUsers[0].role},
       configService.config.auth.accessToken.secret,
       {expiresIn: 0}
     );

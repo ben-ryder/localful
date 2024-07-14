@@ -19,10 +19,6 @@ export class UsersDatabaseService {
     switch (fieldName) {
       case "passwordHash":
         return "password_hash";
-      case "protectedEncryptionKey":
-        return "protected_encryption_key";
-      case "protectedAdditionalData":
-        return "protected_additional_data"
       case "createdAt":
         return "created_at";
       case "updatedAt":
@@ -39,22 +35,20 @@ export class UsersDatabaseService {
   private static convertRawUserToDto(user: RawDatabaseUser): DatabaseUserDto {
     return {
       id: user.id,
-      displayName: user.display_name,
       email: user.email,
+      displayName: user.display_name,
       passwordHash: user.password_hash,
       isVerified: user.is_verified,
       role: user.role,
-      protectedEncryptionKey: user.protected_encryption_key,
-      protectedAdditionalData: user.protected_additional_data,
       createdAt: user.created_at,
-      updatedAt: user.updated_at
+      updatedAt: user.updated_at,
     }
   }
 
   private static getDatabaseError(e: any) {
     if (e instanceof postgres.PostgresError) {
       if (e.code && e.code === PG_UNIQUE_VIOLATION) {
-        if (e.constraint_name == "users_email_key") {
+        if (e.constraint_name == "email_unique") {
           return new ResourceRelationshipError({
             identifier: ErrorIdentifiers.USER_EMAIL_EXISTS,
             applicationMessage: "The supplied email address is already in use."
@@ -119,8 +113,8 @@ export class UsersDatabaseService {
     let result: RawDatabaseUser[] = [];
     try {
       result = await sql<RawDatabaseUser[]>`
-        INSERT INTO users(id, display_name, email, password_hash, is_verified, role , protected_encryption_key, protected_additional_data, created_at, updated_at) 
-        VALUES (DEFAULT, ${user.displayName}, ${user.email}, ${user.passwordHash}, DEFAULT, ${user.role}, ${user.protectedEncryptionKey}, ${user.protectedAdditionalData || null}, DEFAULT, DEFAULT)
+        INSERT INTO users(id, email, display_name, password_hash, is_verified, role, created_at, updated_at) 
+        VALUES (DEFAULT, ${user.email}, ${user.displayName}, ${user.passwordHash}, DEFAULT, ${user.role}, DEFAULT, DEFAULT)
         RETURNING *;
        `;
     }

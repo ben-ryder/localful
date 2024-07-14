@@ -34,5 +34,5 @@ export type CreateUserDto = z.infer<typeof CreateUserDto>;
 
 export const UpdateUserDto = UserFields
 	.omit({isVerified: true, role: true})
-	.strict()
+	.partial()
 export type UpdateUserDto = z.infer<typeof UpdateUserDto>;

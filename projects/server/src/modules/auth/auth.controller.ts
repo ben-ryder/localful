@@ -34,6 +34,15 @@ export class AuthController {
     return await this.authService.refresh(refreshRequest.refreshToken);
   }
 
+  @Get("/check")
+  @UseGuards(AuthGuard)
+  async check(@Response() res: ExpressResponse) {
+    return res.status(HttpStatus.OK).send({
+      statusCode: HttpStatus.OK,
+      message: "Current user is authenticated"
+    });
+  }
+
   /**
    * An endpoint where users can request email verification emails.
    * Will always succeed regardless of if the email address supplied was valid and/or an email was actually sent
