@@ -48,7 +48,7 @@ export class UsersService {
         return this.usersDatabaseService.getByEmail(email);
     }
 
-    async add(createUserDto: CreateUserDto): Promise<UserDto> {
+    async create(createUserDto: CreateUserDto): Promise<UserDto> {
         // todo: add additional permission based access control? an anonymous role and user context would need adding
         if (!this.configService.config.app.registrationEnabled) {
             throw new AccessForbiddenError({

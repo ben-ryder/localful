@@ -14,6 +14,7 @@ export type VaultFields = z.infer<typeof VaultFields>;
 
 export const VaultEntity = VaultFields.extend({
 	id: createIdField(),
+	ownerId: createIdField('ownerId'),
 	createdAt: CreatedAtField,
 	updatedAt: UpdatedAtField,
 }).strict()

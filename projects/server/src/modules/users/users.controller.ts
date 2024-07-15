@@ -20,11 +20,11 @@ export class UsersController {
   ) {}
 
   @Post()
-  async add(
+  async create(
     @Body(new ZodValidationPipe(CreateUserDto)) createUserDto: CreateUserDto
   ) {
     // Access control and registration enabled checks are done within the service.
-    const newUser = await this.usersService.add(createUserDto);
+    const newUser = await this.usersService.create(createUserDto);
     const tokens = await this.tokenService.createNewTokenPair(newUser);
 
     return {
