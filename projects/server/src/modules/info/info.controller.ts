@@ -1,6 +1,6 @@
 import {ConfigService} from "../../services/config/config";
 import {Controller, Get} from "@nestjs/common";
-import {InfoDto} from "@localful/common";
+import {ServerInfoDto} from "@localful/common";
 
 
 @Controller({
@@ -13,9 +13,15 @@ export class InfoController {
 
   @Get()
   async getInfo() {
-    const meta: InfoDto = {
+    const meta: ServerInfoDto = {
       version: "v1",
-      registrationEnabled: this.configService.config.app.registrationEnabled
+      registrationEnabled: this.configService.config.app.registrationEnabled,
+      limits: {
+        vaultsPerUser: 10,
+        // todo: review if/how to implement these size limits.
+        contentSize: 20,
+        vaultSize: 1000,
+      }
     }
 
     return meta;

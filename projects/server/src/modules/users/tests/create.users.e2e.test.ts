@@ -7,7 +7,7 @@ import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-
 import {exampleUsers, testUsers} from "../../../../tests-utils/test-data";
 
 
-// A default user which can be reused in multiple data to save a bit of copy-pasting.
+// A default user which can be reused in multiple tests to save a bit of copy-pasting.
 // Uses Object.freeze to ensure no test can modify it
 const defaultTestUser = Object.freeze({
   email: exampleUsers[0].email,
@@ -15,7 +15,7 @@ const defaultTestUser = Object.freeze({
   password: exampleUsers[0].password,
 });
 
-describe("Add User - /v1/users [POST]",() => {
+describe("Create User - /v1/users [POST]",() => {
   const testHelper: TestHelper = new TestHelper();
 
   beforeAll(async () => {

@@ -40,3 +40,6 @@ lerna-debug.log*
 .env
 .env.*
 !.env.example
+
+# backups (local db, redis etc)
+/backup

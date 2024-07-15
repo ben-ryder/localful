@@ -1,12 +1,12 @@
 import {DatabaseService} from "../../../services/database/database.service";
 import {PostgresError, Row, RowList} from "postgres";
-import {PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes";
 import {Injectable} from "@nestjs/common";
-import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error";
 import {SystemError} from "../../../services/errors/base/system.error";
 import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error";
-import {CreateVaultDto, ErrorIdentifiers, VaultDto} from "@localful/common";
+import {CreateVaultDto, ErrorIdentifiers, UpdateVaultDto, VaultDto} from "@localful/common";
 import {RawDatabaseVault} from "./database-vault";
+import {PG_FOREIGN_KEY_VIOLATION} from "../../../services/database/database-error-codes";
+import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error";
 
 
 @Injectable()
@@ -46,11 +46,11 @@ export class VaultsDatabaseService {
 
   private static getDatabaseError(e: any) {
     if (e instanceof PostgresError) {
-      if (e.code && e.code === PG_UNIQUE_VIOLATION) {
-        if (e.constraint_name === "profiles_pkey") {
+      if (e.code && e.code === PG_FOREIGN_KEY_VIOLATION) {
+        if (e.constraint_name === "vaults_owner") {
           return new ResourceRelationshipError({
-            identifier: ErrorIdentifiers.RESOURCE_NOT_UNIQUE,
-            applicationMessage: "A profile already exists for that user."
+            identifier: ErrorIdentifiers.RESOURCE_NOT_FOUND,
+            applicationMessage: "Attempted to add a vault with owner that doesn't exist."
           })
         }
       }
@@ -90,8 +90,8 @@ export class VaultsDatabaseService {
     let result: RawDatabaseVault[] = [];
     try {
       result = await sql<RawDatabaseVault[]>`
-        INSERT INTO vaults(id, name, protected_encryption_key, protected_data, owner_id, createdAt, updatedAt) 
-        VALUES (DEFAULT, ${createVaultDto.name}, ${createVaultDto.protectedEncryptionKey}, ${createVaultDto.protectedData}, ${ownerId}, DEFAULT, DEFAULT)
+        INSERT INTO vaults(id, name, protected_encryption_key, protected_data, owner_id, created_at, updated_at) 
+        VALUES (${createVaultDto.id}, ${createVaultDto.name}, ${createVaultDto.protectedEncryptionKey}, ${createVaultDto.protectedData || null}, ${ownerId}, ${createVaultDto.createdAt}, ${createVaultDto.updatedAt})
         RETURNING *;
        `;
     }
@@ -109,27 +109,27 @@ export class VaultsDatabaseService {
     }
   }
 
-  async update(userId: string, profileUpdateDto: ProfileUpdateDto): Promise<ProfileDto> {
+  async update(id: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {
     const sql = await this.databaseService.getSQL();
 
     // If there are no supplied fields to update, then just return the existing user.
-    if (Object.keys(profileUpdateDto).length === 0) {
-      return this.get(userId);
+    if (Object.keys(updateVaultDto).length === 0) {
+      return this.get(id);
     }
 
     // Process all fields
     // todo: this offers no protection against updating fields like id which should never be updated
     const updateObject: any = {};
-    for (const fieldName of Object.keys(profileUpdateDto) as Array<keyof ProfileUpdateDto>) {
-      updateObject[VaultsDatabaseService.mapApplicationField(fieldName)] = profileUpdateDto[fieldName];
+    for (const fieldName of Object.keys(updateVaultDto) as Array<keyof UpdateVaultDto>) {
+      updateObject[VaultsDatabaseService.mapApplicationField(fieldName)] = updateVaultDto[fieldName];
     }
 
-    let result: ProfileInternalDatabaseDto[] = [];
+    let result: RawDatabaseVault[] = [];
     try {
-      result = await sql<ProfileInternalDatabaseDto[]>`
-        UPDATE profiles
+      result = await sql<RawDatabaseVault[]>`
+        UPDATE vaults
         SET ${sql(updateObject, ...Object.keys(updateObject))}
-        WHERE user_id = ${userId}
+        WHERE id = ${id}
         RETURNING *;
       `;
     }
@@ -142,17 +142,17 @@ export class VaultsDatabaseService {
     }
     else {
       throw new SystemError({
-        message: "Unexpected error returning profile after update",
+        message: "Unexpected error returning vault after update",
       })
     }
   }
 
-  async delete(userId: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     const sql = await this.databaseService.getSQL();
 
     let result: RowList<Row[]>;
     try {
-      result = await sql`DELETE FROM profiles WHERE user_id = ${userId}`;
+      result = await sql`DELETE FROM vaults WHERE id = ${id}`;
     }
     catch (e: any) {
       throw VaultsDatabaseService.getDatabaseError(e);
@@ -165,8 +165,8 @@ export class VaultsDatabaseService {
     }
     else {
       throw new ResourceNotFoundError({
-        identifier: ErrorIdentifiers.PROFILE_NOT_FOUND,
-        applicationMessage: "The requested profile could not be found."
+        identifier: ErrorIdentifiers.RESOURCE_NOT_FOUND,
+        applicationMessage: "The requested vault could not be found."
       })
     }
   }

@@ -7,7 +7,7 @@ import {AuthGuard} from "../auth/auth.guards";
 import {CreateVaultDto, UpdateVaultDto, VaultsURLParams} from "@localful/common";
 
 @Controller({
-  path: "/profiles",
+  path: "/vaults",
   version: "1"
 })
 @UseGuards(AuthGuard)
@@ -25,7 +25,7 @@ export class VaultsController {
     return await this.profilesService.create(context.user, profileCreateDto);
   }
 
-  @Get("/:userId")
+  @Get("/:vaultId")
   async get(
     @Param(new ZodValidationPipe(VaultsURLParams)) params: VaultsURLParams,
     @RequestContext() context: RequestContext
@@ -33,7 +33,7 @@ export class VaultsController {
     return await this.profilesService.get(context.user, params.vaultId);
   }
 
-  @Patch("/:userId")
+  @Patch("/:vaultId")
   async update(
     @Param(new ZodValidationPipe(VaultsURLParams)) params: VaultsURLParams,
     @Body(new ZodValidationPipe(UpdateVaultDto)) profileUpdateDto: UpdateVaultDto,
@@ -42,7 +42,7 @@ export class VaultsController {
     return await this.profilesService.update(context.user, params.vaultId, profileUpdateDto);
   }
 
-  @Delete("/:userId")
+  @Delete("/:vaultId")
   async delete(
     @Param(new ZodValidationPipe(VaultsURLParams)) params: VaultsURLParams,
     @RequestContext() context: RequestContext

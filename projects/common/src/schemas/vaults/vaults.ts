@@ -9,12 +9,12 @@ export const VaultFields = z.object({
 		.min(1, "protectedEncryptionKey must be at least 1 character.")
 		.max(255, "protectedEncryptionKey can't be over 255 characters."),
 	protectedData: ProtectedDataField.nullish(),
+	ownerId: createIdField('ownerId'),
 }).strict()
 export type VaultFields = z.infer<typeof VaultFields>;
 
 export const VaultEntity = VaultFields.extend({
 	id: createIdField(),
-	ownerId: createIdField('ownerId'),
 	createdAt: CreatedAtField,
 	updatedAt: UpdatedAtField,
 }).strict()
@@ -23,10 +23,8 @@ export type VaultEntity = z.infer<typeof VaultEntity>;
 export const VaultDto = VaultEntity;
 export type VaultDto = z.infer<typeof VaultDto>;
 
-export const CreateVaultDto = VaultFields
-export type CreateVaultDto = z.infer<typeof CreateVaultDto>;
+export const CreateVaultDto = VaultEntity;
+export type CreateVaultDto = VaultEntity;
 
-export const UpdateVaultDto = VaultFields
-	.pick({name: true, protectedData: true})
-	.strict()
+export const UpdateVaultDto = VaultFields;
 export type UpdateVaultDto = z.infer<typeof UpdateVaultDto>;

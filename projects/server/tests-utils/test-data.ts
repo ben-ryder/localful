@@ -1,12 +1,5 @@
 import {TestUserEntity} from "./test-user.dto";
-
-export const testEnvironmentVars = {
-  ACCESS_TOKEN_SECRET: "ivfbaklhfvuaiebgkjearbgoebrgkjebgiskbgnbgihsbdkgbodjbgbkgjfddfd",
-  ACCESS_TOKEN_EXPIRY: "2h",
-  REFRESH_TOKEN_SECRET: "jvbfhru9h9iuebukhreuirbghkebrgouaerkbjgbfousfashkbgrieaobferge",
-  REFRESH_TOKEN_EXPIRY: "7 days",
-  APP_REGISTRATION_ENABLED: true
-}
+import {VaultEntity} from "@localful/common";
 
 /**
  * Test users.
@@ -15,6 +8,9 @@ export const testEnvironmentVars = {
  * THIS IS THE ONLY PLACE WITH SOME COUPLING BETWEEN THE FRONT AND THE BACK END
  * IMPLEMENTATIONS AS THE USER PASSWORD AND SERVER PASSWORD ARE DIFFERENT, SO
  * CONSUMERS OF THIS DATA MUST DECIDE WHICH ONE THEY NEED TO USE FOR TESTING.
+ *
+ * todo: tests currently rely on users at specific array indexes being specific roles which feels somewhat fragile.
+ * Maybe test data should not be in arrays but be even more hardcoded such as 'testUser', 'testUser2', 'testAdmin' etc.
  */
 export const testUsers: readonly TestUserEntity[] = Object.freeze([
   {
@@ -90,3 +86,43 @@ export const exampleUsers: readonly TestUserEntity[] = Object.freeze([
     role: "admin",
   }
 ]);
+
+export const testVaults: readonly VaultEntity[] = Object.freeze([
+  {
+    id: "ad5a85d1-86db-477e-af04-19033ef9c53e",
+    ownerId: "90938b63-3b14-4b18-8185-b3cfa5de2d6a", // testUsers[0]
+    name: "testVault1",
+    protectedEncryptionKey: "protectedEncryptionKey",
+    protectedData: "protectedData",
+    createdAt: "2022-07-11T18:17:43.784Z",
+    updatedAt: "2022-07-11T18:20:32.482Z",
+  },
+  {
+    id: "c5367e62-ce94-4a14-950e-297a68bbf73b",
+    ownerId: "90938b63-3b14-4b18-8185-b3cfa5de2d6a", // testUsers[0]
+    name: "testVault2",
+    protectedEncryptionKey: "protectedEncryptionKey",
+    createdAt: "2022-07-11T18:17:43.784Z",
+    updatedAt: "2022-07-11T18:20:32.482Z",
+  },
+  {
+    id: "41eecc22-a0b6-4734-96be-e4003ea7132d",
+    ownerId: "98f4cb22-7815-4785-b659-3285fb06dacf", // testUsers[2]
+    name: "testVault3",
+    protectedEncryptionKey: "protectedEncryptionKey",
+    protectedData: "protectedData",
+    createdAt: "2022-07-11T18:17:43.784Z",
+    updatedAt: "2022-07-11T18:20:32.482Z",
+  }
+])
+
+export const exampleVaults: readonly VaultEntity[] = Object.freeze([
+  {
+    id: "1391d9d5-831b-4f79-93bd-eaf049993162",
+    ownerId: "90938b63-3b14-4b18-8185-b3cfa5de2d6a", // testUsers[0]
+    name: "testVault1",
+    protectedEncryptionKey: "protectedEncryptionKey",
+    createdAt: "2022-07-11T18:17:43.784Z",
+    updatedAt: "2022-07-11T18:20:32.482Z",
+  },
+])

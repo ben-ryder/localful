@@ -4,14 +4,16 @@ import {InfoModule} from "./modules/info/info.module";
 import {ServicesModule} from "./services/services.module";
 import {UsersModule} from "./modules/users/users.module";
 import {AuthModule} from "./modules/auth/auth.module";
+import {VaultsModule} from "./modules/vaults/vaults.module";
 
 @Module({
   imports: [
     ServicesModule,
     BaseModule,
     InfoModule,
+    AuthModule,
     UsersModule,
-    AuthModule
+    VaultsModule,
   ],
 })
 export class AppModule {}
