@@ -1,11 +1,11 @@
 import {ErrorIdentifiers} from "@localful/common";
 import {sign} from "jsonwebtoken";
 import {ConfigService} from "../../../services/config/config";
-import {TestHelper} from "../../../../tests-utils/test-helper";
-import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
-import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
-import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
-import {testUsers} from "../../../../tests-utils/test-data";
+import {TestHelper} from "../../../../testing/test-helper";
+import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
+import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
+import {testInvalidDataTypes} from "../../../../testing/common/test-invalid-data-types";
+import {testUser1} from "../../../../testing/data/users";
 
 
 describe("Refresh Auth",() => {
@@ -23,7 +23,7 @@ describe("Refresh Auth",() => {
 
   describe("Success Cases", () => {
     test("When supplying a valid refreshToken, an accessToken and refreshToken should be returned", async () => {
-      const { refreshToken } = await testHelper.getUserTokens(testUsers[0].id);
+      const { refreshToken } = await testHelper.getUserTokens(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/refresh")
@@ -41,7 +41,7 @@ describe("Refresh Auth",() => {
 
   describe("Token Revocation", () => {
     test("After a successful refresh, the previous refreshToken should be invalid", async () => {
-      const { refreshToken } = await testHelper.getUserTokens(testUsers[0].id);
+      const { refreshToken } = await testHelper.getUserTokens(testUser1.id);
 
       // Call a refresh to get new access & refresh token
       const {statusCode} = await testHelper.client
@@ -67,7 +67,7 @@ describe("Refresh Auth",() => {
     test("When supplying an incorrectly signed refreshToken, the request should fail", async () => {
       //  Create a token with the expected payload but signed wrong
       const refreshToken = sign(
-        {userId: testUsers[0].id, type: "refreshToken"},
+        {userId: testUser1.id, type: "refreshToken"},
         "aergsethsrjsrj",
         {expiresIn: "1h"}
       );
@@ -96,7 +96,7 @@ describe("Refresh Auth",() => {
 
       // Create an expired token with the correct payload & sign it correctly
       const refreshToken = sign(
-        {userId: testUsers[0].id, type: "refreshToken"},
+        {userId: testUser1.id, type: "refreshToken"},
         configService.config.auth.refreshToken.secret,
         {expiresIn: 0}
       );

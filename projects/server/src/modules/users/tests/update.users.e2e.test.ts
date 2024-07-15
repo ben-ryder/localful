@@ -1,10 +1,10 @@
 import {ErrorIdentifiers} from "@localful/common";
-import {TestHelper} from "../../../../tests-utils/test-helper";
-import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
-import {expectForbidden} from "../../../../tests-utils/common-expects/expect-forbidden";
-import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
-import {testMalformedData} from "../../../../tests-utils/common-expects/test-malformed-data";
-import {exampleUsers, testUsers} from "../../../../tests-utils/test-data";
+import {TestHelper} from "../../../../testing/test-helper";
+import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
+import {expectForbidden} from "../../../../testing/common/expect-forbidden";
+import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
+import {testMalformedData} from "../../../../testing/common/test-malformed-data";
+import {testUser1, testUser2} from "../../../../testing/data/users";
 
 
 describe("Update User - /v1/users/:id [PATCH]",() => {
@@ -27,36 +27,36 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         displayName: "testudpated1",
       };
 
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
 
       expect(statusCode).toEqual(200);
       expect(body).toEqual(expect.objectContaining({
-        id: testUsers[0].id,
-        email: testUsers[0].email,
+        id: testUser1.id,
+        email: testUser1.email,
         displayName: dataToUpdate.displayName,
-        isVerified: testUsers[0].isVerified,
-        role: testUsers[0].role,
-        createdAt: testUsers[0].createdAt,
+        isVerified: testUser1.isVerified,
+        role: testUser1.role,
+        createdAt: testUser1.createdAt,
         updatedAt: expect.any(String),
       }))
     })
 
     test("When updating a user, the updatedAt timestamp should become more recent", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send({email: "udpated@example.com"});
 
       expect(statusCode).toEqual(200);
 
-      const previousTimestamp = new Date(testUsers[0].updatedAt);
+      const previousTimestamp = new Date(testUser1.updatedAt);
       const updatedTimestamp = new Date(body.updatedAt);
 
       expect(updatedTimestamp.getTime()).toBeGreaterThan(previousTimestamp.getTime())
@@ -66,17 +66,17 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
   describe("Invalid Authentication", () => {
     test("When unauthorized, the request should fail", async () => {
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .send({displayName: "updateduser1"});
 
       expectUnauthorized(body, statusCode);
     })
 
     test("When authorized as a different user to the one to update, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[1].id}`)
+        .patch(`/v1/users/${testUser2.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send({displayName: "updateduser1"});
 
@@ -84,7 +84,7 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
     })
 
     test("When updating a user that doesn't exist, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
         .patch("/v1/users/82f7d7a4-e094-4f15-9de0-5b5621376714")
@@ -95,7 +95,7 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
     })
 
     test("When passing an invalid ID, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
         .patch("/v1/users/invalid")
@@ -108,23 +108,23 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
 
   describe("None Unique Data", () => {
     // test("When using an existing username, the request should fail", async () => {
-    //   const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+    //   const accessToken = await testHelper.getUserAccessToken(testUser1.id);
     //
     //   const {body, statusCode} = await testHelper.client
-    //     .patch(`/v1/users/${testUsers[0].id}`)
+    //     .patch(`/v1/users/${testUser1.id}`)
     //     .set("Authorization", `Bearer ${accessToken}`)
-    //     .send({username: testUsers[1].username});
+    //     .send({username: testUser2.username});
     //
     //   expectBadRequest(body, statusCode, ErrorIdentifiers.USER_USERNAME_EXISTS);
     // })
 
     test("When using an existing email, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
-        .send({email: testUsers[1].email});
+        .send({email: testUser2.email});
 
       expectBadRequest(body, statusCode, ErrorIdentifiers.USER_EMAIL_EXISTS);
     })
@@ -136,10 +136,10 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         email: "invalid-email"
       }
 
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(updatesUser);
 
@@ -151,10 +151,10 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         password: "hi"
       }
 
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(updatedUser );
 
@@ -166,10 +166,10 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         username: ""
       }
 
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(updatedUser);
 
@@ -181,10 +181,10 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         username: "this-is-a-username-which-is-over-the-maximum"
       }
 
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(updatedUser);
 
@@ -198,10 +198,10 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         id: "a78a9859-314e-44ec-8701-f0c869cfc07f"
       }
 
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
 
@@ -213,10 +213,10 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         createdAt: "2022-07-11T18:20:32.482Z"
       }
 
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
 
@@ -228,10 +228,10 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         updatedAt: "2022-07-11T18:20:32.482Z"
       }
 
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
 
@@ -243,10 +243,10 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         isVerified: true
       }
 
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUsers[0].id}`)
+        .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
 
@@ -256,11 +256,11 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
 
   describe("Invalid Data", () => {
     test("When supplying invalid JSON data, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       await testMalformedData({
         clientFunction: testHelper.client.patch.bind(testHelper.client),
-        endpoint: `/v1/users/${testUsers[0].id}`,
+        endpoint: `/v1/users/${testUser1.id}`,
         accessToken: accessToken
       })
     })
@@ -269,8 +269,8 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
     //   testInvalidDataTypes({
     //     testHelper: testHelper,
     //     clientMethod: "patch",
-    //     user: testUsers[0],
-    //     endpoint: `/v1/users/${testUsers[0].id}`,
+    //     user: testUser1,
+    //     endpoint: `/v1/users/${testUser1.id}`,
     //     data: {},
     //     testFieldKey: "username",
     //     testCases: [1, 1.5, true, null, {test: "yes"}, [1, 2]]
@@ -281,8 +281,8 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
     //   testInvalidDataTypes({
     //     testHelper: testHelper,
     //     clientMethod: "patch",
-    //     user: testUsers[0],
-    //     endpoint: `/v1/users/${testUsers[0].id}`,
+    //     user: testUser1,
+    //     endpoint: `/v1/users/${testUser1.id}`,
     //     data: {},
     //     testFieldKey: "email",
     //     testCases: [1, 1.5, true, null, {test: "yes"}, [1, 2]]
@@ -293,8 +293,8 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
     //   testInvalidDataTypes({
     //     testHelper: testHelper,
     //     clientMethod: "patch",
-    //     user: testUsers[0],
-    //     endpoint: `/v1/users/${testUsers[0].id}`,
+    //     user: testUser1,
+    //     endpoint: `/v1/users/${testUser1.id}`,
     //     data: {},
     //     testFieldKey: "password",
     //     testCases: [1, 1.5, true, null, {test: "yes"}, [1, 2]]
@@ -305,8 +305,8 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
     //   testInvalidDataTypes({
     //     testHelper: testHelper,
     //     clientMethod: "patch",
-    //     user: testUsers[0],
-    //     endpoint: `/v1/users/${testUsers[0].id}`,
+    //     user: testUser1,
+    //     endpoint: `/v1/users/${testUser1.id}`,
     //     data: {},
     //     testFieldKey: "encryptionSecret",
     //     testCases: [1, 1.5, true, null, {test: "yes"}, [1, 2]]

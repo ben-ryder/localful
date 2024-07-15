@@ -1,9 +1,9 @@
 import {ErrorIdentifiers} from "@localful/common";
-import {TestHelper} from "../../../../tests-utils/test-helper";
-import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
-import {expectForbidden} from "../../../../tests-utils/common-expects/expect-forbidden";
-import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
-import {exampleUsers, testUsers} from "../../../../tests-utils/test-data";
+import {TestHelper} from "../../../../testing/test-helper";
+import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
+import {expectForbidden} from "../../../../testing/common/expect-forbidden";
+import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
+import {testUser1, testUser2} from "../../../../testing/data/users";
 
 
 describe("Get User - /v1/users/:id [GET]",() => {
@@ -20,26 +20,26 @@ describe("Get User - /v1/users/:id [GET]",() => {
   });
 
   test("When unauthorized, the request should fail", async () => {
-    const {body, statusCode} = await testHelper.client.get(`/v1/users/${testUsers[0].id}`);
+    const {body, statusCode} = await testHelper.client.get(`/v1/users/${testUser1.id}`);
 
     expectUnauthorized(body, statusCode);
   })
 
   test("When authorized as the user to get, the response should succeed and return the user", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+    const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
     const {body, statusCode} = await testHelper.client
-      .get(`/v1/users/${testUsers[0].id}`)
+      .get(`/v1/users/${testUser1.id}`)
       .set("Authorization", `Bearer ${accessToken}`);
 
     const expectedUser = {
-      id: testUsers[0].id,
-      email: testUsers[0].email,
-      displayName: testUsers[0].displayName,
-      isVerified: testUsers[0].isVerified,
-      role: testUsers[0].role,
-      createdAt: testUsers[0].createdAt,
-      updatedAt: testUsers[0].updatedAt,
+      id: testUser1.id,
+      email: testUser1.email,
+      displayName: testUser1.displayName,
+      isVerified: testUser1.isVerified,
+      role: testUser1.role,
+      createdAt: testUser1.createdAt,
+      updatedAt: testUser1.updatedAt,
     };
 
     expect(statusCode).toEqual(200);
@@ -47,10 +47,10 @@ describe("Get User - /v1/users/:id [GET]",() => {
   })
 
   test("When authorized as a different user to the one to get, the request should fail", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+    const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
     const {body, statusCode} = await testHelper.client
-      .get(`/v1/users/${testUsers[1].id}`)
+      .get(`/v1/users/${testUser2.id}`)
       .set("Authorization", `Bearer ${accessToken}`);
 
     expectForbidden(body, statusCode);
@@ -58,7 +58,7 @@ describe("Get User - /v1/users/:id [GET]",() => {
 
   // todo: reword to call out that 404 is not expected here and why?
   test("When fetching a user that doesn't exist, the request should fail", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+    const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
     const {body, statusCode} = await testHelper.client
       .get("/v1/users/82f7d7a4-e094-4f15-9de0-5b5621376714")
@@ -68,7 +68,7 @@ describe("Get User - /v1/users/:id [GET]",() => {
   })
 
   test("When passing an invalid ID, the request should fail", async () => {
-    const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+    const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
     const {body, statusCode} = await testHelper.client
       .get("/v1/users/invalid")

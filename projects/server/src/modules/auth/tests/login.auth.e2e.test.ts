@@ -1,10 +1,10 @@
-import {TestHelper} from "../../../../tests-utils/test-helper";
-import {expectForbidden} from "../../../../tests-utils/common-expects/expect-forbidden";
-import {testMissingField} from "../../../../tests-utils/common-expects/test-missing-field";
-import {testMalformedData} from "../../../../tests-utils/common-expects/test-malformed-data";
-import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
+import {TestHelper} from "../../../../testing/test-helper";
+import {expectForbidden} from "../../../../testing/common/expect-forbidden";
+import {testMissingField} from "../../../../testing/common/test-missing-field";
+import {testMalformedData} from "../../../../testing/common/test-malformed-data";
+import {testInvalidDataTypes} from "../../../../testing/common/test-invalid-data-types";
 import {ErrorIdentifiers} from "@localful/common"
-import {testUsers} from "../../../../tests-utils/test-data";
+import {testUser1} from "../../../../testing/data/users";
 
 
 describe("Login Auth",() => {
@@ -25,20 +25,20 @@ describe("Login Auth",() => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/login")
         .send({
-          email: testUsers[0].email,
-          password: testUsers[0].serverPassword
+          email: testUser1.email,
+          password: testUser1.serverPassword
         });
 
       expect(statusCode).toEqual(200);
       expect(body).toEqual(expect.objectContaining({
         user: {
-          id: testUsers[0].id,
-          email: testUsers[0].email,
-          displayName: testUsers[0].displayName,
-          isVerified: testUsers[0].isVerified,
-          role: testUsers[0].role,
-          createdAt: testUsers[0].createdAt,
-          updatedAt: testUsers[0].updatedAt
+          id: testUser1.id,
+          email: testUser1.email,
+          displayName: testUser1.displayName,
+          isVerified: testUser1.isVerified,
+          role: testUser1.role,
+          createdAt: testUser1.createdAt,
+          updatedAt: testUser1.updatedAt
         },
         tokens: {
           accessToken: expect.any(String),
@@ -49,8 +49,8 @@ describe("Login Auth",() => {
       // Check no password data is included in fetches user
       // todo: should this be a separate test?
       expect(body).not.toEqual(expect.objectContaining({
-        passwordHash: testUsers[0].passwordHash,
-        password: testUsers[0].serverPassword
+        passwordHash: testUser1.passwordHash,
+        password: testUser1.serverPassword
       }))
     })
   })
@@ -71,7 +71,7 @@ describe("Login Auth",() => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/login")
         .send({
-          email: testUsers[0].email,
+          email: testUser1.email,
           password: "random password"
         });
 
@@ -83,7 +83,7 @@ describe("Login Auth",() => {
         .post("/v1/auth/login")
         .send({
           email: "randomuser@example.com",
-          password: testUsers[0].serverPassword
+          password: testUser1.serverPassword
         });
 
       expectForbidden(body, statusCode, ErrorIdentifiers.AUTH_CREDENTIALS_INVALID)
@@ -96,8 +96,8 @@ describe("Login Auth",() => {
         clientFunction: testHelper.client.post.bind(testHelper.client),
         endpoint: "/v1/auth/login",
         data: {
-          email: testUsers[0].email,
-          password: testUsers[0].serverPassword
+          email: testUser1.email,
+          password: testUser1.serverPassword
         },
         testFieldKey: "email"
       })
@@ -108,8 +108,8 @@ describe("Login Auth",() => {
         clientFunction: testHelper.client.post.bind(testHelper.client),
         endpoint: "/v1/auth/login",
         data: {
-          email: testUsers[0].email,
-          password: testUsers[0].serverPassword
+          email: testUser1.email,
+          password: testUser1.serverPassword
         },
         testFieldKey: "password"
       })
@@ -118,7 +118,7 @@ describe("Login Auth",() => {
 
   describe("Invalid Data", () => {
     test("When supplying invalid JSON data, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       await testMalformedData({
         clientFunction: testHelper.client.post.bind(testHelper.client),
@@ -149,7 +149,7 @@ describe("Login Auth",() => {
           clientMethod: "post",
           endpoint: "/v1/auth/login",
           initialData: {
-            email: testUsers[0].email,
+            email: testUser1.email,
           }
         },
         testFieldKey: "password",

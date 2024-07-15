@@ -1,5 +1,5 @@
-import {TestHelper} from "./test-helper";
-import {testUsers} from "./test-data";
+import {TestHelper} from "../test-helper";
+import {testUsers} from "../data/test-data";
 
 
 describe("Short Description - /v1/path [METHOD]",() => {
@@ -16,10 +16,10 @@ describe("Short Description - /v1/path [METHOD]",() => {
   });
 
   // Testing success cases/happy paths work.
-  describe("Happy Paths", () => {
+  describe("Success Cases", () => {
 
     test("Given CONTEXT, When ACTION, Then RESULT", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
         .post("/v1/ROUTE")

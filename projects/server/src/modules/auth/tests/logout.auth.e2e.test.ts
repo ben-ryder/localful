@@ -1,10 +1,9 @@
 import {ConfigService} from "../../../services/config/config";
 import {sign} from "jsonwebtoken";
-import {TestHelper} from "../../../../tests-utils/test-helper";
-import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
-import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
-import {testUsers} from "../../../../tests-utils/test-data";
-
+import {TestHelper} from "../../../../testing/test-helper";
+import {testInvalidDataTypes} from "../../../../testing/common/test-invalid-data-types";
+import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
+import {testUser1} from "../../../../testing/data/users";
 // todo: add data that revoked tokens actually are revoked and no longer work (when some are expired and some not)!!!!!
 
 
@@ -23,10 +22,10 @@ describe("Logout Auth",() => {
 
   describe("Success Cases", () => {
     test("When a valid refresh token a supplied, all tokens should be revoked", async () => {
-      const {refreshToken, accessToken} = await testHelper.getUserTokens(testUsers[0].id);
+      const {refreshToken, accessToken} = await testHelper.getUserTokens(testUser1.id);
 
       // Revoke the tokens, check that request succeeded
-      const {statusCode: revokeStatusCode, body} = await testHelper.client
+      const {statusCode: revokeStatusCode} = await testHelper.client
         .post("/v1/auth/logout")
         .send({refreshToken});
       expect(revokeStatusCode).toEqual(200);
@@ -50,12 +49,12 @@ describe("Logout Auth",() => {
       const configService = testHelper.app.get(ConfigService);
 
       const refreshToken = sign(
-        {userId: testUsers[0].id, type: "refreshToken"},
+        {userId: testUser1.id, type: "refreshToken"},
         configService.config.auth.refreshToken.secret,
         {expiresIn: 0}
       );
 
-      const {body, statusCode} = await testHelper.client
+      const {statusCode} = await testHelper.client
         .post("/v1/auth/logout")
         .send({
           refreshToken
@@ -70,7 +69,7 @@ describe("Logout Auth",() => {
         {
           iss: "localful",
           aud: "localful",
-          sub: testUsers[0].id,
+          sub: testUser1.id,
           type: "refreshToken",
           gid: "bbafbee5-155b-4844-8f74-82bd442a4a1",
           cid: 1
@@ -79,7 +78,7 @@ describe("Logout Auth",() => {
         {expiresIn: "1h"}
       );
 
-      const {body, statusCode} = await testHelper.client
+      const {statusCode} = await testHelper.client
         .post("/v1/auth/logout")
         .send({
           refreshToken

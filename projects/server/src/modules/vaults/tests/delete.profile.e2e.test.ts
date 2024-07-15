@@ -1,8 +1,8 @@
 import {HttpStatus} from "@nestjs/common";
-import {TestHelper} from "../../../../tests-utils/test-helper";
-import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
-import {expectForbidden} from "../../../../tests-utils/common-expects/expect-forbidden";
-import {expectNotFound} from "../../../../tests-utils/common-expects/expect-not-found";
+import {TestHelper} from "../../../../testing/test-helper";
+import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
+import {expectForbidden} from "../../../../testing/common/expect-forbidden";
+import {expectNotFound} from "../../../../testing/common/expect-not-found";
 
 
 // describe("Delete Profile - /v1/profiles/:userId [DELETE]",() => {

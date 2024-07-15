@@ -1,4 +1,4 @@
-import {TestHelper} from "../../../../tests-utils/test-helper";
+import {TestHelper} from "../../../../testing/test-helper";
 
 describe("Base Module",() => {
   const testHelper = new TestHelper();

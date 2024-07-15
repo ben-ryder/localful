@@ -21,7 +21,7 @@
     "db:init": "psql postgres -f ./scripts/setup.sql && npm run db:init:data",
     "db:dump": "pg_dump localful > ./backup/localful.sql",
     "db:restore": "psql localful < ./backup/localful.sql",
-    "db:init:data": "ts-node tests-utils/cli.ts"
+    "db:init:data": "ts-node testing/cli.ts"
   },
   "dependencies": {
     "@localful/common": "file:../common",

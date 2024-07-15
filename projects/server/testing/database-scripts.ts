@@ -1,5 +1,5 @@
 import {Sql} from "postgres";
-import {exampleUsers, testUsers} from "./test-data";
+import {exampleUser1, testAdminUser1, testUser1, testUser2} from "./data/users";
 
 export interface ScriptOptions {
   logging: boolean
@@ -26,12 +26,12 @@ export async function clearTestData(sql: Sql<any>, options?: ScriptOptions) {
   }
 
   // Deleting users will cascade delete their resources which will cascade delete the related changes too
-  for (const user of testUsers) {
+  for (const user of [testUser1, testUser2, testAdminUser1]) {
     await sql`DELETE FROM users where id = ${user.id}`;
   }
 
-  // Delete example user by email, as they has be created with a different id
-  for (const user of exampleUsers) {
+  // Delete example user by email, as they will be created with a random id
+  for (const user of [exampleUser1]) {
     await sql`DELETE FROM users where email = ${user.email}`;
   }
 
@@ -48,7 +48,7 @@ export async function seedTestData(sql: Sql<any>, options?: ScriptOptions) {
     console.log("Running database seed");
   }
 
-  for (const user of testUsers) {
+  for (const user of [testUser1, testUser2, testAdminUser1]) {
     await sql`
       INSERT INTO users(id, created_at, updated_at, email, password_hash, display_name, is_verified)
       VALUES (${user.id}, ${user.createdAt}, ${user.updatedAt}, ${user.email}, ${user.passwordHash}, ${user.displayName}, ${user.isVerified})

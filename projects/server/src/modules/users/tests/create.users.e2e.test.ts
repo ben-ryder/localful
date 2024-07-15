@@ -1,19 +1,10 @@
-import {ErrorIdentifiers} from "@localful/common";
-import {TestHelper} from "../../../../tests-utils/test-helper";
-import {expectBadRequest} from "../../../../tests-utils/common-expects/expect-bad-request";
-import {testMissingField} from "../../../../tests-utils/common-expects/test-missing-field";
-import {testMalformedData} from "../../../../tests-utils/common-expects/test-malformed-data";
-import {testInvalidDataTypes} from "../../../../tests-utils/common-expects/test-invalid-data-types";
-import {exampleUsers, testUsers} from "../../../../tests-utils/test-data";
-
-
-// A default user which can be reused in multiple tests to save a bit of copy-pasting.
-// Uses Object.freeze to ensure no test can modify it
-const defaultTestUser = Object.freeze({
-  email: exampleUsers[0].email,
-  displayName: exampleUsers[0].displayName,
-  password: exampleUsers[0].password,
-});
+import {ErrorIdentifiers, Roles} from "@localful/common";
+import {TestHelper} from "../../../../testing/test-helper";
+import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
+import {testMissingField} from "../../../../testing/common/test-missing-field";
+import {testMalformedData} from "../../../../testing/common/test-malformed-data";
+import {testInvalidDataTypes} from "../../../../testing/common/test-invalid-data-types";
+import {exampleUser1, testUser1} from "../../../../testing/data/users";
 
 describe("Create User - /v1/users [POST]",() => {
   const testHelper: TestHelper = new TestHelper();
@@ -32,16 +23,16 @@ describe("Create User - /v1/users [POST]",() => {
     test("When adding a valid new user, the new user should be added & returned", async () => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/users")
-        .send(defaultTestUser);
+        .send(exampleUser1);
 
       expect(statusCode).toEqual(201);
       expect(body).toEqual(expect.objectContaining({
         user: {
           id: expect.any(String),
-          email: defaultTestUser.email,
-          displayName: defaultTestUser.displayName,
+          email: exampleUser1.email,
+          displayName: exampleUser1.displayName,
           isVerified: false,
-          role: exampleUsers[0].role ,// assuming defaultTestUser will always be exampleUser[0]!
+          role: Roles.Enum.user,
           createdAt: expect.any(String),
           updatedAt: expect.any(String),
         },
@@ -58,7 +49,7 @@ describe("Create User - /v1/users [POST]",() => {
 
     test("When using a password that's 12 characters, the new user should be added & returned", async () => {
       const newUser = {
-        ...defaultTestUser,
+        ...exampleUser1,
         password: "password1234!",
       }
 
@@ -71,7 +62,7 @@ describe("Create User - /v1/users [POST]",() => {
 
     // test("When using a username that's 1 character, the new user should be added & returned", async () => {
     //   const newUser = {
-    //     ...defaultTestUser,
+    //     ...exampleUser1,
     //     username: "a"
     //   }
     //
@@ -96,7 +87,7 @@ describe("Create User - /v1/users [POST]",() => {
 
     // test("When using a username that's 20 characters, the new user should be added & returned", async () => {
     //   const newUser = {
-    //     ...defaultTestUser,
+    //     ...exampleUser1,
     //     username: "qwertyuiopasdfghjklz"
     //   }
     //
@@ -123,8 +114,8 @@ describe("Create User - /v1/users [POST]",() => {
   describe("None Unique Data", () => {
     test("When using an existing email, the request should fail", async () => {
       const newUser = {
-        ...defaultTestUser,
-        email: testUsers[0].email,
+        ...exampleUser1,
+        email: testUser1.email,
       }
 
       const {body, statusCode} = await testHelper.client
@@ -138,7 +129,7 @@ describe("Create User - /v1/users [POST]",() => {
   describe("Data Validation", () => {
     test("When using an invalid email, the request should fail", async () => {
       const newUser = {
-        ...defaultTestUser,
+        ...exampleUser1,
         email: "invalid-email"
       }
 
@@ -152,7 +143,7 @@ describe("Create User - /v1/users [POST]",() => {
     // todo: add boundary tests for this
     test("When using a password that's too short, the request should fail", async () => {
       const newUser = {
-        ...defaultTestUser,
+        ...exampleUser1,
         password: "hi"
       }
 
@@ -166,7 +157,7 @@ describe("Create User - /v1/users [POST]",() => {
     // @todo: add max length to email schema and re-add this test
     // test("When using a email that's too long, the request should fail", async () => {
     //   const newUser = {
-    //     ...defaultTestUser,
+    //     ...exampleUser1,
     //     email: "this-is-a-username-which-is-over-the-maximum"
     //   }
     //
@@ -180,37 +171,37 @@ describe("Create User - /v1/users [POST]",() => {
 
   describe("Required Fields", () => {
     test("When not supplying an email, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
         accessToken: accessToken,
         endpoint: "/v1/users",
-        data: defaultTestUser,
+        data: exampleUser1,
         testFieldKey: "email"
       })
     })
 
     test("When not supplying a password, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
         accessToken: accessToken,
         endpoint: "/v1/users",
-        data: defaultTestUser,
+        data: exampleUser1,
         testFieldKey: "password"
       })
     })
 
     test("When not supplying a displayName, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       await testMissingField({
         clientFunction: testHelper.client.post.bind(testHelper.client),
         accessToken: accessToken,
         endpoint: "/v1/users",
-        data: defaultTestUser,
+        data: exampleUser1,
         testFieldKey: "displayName"
       })
     })
@@ -219,7 +210,7 @@ describe("Create User - /v1/users [POST]",() => {
   describe("Forbidden Fields", () => {
     test("When passing an ID field, the request should fail", async () => {
       const newUser = {
-        ...defaultTestUser,
+        ...exampleUser1,
         id: "a78a9859-314e-44ec-8701-f0c869cfc07f"
       }
 
@@ -232,7 +223,7 @@ describe("Create User - /v1/users [POST]",() => {
 
     test("When passing a createdAt field, the request should fail", async () => {
       const newUser = {
-        ...defaultTestUser,
+        ...exampleUser1,
         createdAt: "2022-07-11T18:20:32.482Z"
       }
 
@@ -245,7 +236,7 @@ describe("Create User - /v1/users [POST]",() => {
 
     test("When passing an updatedAt field, the request should fail", async () => {
       const newUser = {
-        ...defaultTestUser,
+        ...exampleUser1,
         updatedAt: "2022-07-11T18:20:32.482Z"
       }
 
@@ -258,7 +249,7 @@ describe("Create User - /v1/users [POST]",() => {
 
     test("When passing an isVerified field, the request should fail", async () => {
       const newUser = {
-        ...defaultTestUser,
+        ...exampleUser1,
         isVerified: true
       }
 
@@ -271,7 +262,7 @@ describe("Create User - /v1/users [POST]",() => {
 
     test("When passing a role field, the request should fail", async () => {
       const newUser = {
-        ...defaultTestUser,
+        ...exampleUser1,
         role: "admin"
       }
 
@@ -285,7 +276,7 @@ describe("Create User - /v1/users [POST]",() => {
 
   describe("Invalid Data", () => {
     test("When supplying invalid JSON data, the request should fail", async () => {
-      const accessToken = await testHelper.getUserAccessToken(testUsers[0].id);
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       await testMalformedData({
         clientFunction: testHelper.client.post.bind(testHelper.client),
@@ -300,10 +291,10 @@ describe("Create User - /v1/users [POST]",() => {
           req: {
             clientMethod: "post",
             endpoint: "/v1/users",
-            initialData: defaultTestUser
+            initialData: exampleUser1
           },
           auth: {
-            userId: testUsers[0].id
+            userId: testUser1.id
           },
           testFieldKey: "email",
           testCases: [1, 1.5, true, null, undefined, {test: "yes"}, [1, 2]]
@@ -316,10 +307,10 @@ describe("Create User - /v1/users [POST]",() => {
         req: {
           clientMethod: "post",
           endpoint: "/v1/users",
-          initialData: defaultTestUser
+          initialData: exampleUser1
         },
         auth: {
-          userId: testUsers[0].id
+          userId: testUser1.id
         },
         testFieldKey: "password",
         testCases: [1, 1.5, true, null, undefined, {test: "yes"}, [1, 2]]
@@ -332,10 +323,10 @@ describe("Create User - /v1/users [POST]",() => {
         req: {
           clientMethod: "post",
           endpoint: "/v1/users",
-          initialData: defaultTestUser
+          initialData: exampleUser1
         },
         auth: {
-          userId: testUsers[0].id
+          userId: testUser1.id
         },
         testFieldKey: "displayName",
         testCases: [1, 1.5, true, null, undefined, {test: "yes"}, [1, 2]]

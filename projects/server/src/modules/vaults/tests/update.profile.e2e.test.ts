@@ -1,7 +1,7 @@
-import {TestHelper} from "../../../../tests-utils/test-helper";
+import {TestHelper} from "../../../../testing/test-helper";
 import {HttpStatus} from "@nestjs/common";
-import {expectUnauthorized} from "../../../../tests-utils/common-expects/expect-unauthorized";
-import {expectForbidden} from "../../../../tests-utils/common-expects/expect-forbidden";
+import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
+import {expectForbidden} from "../../../../testing/common/expect-forbidden";
 
 
 // describe("Update Profile - /v1/profiles [PATCH]",() => {
