@@ -3,7 +3,7 @@ import {TestHelper} from "../../../../testing/test-helper";
 import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
 import {expectForbidden} from "../../../../testing/common/expect-forbidden";
 import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
-import {testUser1, testUser2} from "../../../../testing/data/users";
+import {testUser1, testUser2Unverified} from "../../../../testing/data/users";
 
 
 describe("Delete User - /v1/users/:id [DELETE]",() => {
@@ -48,7 +48,7 @@ describe("Delete User - /v1/users/:id [DELETE]",() => {
     const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
     const {body, statusCode} = await testHelper.client
-      .delete(`/v1/users/${testUser2.id}`)
+      .delete(`/v1/users/${testUser2Unverified.id}`)
       .set("Authorization", `Bearer ${accessToken}`);
 
     expectForbidden(body, statusCode)

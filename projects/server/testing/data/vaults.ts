@@ -9,7 +9,7 @@ import {testAdminUser1, testUser1} from "./users";
 export const testUser1Vault1: VaultEntity = {
   id: "ad5a85d1-86db-477e-af04-19033ef9c53e",
   ownerId: testUser1.id,
-  name: "testVault1",
+  name: "testUser1Vault1",
   protectedEncryptionKey: "protectedEncryptionKey",
   protectedData: "protectedData",
   createdAt: "2022-07-11T18:17:43.784Z",
@@ -19,7 +19,7 @@ export const testUser1Vault1: VaultEntity = {
 export const testUser1Vault2: VaultEntity = {
   id: "c5367e62-ce94-4a14-950e-297a68bbf73b",
   ownerId: testUser1.id,
-  name: "testVault2",
+  name: "testUser1Vault2",
   protectedEncryptionKey: "protectedEncryptionKey",
   createdAt: "2022-07-11T18:17:43.784Z",
   updatedAt: "2022-07-11T18:20:32.482Z",
@@ -28,7 +28,7 @@ export const testUser1Vault2: VaultEntity = {
 export const testAdminUser1Vault1: VaultEntity = {
   id: "41eecc22-a0b6-4734-96be-e4003ea7132d",
   ownerId: testAdminUser1.id,
-  name: "testVault3",
+  name: "testAdminUser1Vault1",
   protectedEncryptionKey: "protectedEncryptionKey",
   protectedData: "protectedData",
   createdAt: "2022-07-11T18:17:43.784Z",

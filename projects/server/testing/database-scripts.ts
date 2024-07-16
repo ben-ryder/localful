@@ -1,5 +1,6 @@
 import {Sql} from "postgres";
-import {exampleUser1, testAdminUser1, testUser1, testUser2} from "./data/users";
+import {exampleUser1, testAdminUser1, testAdminUser2Unverified, testUser1, testUser2Unverified} from "./data/users";
+import {testAdminUser1Vault1, testUser1Vault1, testUser1Vault2} from "./data/vaults";
 
 export interface ScriptOptions {
   logging: boolean
@@ -26,7 +27,7 @@ export async function clearTestData(sql: Sql<any>, options?: ScriptOptions) {
   }
 
   // Deleting users will cascade delete their resources which will cascade delete the related changes too
-  for (const user of [testUser1, testUser2, testAdminUser1]) {
+  for (const user of [testUser1, testUser2Unverified, testAdminUser1, testAdminUser2Unverified]) {
     await sql`DELETE FROM users where id = ${user.id}`;
   }
 
@@ -48,11 +49,17 @@ export async function seedTestData(sql: Sql<any>, options?: ScriptOptions) {
     console.log("Running database seed");
   }
 
-  for (const user of [testUser1, testUser2, testAdminUser1]) {
+  for (const user of [testUser1, testUser2Unverified, testAdminUser1, testAdminUser2Unverified]) {
     await sql`
-      INSERT INTO users(id, created_at, updated_at, email, password_hash, display_name, is_verified)
-      VALUES (${user.id}, ${user.createdAt}, ${user.updatedAt}, ${user.email}, ${user.passwordHash}, ${user.displayName}, ${user.isVerified})
-        RETURNING *;
+      INSERT INTO users(id, email, display_name, password_hash, is_verified, role, created_at, updated_at)
+      VALUES (${user.id}, ${user.email}, ${user.displayName}, ${user.passwordHash}, ${user.isVerified}, ${user.role}, ${user.createdAt}, ${user.updatedAt})
+    `;
+  }
+
+  for (const vault of [testUser1Vault1, testUser1Vault2, testAdminUser1Vault1]) {
+    await sql`
+      INSERT INTO vaults(id, vault_name, protected_encryption_key, protected_data, owner_id, created_at, updated_at)
+      VALUES (${vault.id}, ${vault.name}, ${vault.protectedEncryptionKey}, ${vault.protectedData || null}, ${vault.ownerId}, ${vault.createdAt}, ${vault.updatedAt})
     `;
   }
 

@@ -5,7 +5,7 @@ import {SystemError} from "../../../services/errors/base/system.error";
 import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error";
 import {CreateVaultDto, ErrorIdentifiers, UpdateVaultDto, VaultDto} from "@localful/common";
 import {RawDatabaseVault} from "./database-vault";
-import {PG_FOREIGN_KEY_VIOLATION} from "../../../services/database/database-error-codes";
+import {PG_FOREIGN_KEY_VIOLATION, PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes";
 import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error";
 
 
@@ -35,7 +35,7 @@ export class VaultsDatabaseService {
   private static convertDatabaseDtoToDto(vault: RawDatabaseVault): VaultDto {
     return {
       id: vault.id,
-      name: vault.name,
+      name: vault.vault_name,
       protectedEncryptionKey: vault.protected_encryption_key,
       protectedData: vault.protected_data,
       ownerId: vault.owner_id,
@@ -45,12 +45,26 @@ export class VaultsDatabaseService {
   }
 
   private static getDatabaseError(e: any) {
-    if (e instanceof PostgresError) {
-      if (e.code && e.code === PG_FOREIGN_KEY_VIOLATION) {
+    if (e instanceof PostgresError && e.code) {
+      if (e.code === PG_FOREIGN_KEY_VIOLATION) {
         if (e.constraint_name === "vaults_owner") {
           return new ResourceRelationshipError({
-            identifier: ErrorIdentifiers.RESOURCE_NOT_FOUND,
+            identifier: ErrorIdentifiers.USER_NOT_FOUND,
             applicationMessage: "Attempted to add a vault with owner that doesn't exist."
+          })
+        }
+      }
+      if (e.code === PG_UNIQUE_VIOLATION) {
+        if (e.constraint_name === "vault_name_unique") {
+          return new ResourceRelationshipError({
+            identifier: ErrorIdentifiers.VAULT_NAME_EXISTS,
+            applicationMessage: "Vault owner already has vault with the given name."
+          })
+        }
+        else if (e.constraint_name === "vaults_pk") {
+          return new ResourceRelationshipError({
+            identifier: ErrorIdentifiers.RESOURCE_NOT_UNIQUE,
+            applicationMessage: "Vault with given id already exists."
           })
         }
       }
@@ -78,20 +92,20 @@ export class VaultsDatabaseService {
     }
     else {
       throw new ResourceNotFoundError({
-        identifier: ErrorIdentifiers.RESOURCE_NOT_FOUND,
+        identifier: ErrorIdentifiers.VAULT_NOT_FOUND,
         applicationMessage: "The requested vault could not be found."
       })
     }
   }
 
-  async create(ownerId: string, createVaultDto: CreateVaultDto): Promise<VaultDto> {
+  async create(createVaultDto: CreateVaultDto): Promise<VaultDto> {
     const sql = await this.databaseService.getSQL();
 
     let result: RawDatabaseVault[] = [];
     try {
       result = await sql<RawDatabaseVault[]>`
-        INSERT INTO vaults(id, name, protected_encryption_key, protected_data, owner_id, created_at, updated_at) 
-        VALUES (${createVaultDto.id}, ${createVaultDto.name}, ${createVaultDto.protectedEncryptionKey}, ${createVaultDto.protectedData || null}, ${ownerId}, ${createVaultDto.createdAt}, ${createVaultDto.updatedAt})
+        INSERT INTO vaults(id, vault_name, protected_encryption_key, protected_data, owner_id, created_at, updated_at) 
+        VALUES (${createVaultDto.id}, ${createVaultDto.name}, ${createVaultDto.protectedEncryptionKey}, ${createVaultDto.protectedData || null}, ${createVaultDto.ownerId}, ${createVaultDto.createdAt}, ${createVaultDto.updatedAt})
         RETURNING *;
        `;
     }
@@ -165,7 +179,7 @@ export class VaultsDatabaseService {
     }
     else {
       throw new ResourceNotFoundError({
-        identifier: ErrorIdentifiers.RESOURCE_NOT_FOUND,
+        identifier: ErrorIdentifiers.VAULT_NOT_FOUND,
         applicationMessage: "The requested vault could not be found."
       })
     }

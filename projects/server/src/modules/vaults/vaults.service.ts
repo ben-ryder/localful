@@ -17,19 +17,21 @@ export class VaultsService {
         return await this.vaultsDatabaseService.get(userId);
     }
 
-    async get(userContext: UserContext, userId: string) {
+    async get(userContext: UserContext, id: string) {
+        const vault = await this.vaultsDatabaseService.get(id);
+
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["vaults:retrieve"],
             globalScopedPermissions: ["vaults:retrieve:all"],
             requestingUserContext: userContext,
-            targetUserId: userId
+            targetUserId: vault.ownerId
         })
         
-        return this._UNSAFE_get(userId);
+        return vault
     }
 
-    async _UNSAFE_create(ownerId: string, createVaultDto: CreateVaultDto): Promise<VaultDto> {
-        return await this.vaultsDatabaseService.create(ownerId, createVaultDto);
+    async _UNSAFE_create(createVaultDto: CreateVaultDto): Promise<VaultDto> {
+        return await this.vaultsDatabaseService.create(createVaultDto);
     }
 
     async create(userContext: UserContext, createVaultDto: CreateVaultDto): Promise<VaultDto> {
@@ -37,10 +39,10 @@ export class VaultsService {
             userScopedPermissions: ["vaults:create"],
             globalScopedPermissions: ["vaults:create:all"],
             requestingUserContext: userContext,
-            targetUserId: userContext.id
+            targetUserId: createVaultDto.ownerId
         })
         
-        return await this._UNSAFE_create(userContext.id, createVaultDto);
+        return await this._UNSAFE_create(createVaultDto);
     }
 
     async _UNSAFE_update(userId: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {

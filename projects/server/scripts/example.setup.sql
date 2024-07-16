@@ -59,13 +59,15 @@ CREATE TABLE IF NOT EXISTS vaults (
     id UUID NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    name VARCHAR(100) NOT NULL,
+    vault_name VARCHAR(100) NOT NULL,
     protected_encryption_key VARCHAR(255) NOT NULL,
     protected_data TEXT,
     owner_id UUID NOT NULL,
+    CONSTRAINT vault_name_unique UNIQUE (owner_id, vault_name),
     CONSTRAINT vaults_pk PRIMARY KEY (id),
-    CONSTRAINT vaults_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT vaults_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
 );
+CREATE TRIGGER update_vault_timestamps BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_table_timestamps();
 
 /**
     Content Table
@@ -74,7 +76,7 @@ CREATE TABLE IF NOT EXISTS vaults (
  */
 CREATE TABLE IF NOT EXISTS content (
     id UUID NOT NULL,
-    type VARCHAR(20) NOT NULL,
+    content_type VARCHAR(20) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
     vault_id UUID NOT NULL,
     CONSTRAINT content_pk PRIMARY KEY (id),

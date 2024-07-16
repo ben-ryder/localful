@@ -1,10 +1,9 @@
-import {ConfigService} from "../../services/config/config";
 import {UsersService} from "./users.service";
 import {TokenService} from "../../services/token/token.service";
 import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
 import {CreateUserDto, UsersURLParams, UpdateUserDto} from "@localful/common";
 import {RequestContext} from "../../common/request-context.decorator";
-import {AuthGuard} from "../auth/auth.guards";
+import {createAuthGuard} from "../auth/auth.guards";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 
 
@@ -14,7 +13,6 @@ import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 })
 export class UsersController {
   constructor(
-    private configService: ConfigService,
     private usersService: UsersService,
     private tokenService: TokenService
   ) {}
@@ -37,13 +35,13 @@ export class UsersController {
   }
 
   @Get("/:userId")
-  @UseGuards(AuthGuard)
+  @UseGuards(createAuthGuard())
   async get(@Param(new ZodValidationPipe(UsersURLParams)) params: UsersURLParams, @RequestContext() context: RequestContext) {
     return await this.usersService.get(context.user, params.userId);
   }
 
   @Patch("/:userId")
-  @UseGuards(AuthGuard)
+  @UseGuards(createAuthGuard())
   async update(
     @Param(new ZodValidationPipe(UsersURLParams)) params: UsersURLParams,
     @Body(new ZodValidationPipe(UpdateUserDto)) updateUserDto: UpdateUserDto,
@@ -53,7 +51,7 @@ export class UsersController {
   }
 
   @Delete("/:userId")
-  @UseGuards(AuthGuard)
+  @UseGuards(createAuthGuard({allowUnverifiedUser: true}))
   async delete(
     @Param(new ZodValidationPipe(UsersURLParams)) params: UsersURLParams,
     @RequestContext() context: RequestContext

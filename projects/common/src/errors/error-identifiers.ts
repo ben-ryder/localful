@@ -2,13 +2,9 @@
  * Error identifiers
  */
 export enum ErrorIdentifiers {
-  // Generalised Errors
+  // General Errors
   NOT_FOUND = "not-found",
-
-  // System Errors
   SYSTEM_UNEXPECTED = "system-unexpected-error",
-
-  // Request Errors
   REQUEST_INVALID = "request-invalid",
 
   // Access Errors
@@ -30,4 +26,8 @@ export enum ErrorIdentifiers {
   USER_REGISTRATION_DISABLED = "user-registration-disabled",
   USER_EMAIL_EXISTS = "user-email-exists",
   USER_NOT_FOUND = "user-not-found",
+
+  // Vault Errors
+  VAULT_NOT_FOUND = "vault-not-found",
+  VAULT_NAME_EXISTS = 'vault-name-exists'
 }

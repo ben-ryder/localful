@@ -4,7 +4,7 @@ import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized
 import {expectForbidden} from "../../../../testing/common/expect-forbidden";
 import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
 import {testMalformedData} from "../../../../testing/common/test-malformed-data";
-import {testUser1, testUser2} from "../../../../testing/data/users";
+import {testUser1, testUser2Unverified} from "../../../../testing/data/users";
 
 
 describe("Update User - /v1/users/:id [PATCH]",() => {
@@ -76,7 +76,7 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
       const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
       const {body, statusCode} = await testHelper.client
-        .patch(`/v1/users/${testUser2.id}`)
+        .patch(`/v1/users/${testUser2Unverified.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send({displayName: "updateduser1"});
 
@@ -124,7 +124,7 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
       const {body, statusCode} = await testHelper.client
         .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
-        .send({email: testUser2.email});
+        .send({email: testUser2Unverified.email});
 
       expectBadRequest(body, statusCode, ErrorIdentifiers.USER_EMAIL_EXISTS);
     })

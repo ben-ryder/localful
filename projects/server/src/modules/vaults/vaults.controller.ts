@@ -3,18 +3,18 @@ import {VaultsService} from "./vaults.service";
 import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
 import {RequestContext} from "../../common/request-context.decorator";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
-import {AuthGuard} from "../auth/auth.guards";
+import {createAuthGuard} from "../auth/auth.guards";
 import {CreateVaultDto, UpdateVaultDto, VaultsURLParams} from "@localful/common";
 
 @Controller({
   path: "/vaults",
   version: "1"
 })
-@UseGuards(AuthGuard)
+@UseGuards(createAuthGuard())
 export class VaultsController {
   constructor(
     private configService: ConfigService,
-    private profilesService: VaultsService
+    private vaultsService: VaultsService
   ) {}
 
   @Post()
@@ -22,7 +22,7 @@ export class VaultsController {
     @Body(new ZodValidationPipe(CreateVaultDto)) profileCreateDto: CreateVaultDto,
     @RequestContext() context: RequestContext
   ) {
-    return await this.profilesService.create(context.user, profileCreateDto);
+    return await this.vaultsService.create(context.user, profileCreateDto);
   }
 
   @Get("/:vaultId")
@@ -30,7 +30,7 @@ export class VaultsController {
     @Param(new ZodValidationPipe(VaultsURLParams)) params: VaultsURLParams,
     @RequestContext() context: RequestContext
   ) {
-    return await this.profilesService.get(context.user, params.vaultId);
+    return await this.vaultsService.get(context.user, params.vaultId);
   }
 
   @Patch("/:vaultId")
@@ -39,7 +39,7 @@ export class VaultsController {
     @Body(new ZodValidationPipe(UpdateVaultDto)) profileUpdateDto: UpdateVaultDto,
     @RequestContext() context: RequestContext
   ) {
-    return await this.profilesService.update(context.user, params.vaultId, profileUpdateDto);
+    return await this.vaultsService.update(context.user, params.vaultId, profileUpdateDto);
   }
 
   @Delete("/:vaultId")
@@ -47,6 +47,6 @@ export class VaultsController {
     @Param(new ZodValidationPipe(VaultsURLParams)) params: VaultsURLParams,
     @RequestContext() context: RequestContext
   ) {
-    return await this.profilesService.delete(context.user, params.vaultId);
+    return await this.vaultsService.delete(context.user, params.vaultId);
   }
 }
