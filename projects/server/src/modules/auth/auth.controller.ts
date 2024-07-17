@@ -3,7 +3,7 @@ import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service";
 import {LoginRequest, LogoutRequest, RefreshRequest} from "@localful/common";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
-import {createAuthGuard} from "./auth.guards";
+import {AuthenticationGuard} from "./auth.guards";
 
 @Controller({
   path: "/auth",
@@ -35,7 +35,7 @@ export class AuthController {
   }
 
   @Get("/check")
-  @UseGuards(createAuthGuard())
+  @UseGuards(AuthenticationGuard)
   async check(@Response() res: ExpressResponse) {
     return res.status(HttpStatus.OK).send({
       statusCode: HttpStatus.OK,
@@ -50,7 +50,7 @@ export class AuthController {
    * @param res
    */
   @Get("/verify")
-  @UseGuards(createAuthGuard())
+  @UseGuards(AuthenticationGuard)
   async requestVerificationEmail(@Response() res: ExpressResponse) {
     // todo: implement /v1/auth/verify [GET]
     return res.status(HttpStatus.NOT_IMPLEMENTED).send({
@@ -65,7 +65,7 @@ export class AuthController {
    * @param res
    */
   @Post("/verify")
-  @UseGuards(createAuthGuard())
+  @UseGuards(AuthenticationGuard)
   async verifyAccountEmail(@Response() res: ExpressResponse) {
     // todo: implement /v1/auth/verify [GET]
     return res.status(HttpStatus.NOT_IMPLEMENTED).send({

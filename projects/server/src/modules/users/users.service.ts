@@ -11,6 +11,7 @@ import {UserContext} from "../../common/request-context.decorator";
 import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto} from "./database/database-user";
 import {AuthService} from "../auth/auth.service";
 import {ConfigService} from "../../services/config/config";
+import {ResourceNotFoundError} from "../../services/errors/resource/resource-not-found.error";
 
 
 @Injectable()
@@ -30,7 +31,7 @@ export class UsersService {
     async get(userContext: UserContext, userId: string): Promise<UserDto> {
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["users:retrieve"],
-            globalScopedPermissions: ["users:retrieve:all"],
+            unscopedPermissions: ["users:retrieve:all"],
             requestingUserContext: userContext,
             targetUserId: userId
         })
@@ -92,7 +93,7 @@ export class UsersService {
     async update(userContext: UserContext, userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["users:update"],
-            globalScopedPermissions: ["users:update:all"],
+            unscopedPermissions: ["users:update:all"],
             requestingUserContext: userContext,
             targetUserId: userId
         })
@@ -107,7 +108,7 @@ export class UsersService {
     async delete(userContext: UserContext, userId: string): Promise<void> {
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["users:delete"],
-            globalScopedPermissions: ["users:delete:all"],
+            unscopedPermissions: ["users:delete:all"],
             requestingUserContext: userContext,
             targetUserId: userId
         })

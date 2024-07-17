@@ -11,6 +11,9 @@ export interface ErrorHttpMappings {
   [x: string]: ErrorHttpMapping;
 }
 
+// todo: distinguish 50x errors?
+// https://web.archive.org/web/20180226110035/http://www.codetinkerer.com/2015/12/04/choosing-an-http-status-code.html
+
 export const fallbackMapping: ErrorHttpMapping = {
   identifier: ErrorIdentifiers.SYSTEM_UNEXPECTED,
   statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

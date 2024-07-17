@@ -22,7 +22,7 @@ export class VaultsService {
 
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["vaults:retrieve"],
-            globalScopedPermissions: ["vaults:retrieve:all"],
+            unscopedPermissions: ["vaults:retrieve:all"],
             requestingUserContext: userContext,
             targetUserId: vault.ownerId
         })
@@ -37,7 +37,7 @@ export class VaultsService {
     async create(userContext: UserContext, createVaultDto: CreateVaultDto): Promise<VaultDto> {
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["vaults:create"],
-            globalScopedPermissions: ["vaults:create:all"],
+            unscopedPermissions: ["vaults:create:all"],
             requestingUserContext: userContext,
             targetUserId: createVaultDto.ownerId
         })
@@ -52,7 +52,7 @@ export class VaultsService {
     async update(userContext: UserContext, userId: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["vaults:update"],
-            globalScopedPermissions: ["vaults:update:all"],
+            unscopedPermissions: ["vaults:update:all"],
             requestingUserContext: userContext,
             targetUserId: userId
         })
@@ -67,7 +67,7 @@ export class VaultsService {
     async delete(userContext: UserContext, userId: string): Promise<void> {
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["vaults:delete"],
-            globalScopedPermissions: ["vaults:delete:all"],
+            unscopedPermissions: ["vaults:delete:all"],
             requestingUserContext: userContext,
             targetUserId: userId
         })

@@ -8,6 +8,7 @@ import {AccessUnauthorizedError} from "../../services/errors/access/access-unaut
 import {UserRequestError} from "../../services/errors/base/user-request.error";
 import {DatabaseUserDto} from "../users/database/database-user";
 import {AccessControlOptions} from "./auth.guards";
+import {ResourceNotFoundError} from "../../services/errors/resource/resource-not-found.error";
 
 
 @Injectable()
@@ -92,25 +93,68 @@ export class AuthService {
    * @param options
    */
   async validateAccessControlRules(options: AccessControlOptions): Promise<void> {
+    // Validate the requesting users verification first, as they shouldn't be able to do anything when unverified even if they have valid permissions.
+    if (!options.requestingUserContext.isVerified && !options.allowUnverifiedRequestingUser) {
+      throw new AccessForbiddenError({
+        applicationMessage: "You are unverified and do not have the permissions required to perform this action."
+      });
+    }
+
+    let hasValidPermission = false;
     for (const userPermission of options.userScopedPermissions) {
       if (
         options.requestingUserContext?.permissions.includes(userPermission) &&
         options.requestingUserContext.id === options.targetUserId
       ) {
-        return;
+        hasValidPermission = true;
+        break
       }
     }
-    for (const globalPermission of options.globalScopedPermissions) {
+    for (const globalPermission of options.unscopedPermissions) {
       if (
         options.requestingUserContext?.permissions.includes(globalPermission)
       ) {
-        return;
+        hasValidPermission = true;
+        break
       }
     }
 
-    throw new AccessForbiddenError({
-      applicationMessage: "You do not have the permissions required to perform this action."
-    });
+    if (!hasValidPermission) {
+      throw new AccessForbiddenError({
+        applicationMessage: "You do not have the permissions required to perform this action."
+      });
+    }
+
+    // Check target user permissions AFTER permission checks.
+    // This ensures no target user information (like verification status) will be exposed to users that only have
+    // permissions to access their own data.
+    if (!options.allowUnverifiedTargetUser && options.requestingUserContext.id !== options.targetUserId) {
+
+      let targetUser
+      try {
+        targetUser = await this.usersService._UNSAFE_get(options.targetUserId)
+      }
+      catch (e) {
+        // Rethrow a user not found error as a request error
+        if (e instanceof ResourceNotFoundError && e.identifier === ErrorIdentifiers.USER_NOT_FOUND) {
+          throw new UserRequestError({
+            identifier: ErrorIdentifiers.USER_NOT_FOUND,
+            applicationMessage: "You have attempted to perform an action against a user that doesn't exist."
+          })
+        }
+
+        throw e
+      }
+
+      if (!targetUser.isVerified) {
+        throw new UserRequestError({
+          identifier: ErrorIdentifiers.AUTH_NOT_VERIFIED,
+          applicationMessage: "You have attempted to perform an action against an unverified user."
+        });
+      }
+    }
+
+    return
   }
 
   /**

@@ -10,6 +10,7 @@ export interface ErrorConfig {
 
   /** An application message that can be exposed to the user. */
   applicationMessage?: string;
+  // todo: rename this to userMessage to be clearer?
 
   /** The original error thrown if applicable. */
   originalError?: any;

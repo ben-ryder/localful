@@ -200,7 +200,7 @@ describe("Create Vaults - /v1/vaults [POST]",() => {
 					id: "561b9baa-0e9f-4354-8f93-931437169c24",
 				});
 
-			expectBadRequest(body, statusCode, ErrorIdentifiers.REQUEST_INVALID);
+			expectBadRequest(body, statusCode, ErrorIdentifiers.VAULT_NAME_EXISTS);
 		})
 
 		test("Given user A with existing vault and user B with `admin` role, When user B creates vault for user A with matching id, Then response should be 'HTTP 400 - bad request'", async () => {
@@ -214,7 +214,7 @@ describe("Create Vaults - /v1/vaults [POST]",() => {
 					name: "uniqueName1",
 				});
 
-			expectBadRequest(body, statusCode, ErrorIdentifiers.REQUEST_INVALID);
+			expectBadRequest(body, statusCode, ErrorIdentifiers.RESOURCE_NOT_UNIQUE);
 		})
 	})
 

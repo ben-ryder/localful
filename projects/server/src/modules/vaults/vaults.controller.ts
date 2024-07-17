@@ -3,14 +3,14 @@ import {VaultsService} from "./vaults.service";
 import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
 import {RequestContext} from "../../common/request-context.decorator";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
-import {createAuthGuard} from "../auth/auth.guards";
+import {AuthenticationGuard} from "../auth/auth.guards";
 import {CreateVaultDto, UpdateVaultDto, VaultsURLParams} from "@localful/common";
 
 @Controller({
   path: "/vaults",
   version: "1"
 })
-@UseGuards(createAuthGuard())
+@UseGuards(AuthenticationGuard)
 export class VaultsController {
   constructor(
     private configService: ConfigService,
