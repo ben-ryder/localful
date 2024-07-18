@@ -13,12 +13,12 @@ export class VaultsService {
        public authService: AuthService,
     ) {}
 
-    async _UNSAFE_get(userId: string) {
-        return await this.vaultsDatabaseService.get(userId);
+    async _UNSAFE_get(id: string) {
+        return await this.vaultsDatabaseService.get(id);
     }
 
     async get(userContext: UserContext, id: string) {
-        const vault = await this.vaultsDatabaseService.get(id);
+        const vault = await this._UNSAFE_get(id);
 
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["vaults:retrieve"],
@@ -45,33 +45,37 @@ export class VaultsService {
         return await this._UNSAFE_create(createVaultDto);
     }
 
-    async _UNSAFE_update(userId: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {
-        return await this.vaultsDatabaseService.update(userId, updateVaultDto);
+    async _UNSAFE_update(id: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {
+        return await this.vaultsDatabaseService.update(id, updateVaultDto);
     }
 
-    async update(userContext: UserContext, userId: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {
+    async update(userContext: UserContext, id: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {
+        const vault = await this._UNSAFE_get(id);
+
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["vaults:update"],
             unscopedPermissions: ["vaults:update:all"],
             requestingUserContext: userContext,
-            targetUserId: userId
+            targetUserId: vault.ownerId
         })
         
-        return this._UNSAFE_update(userId, updateVaultDto);
+        return this._UNSAFE_update(id, updateVaultDto);
     }
 
-    async _UNSAFE_delete(userId: string): Promise<void> {
-        await this.vaultsDatabaseService.delete(userId);
+    async _UNSAFE_delete(id: string): Promise<void> {
+        await this.vaultsDatabaseService.delete(id);
     }
 
-    async delete(userContext: UserContext, userId: string): Promise<void> {
+    async delete(userContext: UserContext, id: string): Promise<void> {
+        const vault = await this._UNSAFE_get(id);
+
         await this.authService.validateAccessControlRules({
             userScopedPermissions: ["vaults:delete"],
             unscopedPermissions: ["vaults:delete:all"],
             requestingUserContext: userContext,
-            targetUserId: userId
+            targetUserId: vault.ownerId
         })
 
-        return this._UNSAFE_delete(userId);
+        return this._UNSAFE_delete(id);
     }
 }

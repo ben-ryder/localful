@@ -24,7 +24,7 @@ describe("Retrieve Vaults - /v1/vaults/:vaultId [GET]",() => {
   });
 
   // Testing success cases/happy paths work.
-  describe("Success cases", () => {
+  describe("Success Cases", () => {
 
     test("Given user with `user` role, When retrieving their own vault, Then the vault should be returned", async () => {
       const accessToken = await testHelper.getUserAccessToken(testUser1.id);
@@ -83,12 +83,12 @@ describe("Retrieve Vaults - /v1/vaults/:vaultId [GET]",() => {
 
   // Testing auth & user permissions work.
   describe("Authentication & Permissions", () => {
-    test("Given user that isn't authenticated, When retrieving a vault, Then response should be '401 - unauthorised'", async () => {
+    test("Given user that isn't authenticated, When retrieving a vault, Then response should be '403 - forbidden'", async () => {
       const {body, statusCode} = await testHelper.client
         .get(`/v1/vaults/${testUser1Vault1.id}`)
         .send();
 
-      expectUnauthorized(body, statusCode);
+      expectForbidden(body, statusCode, ErrorIdentifiers.AUTH_NOT_VERIFIED);
     });
 
     test("Given user with 'user' role, When retrieving vault owned by different user, Then response should be '403 - forbidden'", async () => {
@@ -102,7 +102,7 @@ describe("Retrieve Vaults - /v1/vaults/:vaultId [GET]",() => {
       expectForbidden(body, statusCode);
     });
 
-    test("Given unverified admin, When retrieving a vault, Then response should be '401 - unauthorised'", async () => {
+    test("Given unverified admin, When retrieving a vault, Then response should be '403 - forbidden'", async () => {
       const accessToken = await testHelper.getUserAccessToken(testAdminUser2Unverified.id);
 
       const {body, statusCode} = await testHelper.client

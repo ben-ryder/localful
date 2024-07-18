@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS vaults (
     owner_id UUID NOT NULL,
     CONSTRAINT vault_name_unique UNIQUE (owner_id, vault_name),
     CONSTRAINT vaults_pk PRIMARY KEY (id),
-    CONSTRAINT vaults_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT vaults_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE TRIGGER update_vault_timestamps BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_table_timestamps();
 

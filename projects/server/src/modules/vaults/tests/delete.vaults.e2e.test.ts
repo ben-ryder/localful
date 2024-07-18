@@ -2,9 +2,11 @@ import {HttpStatus} from "@nestjs/common";
 import {TestHelper} from "../../../../testing/test-helper";
 import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
 import {expectForbidden} from "../../../../testing/common/expect-forbidden";
+import {testAdminUser1, testUser1} from "../../../../testing/data/users";
+import {testAdminUser1Vault1, testUser1Vault1} from "../../../../testing/data/vaults";
+import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
 import {expectNotFound} from "../../../../testing/common/expect-not-found";
-import {testUser1} from "../../../../testing/data/users";
-import {testUser1Vault1} from "../../../../testing/data/vaults";
+import {ErrorIdentifiers} from "@localful/common";
 
 
 describe("Delete Profile - /v1/vaults/:userId [DELETE]",() => {
@@ -38,129 +40,83 @@ describe("Delete Profile - /v1/vaults/:userId [DELETE]",() => {
         .send();
       expect(checkStatusCode).toEqual(HttpStatus.NOT_FOUND);
     });
-//
-//     test("Given user with `profiles:delete`, When deleting profile with matching userId, Then profile should be deleted", async () => {
-//       const accessToken = await testHelper.getUserAccessToken(seedProfiles[0].userId, [AccessControlScopes.PROFILES_DELETE, AccessControlScopes.PROFILES_RETRIEVE]);
-//
-//       const {statusCode} = await testHelper.client
-//         .delete(`/v1/vaults/${seedProfiles[0].userId}`)
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send();
-//       expect(statusCode).toEqual(HttpStatus.OK);
-//
-//       const {statusCode: checkStatusCode} = await testHelper.client
-//         .get(`/v1/vaults/${seedProfiles[0].userId}`)
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send();
-//       expect(checkStatusCode).toEqual(HttpStatus.NOT_FOUND);
-//     });
-//
-//     test("Given user with `profiles:delete profiles:retrieve`, When deleting profile with different userId, Then profile should be deleted", async () => {
-//       const accessToken = await testHelper.getUserAccessToken(seedProfiles[0].userId, [AccessControlScopes.PROFILES_DELETE, AccessControlScopes.PROFILES_RETRIEVE]);
-//
-//       const {statusCode} = await testHelper.client
-//         .delete(`/v1/vaults/${seedProfiles[1].userId}`)
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send();
-//       expect(statusCode).toEqual(HttpStatus.OK);
-//
-//       const {statusCode: checkStatusCode} = await testHelper.client
-//         .get(`/v1/vaults/${seedProfiles[1].userId}`)
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send();
-//       expect(checkStatusCode).toEqual(HttpStatus.NOT_FOUND);
-//     });
-//
-//     test("When deleting profile, Then profile and matching user changes should be deleted", async () => {
-//       const accessToken = await testHelper.getUserAccessToken(seedProfiles[0].userId, [
-//         AccessControlScopes.PROFILES_DELETE, AccessControlScopes.PROFILES_RETRIEVE, AccessControlScopes.CHANGES_RETRIEVE_SELF
-//       ]);
-//
-//       const {statusCode} = await testHelper.client
-//         .delete(`/v1/vaults/${seedProfiles[0].userId}`)
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send();
-//       expect(statusCode).toEqual(HttpStatus.OK);
-//
-//       const {statusCode: fetchStatusCode} = await testHelper.client
-//         .get(`/v1/vaults/${seedProfiles[0].userId}`)
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send();
-//       expect(fetchStatusCode).toEqual(HttpStatus.NOT_FOUND);
-//
-//       const {body: idsBody} = await testHelper.client
-//         .get(`/v1/changes/${seedProfiles[0].userId}/ids`)
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send();
-//       expect(idsBody).toHaveLength(0);
-//     });
+
+    test("Given user with 'admin' role, When deleting their own vault, Then the vault should be deleted", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testAdminUser1.id);
+
+      const {statusCode} = await testHelper.client
+          .delete(`/v1/vaults/${testAdminUser1Vault1.id}`)
+          .set("Authorization", `Bearer ${accessToken}`)
+          .send();
+      expect(statusCode).toEqual(HttpStatus.OK);
+
+      const {statusCode: checkStatusCode} = await testHelper.client
+          .get(`/v1/vaults/${testAdminUser1Vault1.id}`)
+          .set("Authorization", `Bearer ${accessToken}`)
+          .send();
+      expect(checkStatusCode).toEqual(HttpStatus.NOT_FOUND);
+    });
+
+    test("Given user with 'admin' role, When deleting a different user vault, Then the vault should be deleted", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testAdminUser1.id);
+
+      const {statusCode} = await testHelper.client
+          .delete(`/v1/vaults/${testUser1Vault1.id}`)
+          .set("Authorization", `Bearer ${accessToken}`)
+          .send();
+      expect(statusCode).toEqual(HttpStatus.OK);
+
+      const {statusCode: checkStatusCode} = await testHelper.client
+          .get(`/v1/vaults/${testUser1Vault1.id}`)
+          .set("Authorization", `Bearer ${accessToken}`)
+          .send();
+      expect(checkStatusCode).toEqual(HttpStatus.NOT_FOUND);
+    });
   })
-//
-//   // Testing auth & user permissions work.
-//   describe("Authentication & Permissions", () => {
-//     test("Given user with no auth, When deleting profile, Then response should be '401 - unauthorised'", async () => {
-//       const {body, statusCode} = await testHelper.client
-//         .delete(`/v1/vaults/${seedProfiles[0].userId}`)
-//         .send({});
-//
-//       expectUnauthorized(body, statusCode);
-//     });
-//
-//     test("Given user with `profiles:delete:self` scope, When deleting profile with different userId, Then response should be '403 - forbidden'", async () => {
-//       const accessToken = await testHelper.getUserAccessToken(seedProfiles[0].userId, [AccessControlScopes.PROFILES_DELETE_SELF]);
-//
-//       const {body, statusCode} = await testHelper.client
-//         .delete(`/v1/vaults/${seedProfiles[1].userId}`)
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send({});
-//
-//       expectForbidden(body, statusCode);
-//     });
-//
-//     test("Given user without 'profiles' scopes, When deleting profile with matching userId, Then response should be '403 - forbidden'", async () => {
-//       const accessToken = await testHelper.getUserAccessToken(seedProfiles[0].userId, []);
-//
-//       const {body, statusCode} = await testHelper.client
-//         .delete(`/v1/vaults/${seedProfiles[0].userId}`)
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send({});
-//
-//       expectForbidden(body, statusCode);
-//     });
-//
-//     test("Given user without `profiles` scopes, When deleting profile with different userId, Then response should be '403 - forbidden'", async () => {
-//       const accessToken = await testHelper.getUserAccessToken(seedProfiles[0].userId, []);
-//
-//       const {body, statusCode} = await testHelper.client
-//         .delete(`/v1/vaults/${seedProfiles[1].userId}`)
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send({});
-//
-//       expectForbidden(body, statusCode);
-//     });
-//   })
-//
-//   describe("Logical Validation", () => {
-//     test("Given user with `profiles:delete` scope, When deleting profile with invalid userId, Then response should be '404 - not found'", async () => {
-//       const accessToken = await testHelper.getUserAccessToken(seedProfiles[0].userId, [AccessControlScopes.PROFILES_DELETE]);
-//
-//       const {body, statusCode} = await testHelper.client
-//         .delete("/v1/vaults/random")
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send({});
-//
-//       expectNotFound(body, statusCode, ErrorIdentifiers.PROFILE_NOT_FOUND);
-//     });
-//
-//     test("Given user with `profiles:delete:self` scope, When deleting profile with invalid userId, Then response should be '403 - forbidden'", async () => {
-//       const accessToken = await testHelper.getUserAccessToken(seedProfiles[0].userId, [AccessControlScopes.PROFILES_DELETE_SELF]);
-//
-//       const {body, statusCode} = await testHelper.client
-//         .delete("/v1/vaults/random")
-//         .set("Authorization", `Bearer ${accessToken}`)
-//         .send({});
-//
-//       expectForbidden(body, statusCode);
-//     });
-//   })
+
+  // Testing auth & user permissions work.
+  describe("Authentication & Permissions", () => {
+    test("Given unauthenticated user, When deleting vault, Then response should be '401 - unauthorised'", async () => {
+      const {body, statusCode} = await testHelper.client
+          .delete(`/v1/vaults/${testUser1Vault1.id}`)
+          .send();
+
+      expectUnauthorized(body, statusCode);
+    });
+
+    test("Given user with 'user' role, When deleting a different users vault, Then response should be '403 - forbidden'", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
+
+      const {statusCode, body} = await testHelper.client
+          .delete(`/v1/vaults/${testAdminUser1Vault1.id}`)
+          .set("Authorization", `Bearer ${accessToken}`)
+          .send();
+
+      expectForbidden(body, statusCode);
+    });
+  })
+
+  describe("Logical Validation", () => {
+    test("When deleting vault with invalid id, Then response should be '400 - bad request'", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
+
+      const {body, statusCode} = await testHelper.client
+        .delete("/v1/vaults/random")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send();
+
+      expectBadRequest(body, statusCode);
+    });
+
+    test("When attempting to delete a none existent vault, Then response should be '404 - not found'", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
+
+      const {body, statusCode} = await testHelper.client
+        .delete("/v1/vaults/b283f9e5-f386-4503-abc3-a31729f333e1")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({});
+
+      expectNotFound(body, statusCode, ErrorIdentifiers.VAULT_NOT_FOUND);
+    });
+  })
 })
