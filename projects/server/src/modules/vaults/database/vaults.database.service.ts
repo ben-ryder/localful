@@ -17,12 +17,14 @@ export class VaultsDatabaseService {
 
   private static mapApplicationField(fieldName: string): string {
     switch (fieldName) {
-      case "protected_encryption_key":
-        return "protectedEncryptionKey";
-      case "protected_data":
-        return "protectedData";
-      case "owner_id":
-        return "ownerId";
+      case "name":
+        return "vault_name"
+      case "protectedEncryptionKey":
+        return "protected_encryption_key";
+      case "protectedData":
+        return "protected_data";
+      case "ownerId":
+        return "owner_id";
       case "createdAt":
         return "created_at";
       case "updatedAt":

@@ -26,5 +26,7 @@ export type VaultDto = z.infer<typeof VaultDto>;
 export const CreateVaultDto = VaultEntity;
 export type CreateVaultDto = VaultEntity;
 
-export const UpdateVaultDto = VaultFields;
+export const UpdateVaultDto = VaultFields
+	.pick({name: true, protectedEncryptionKey: true, protectedData: true})
+	.partial();
 export type UpdateVaultDto = z.infer<typeof UpdateVaultDto>;
