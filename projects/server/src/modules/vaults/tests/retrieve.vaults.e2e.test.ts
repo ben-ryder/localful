@@ -83,12 +83,12 @@ describe("Retrieve Vaults - /v1/vaults/:vaultId [GET]",() => {
 
   // Testing auth & user permissions work.
   describe("Authentication & Permissions", () => {
-    test("Given user that isn't authenticated, When retrieving a vault, Then response should be '403 - forbidden'", async () => {
+    test("Given user that isn't authenticated, When retrieving a vault, Then response should be '401 - unauthorised'", async () => {
       const {body, statusCode} = await testHelper.client
         .get(`/v1/vaults/${testUser1Vault1.id}`)
         .send();
 
-      expectForbidden(body, statusCode, ErrorIdentifiers.AUTH_NOT_VERIFIED);
+      expectUnauthorized(body, statusCode);
     });
 
     test("Given user with 'user' role, When retrieving vault owned by different user, Then response should be '403 - forbidden'", async () => {

@@ -96,6 +96,7 @@ export class AuthService {
     // Validate the requesting users verification first, as they shouldn't be able to do anything when unverified even if they have valid permissions.
     if (!options.requestingUserContext.isVerified && !options.allowUnverifiedRequestingUser) {
       throw new AccessForbiddenError({
+        identifier: ErrorIdentifiers.AUTH_NOT_VERIFIED,
         applicationMessage: "You are unverified and do not have the permissions required to perform this action."
       });
     }

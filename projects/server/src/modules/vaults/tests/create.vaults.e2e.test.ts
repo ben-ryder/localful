@@ -127,7 +127,7 @@ describe("Create Vaults - /v1/vaults [POST]",() => {
 					ownerId: testUser2Unverified.id,
 				});
 
-			expectForbidden(body, statusCode);
+			expectForbidden(body, statusCode, ErrorIdentifiers.AUTH_NOT_VERIFIED);
 		})
 
 		test("Given unverified user with `admin` role, When creating vault, Then request should be '403 - forbidden'", async () => {
@@ -141,7 +141,7 @@ describe("Create Vaults - /v1/vaults [POST]",() => {
 					ownerId: testAdminUser2Unverified.id,
 				});
 
-			expectForbidden(body, statusCode);
+			expectForbidden(body, statusCode, ErrorIdentifiers.AUTH_NOT_VERIFIED);
 		})
 
 
@@ -153,7 +153,7 @@ describe("Create Vaults - /v1/vaults [POST]",() => {
 				.set("Authorization", `Bearer ${accessToken}`)
 				.send({...exampleVault1, ownerId: testUser1.id});
 
-			expectForbidden(body, statusCode);
+			expectForbidden(body, statusCode, ErrorIdentifiers.AUTH_NOT_VERIFIED);
 		})
 
 		// todo: should admin be able to add vault to user that isn't verified.
