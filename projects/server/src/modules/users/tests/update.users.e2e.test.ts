@@ -39,7 +39,8 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         id: testUser1.id,
         email: testUser1.email,
         displayName: dataToUpdate.displayName,
-        isVerified: testUser1.isVerified,
+        verifiedAt: testUser1.verifiedAt,
+        firstVerifiedAt: testUser1.firstVerifiedAt,
         role: testUser1.role,
         createdAt: testUser1.createdAt,
         updatedAt: expect.any(String),
@@ -238,9 +239,9 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
       expectBadRequest(body, statusCode);
     })
 
-    test("When passing an isVerified field, the request should fail", async () => {
+    test("When passing an verifiedAt field, the request should fail", async () => {
       const dataToUpdate = {
-        isVerified: true
+        verifiedAt: "2022-07-11T18:20:32.482Z",
       }
 
       const accessToken = await testHelper.getUserAccessToken(testUser1.id);
@@ -249,6 +250,21 @@ describe("Update User - /v1/users/:id [PATCH]",() => {
         .patch(`/v1/users/${testUser1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(dataToUpdate);
+
+      expectBadRequest(body, statusCode);
+    })
+
+    test("When passing an firstVerifiedAt field, the request should fail", async () => {
+      const dataToUpdate = {
+        firstVerifiedAt: "2022-07-11T18:20:32.482Z",
+      }
+
+      const accessToken = await testHelper.getUserAccessToken(testUser1.id);
+
+      const {body, statusCode} = await testHelper.client
+          .patch(`/v1/users/${testUser1.id}`)
+          .set("Authorization", `Bearer ${accessToken}`)
+          .send(dataToUpdate);
 
       expectBadRequest(body, statusCode);
     })

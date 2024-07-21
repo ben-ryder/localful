@@ -31,7 +31,8 @@ describe("Create User - /v1/users [POST]",() => {
           id: expect.any(String),
           email: exampleUser1.email,
           displayName: exampleUser1.displayName,
-          isVerified: false,
+          verifiedAt: null,
+          firstVerifiedAt: null,
           role: Roles.Enum.user,
           createdAt: expect.any(String),
           updatedAt: expect.any(String),
@@ -247,15 +248,28 @@ describe("Create User - /v1/users [POST]",() => {
       expectBadRequest(body, statusCode);
     })
 
-    test("When passing an isVerified field, the request should fail", async () => {
+    test("When passing a verifiedAt field, the request should fail", async () => {
       const newUser = {
         ...exampleUser1,
-        isVerified: true
+        verifiedAt: "2022-07-11T18:20:32.482Z",
       }
 
       const {body, statusCode} = await testHelper.client
         .post("/v1/users")
         .send(newUser);
+
+      expectBadRequest(body, statusCode);
+    })
+
+    test("When passing a firstVerifiedAt field, the request should fail", async () => {
+      const newUser = {
+        ...exampleUser1,
+        firstVerifiedAt: "2022-07-11T18:20:32.482Z",
+      }
+
+      const {body, statusCode} = await testHelper.client
+          .post("/v1/users")
+          .send(newUser);
 
       expectBadRequest(body, statusCode);
     })

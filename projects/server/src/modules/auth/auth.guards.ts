@@ -51,7 +51,7 @@ export class AuthenticationGuard implements CanActivate {
         if (tokenPayload) {
           const userContext: UserContext = {
             id: tokenPayload.sub,
-            isVerified: tokenPayload.isVerified,
+            verifiedAt: tokenPayload.verifiedAt,
             permissions: AuthService.resolveRolePermissions(tokenPayload.role)
           }
 
@@ -102,7 +102,7 @@ export class GatewayAuthenticationGuard implements CanActivate {
       if (tokenPayload) {
         const userContext: UserContext = {
           id: tokenPayload.sub,
-          isVerified: tokenPayload.isVerified,
+          verifiedAt: tokenPayload.verifiedAt,
           permissions: AuthService.resolveRolePermissions(tokenPayload.role)
         }
 

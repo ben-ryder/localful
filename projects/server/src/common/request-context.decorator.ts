@@ -6,7 +6,7 @@ import { Request } from "express";
  */
 export interface RequestUser {
   id: string;
-  isVerified: boolean;
+  verifiedAt: string | null;
   permissions: string[]
 }
 

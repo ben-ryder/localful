@@ -35,7 +35,8 @@ describe("Login Auth",() => {
           id: testUser1.id,
           email: testUser1.email,
           displayName: testUser1.displayName,
-          isVerified: testUser1.isVerified,
+          verifiedAt: testUser1.verifiedAt,
+          firstVerifiedAt: testUser1.firstVerifiedAt,
           role: testUser1.role,
           createdAt: testUser1.createdAt,
           updatedAt: testUser1.updatedAt

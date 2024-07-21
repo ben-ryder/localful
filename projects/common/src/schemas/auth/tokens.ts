@@ -1,5 +1,6 @@
 import {z} from "zod";
 import {Roles} from "./permissions";
+import {createDateField} from "../common/fields";
 
 export const TokenPayload = z.object({
   iss: z.string(),
@@ -13,7 +14,7 @@ export type TokenPayload = z.infer<typeof TokenPayload>;
 
 export const AccessTokenPayload = TokenPayload.extend({
   type: z.literal("accessToken"),
-  isVerified: z.boolean(),
+  verifiedAt: createDateField('verifiedAt').nullable(),
   role: Roles
 })
 export type AccessTokenPayload = z.infer<typeof AccessTokenPayload>;

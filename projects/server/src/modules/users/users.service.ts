@@ -11,7 +11,6 @@ import {UserContext} from "../../common/request-context.decorator";
 import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto} from "./database/database-user";
 import {AuthService} from "../auth/auth.service";
 import {ConfigService} from "../../services/config/config";
-import {ResourceNotFoundError} from "../../services/errors/resource/resource-not-found.error";
 
 
 @Injectable()
@@ -80,10 +79,7 @@ export class UsersService {
         // todo: don't allow email and password updates? Require this to go via verification email?
         if (updateUserDto.email) {
             databaseUpdateDto.email = updateUserDto.email;
-            databaseUpdateDto.isVerified = false;
-        }
-        if (updateUserDto.password) {
-            databaseUpdateDto.passwordHash = await PasswordService.hashPassword(updateUserDto.password);
+            databaseUpdateDto.verifiedAt = null;
         }
 
         const user = await this.usersDatabaseService.update(userId, databaseUpdateDto);

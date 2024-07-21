@@ -94,7 +94,7 @@ export class AuthService {
    */
   async validateAccessControlRules(options: AccessControlOptions): Promise<void> {
     // Validate the requesting users verification first, as they shouldn't be able to do anything when unverified even if they have valid permissions.
-    if (!options.requestingUserContext.isVerified && !options.allowUnverifiedRequestingUser) {
+    if (!options.requestingUserContext.verifiedAt && !options.allowUnverifiedRequestingUser) {
       throw new AccessForbiddenError({
         identifier: ErrorIdentifiers.AUTH_NOT_VERIFIED,
         applicationMessage: "You are unverified and do not have the permissions required to perform this action."
@@ -147,7 +147,7 @@ export class AuthService {
         throw e
       }
 
-      if (!targetUser.isVerified) {
+      if (!targetUser.verifiedAt) {
         throw new UserRequestError({
           identifier: ErrorIdentifiers.AUTH_NOT_VERIFIED,
           applicationMessage: "You have attempted to perform an action against an unverified user."

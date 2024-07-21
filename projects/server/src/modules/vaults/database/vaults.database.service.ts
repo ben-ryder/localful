@@ -29,6 +29,8 @@ export class VaultsDatabaseService {
         return "created_at";
       case "updatedAt":
         return "updated_at";
+      case "deletedAt":
+        return "deleted_at";
       default:
         return fieldName;
     }
@@ -43,13 +45,14 @@ export class VaultsDatabaseService {
       ownerId: vault.owner_id,
       createdAt: vault.created_at,
       updatedAt: vault.updated_at,
+      deletedAt: vault.deleted_at
     }
   }
 
   private static getDatabaseError(e: any) {
     if (e instanceof PostgresError && e.code) {
       if (e.code === PG_FOREIGN_KEY_VIOLATION) {
-        if (e.constraint_name === "vaults_owner") {
+        if (e.constraint_name === "vault_owner") {
           return new ResourceRelationshipError({
             identifier: ErrorIdentifiers.USER_NOT_FOUND,
             applicationMessage: "Attempted to add a vault with owner that doesn't exist."
@@ -106,8 +109,8 @@ export class VaultsDatabaseService {
     let result: RawDatabaseVault[] = [];
     try {
       result = await sql<RawDatabaseVault[]>`
-        INSERT INTO vaults(id, vault_name, protected_encryption_key, protected_data, owner_id, created_at, updated_at) 
-        VALUES (${createVaultDto.id}, ${createVaultDto.name}, ${createVaultDto.protectedEncryptionKey}, ${createVaultDto.protectedData || null}, ${createVaultDto.ownerId}, ${createVaultDto.createdAt}, ${createVaultDto.updatedAt})
+        INSERT INTO vaults(id, vault_name, protected_encryption_key, protected_data, owner_id, created_at, updated_at, deleted_at) 
+        VALUES (${createVaultDto.id}, ${createVaultDto.name}, ${createVaultDto.protectedEncryptionKey}, ${createVaultDto.protectedData || null}, ${createVaultDto.ownerId}, ${createVaultDto.createdAt}, ${createVaultDto.updatedAt}, DEFAULT)
         RETURNING *;
        `;
     }

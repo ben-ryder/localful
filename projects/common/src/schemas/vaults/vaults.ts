@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {CreatedAtField, createIdField, ProtectedDataField, UpdatedAtField} from "../common/fields";
+import {createIdField, ProtectedDataField, createDateField} from "../common/fields";
 
 export const VaultFields = z.object({
 	name: z.string()
@@ -15,8 +15,9 @@ export type VaultFields = z.infer<typeof VaultFields>;
 
 export const VaultEntity = VaultFields.extend({
 	id: createIdField(),
-	createdAt: CreatedAtField,
-	updatedAt: UpdatedAtField,
+	createdAt: createDateField('createdAt'),
+	updatedAt: createDateField('updatedAt'),
+	deletedAt: createDateField('deletedAt').nullable(),
 }).strict()
 export type VaultEntity = z.infer<typeof VaultEntity>;
 

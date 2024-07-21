@@ -1,6 +1,7 @@
 import {z} from "zod";
 
 import {CreateUserDto, Roles, UpdateUserDto, UserDto} from "@localful/common";
+import {createDateField} from "@localful/common/build/src/schemas/common/fields";
 
 // todo: Should this exported from @localful/common as generic UserDtoWithPassword?
 // if not, is there a better way than reusing the CreateUserDto just to get that field?
@@ -19,10 +20,10 @@ export const DatabaseCreateUserDto = CreateUserDto
 export type DatabaseCreateUserDto = z.infer<typeof DatabaseCreateUserDto>
 
 export const DatabaseUpdateUserDto = UpdateUserDto
-	.omit({password: true})
 	.extend({
 		passwordHash: z.string(),
-		isVerified: z.boolean()
+		verifiedAt: createDateField("verifiedAt").nullable(),
+		firstVerifiedAt: createDateField("firstVerifiedAt").nullable(),
 	})
 	.strict()
 	.partial()
@@ -30,13 +31,14 @@ export type DatabaseUpdateUserDto = z.infer<typeof DatabaseUpdateUserDto>
 
 export interface RawDatabaseUser {
 	id: string
-	created_at: string
-	updated_at: string
 	email: string
-	password_hash: string
 	display_name: string
-	is_verified: boolean
-	role: Roles
+	password_hash: string
 	protected_encryption_key: string
 	protected_additional_data: string
+	verified_at: string | null
+	first_verified_at: string | null
+	role: Roles
+	created_at: string
+	updated_at: string
 }

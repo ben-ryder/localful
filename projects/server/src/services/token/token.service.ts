@@ -95,7 +95,7 @@ export class TokenService {
     const accessTokenPayload = {
       ...basicPayload,
       type: "accessToken",
-      isVerified: userDto.isVerified,
+      verifiedAt: userDto.verifiedAt,
       role: userDto.role
     };
     const accessToken = sign(

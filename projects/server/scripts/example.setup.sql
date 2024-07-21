@@ -20,16 +20,16 @@ CREATE OR REPLACE FUNCTION update_table_timestamps()
     RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = now();
-RETURN NEW;
+    RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
 
 /**
   User Role Enum
   ----------
-  Added to users to
+  Added to users to control access to resources and actions.
  */
-CREATE TYPE user_role AS ENUM ('user', 'admin');
+CREATE TYPE user_roles AS ENUM ('user', 'admin');
 
 /**
     Users Table
@@ -38,13 +38,14 @@ CREATE TYPE user_role AS ENUM ('user', 'admin');
  */
 CREATE TABLE IF NOT EXISTS users (
     id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    email VARCHAR(100) NOT NULL,
+    display_name VARCHAR(50) NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
+    verified_at TIMESTAMPTZ,
+    first_verified_at TIMESTAMPTZ,
+    role user_roles NOT NULL DEFAULT 'user',
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    email VARCHAR(100) NOT NULL,
-    password_hash VARCHAR(100) NOT NULL,
-    display_name VARCHAR(50) NOT NULL,
-    is_verified BOOLEAN NOT NULL DEFAULT FALSE,
-    role user_role NOT NULL DEFAULT 'user',
     CONSTRAINT email_unique UNIQUE (email),
     CONSTRAINT users_pk PRIMARY KEY (id)
 );
@@ -57,15 +58,16 @@ CREATE TRIGGER update_user_timestamps BEFORE UPDATE ON users FOR EACH ROW EXECUT
  */
 CREATE TABLE IF NOT EXISTS vaults (
     id UUID NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     vault_name VARCHAR(100) NOT NULL,
     protected_encryption_key VARCHAR(255) NOT NULL,
     protected_data TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ,
     owner_id UUID NOT NULL,
     CONSTRAINT vault_name_unique UNIQUE (owner_id, vault_name),
     CONSTRAINT vaults_pk PRIMARY KEY (id),
-    CONSTRAINT vaults_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT vault_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE TRIGGER update_vault_timestamps BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_table_timestamps();
 
@@ -78,6 +80,7 @@ CREATE TABLE IF NOT EXISTS content (
     id UUID NOT NULL,
     content_type VARCHAR(20) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
+    deleted_at TIMESTAMPTZ,
     vault_id UUID NOT NULL,
     CONSTRAINT content_pk PRIMARY KEY (id),
     CONSTRAINT content_vault FOREIGN KEY (vault_id) REFERENCES vaults(id) ON DELETE CASCADE
@@ -91,7 +94,7 @@ CREATE TABLE IF NOT EXISTS content (
 CREATE TABLE IF NOT EXISTS content_versions (
     id UUID NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
-    device_identifier VARCHAR(50) NOT NULL,
+    device_name VARCHAR(50) NOT NULL,
     protected_data TEXT,
     content_id UUID NOT NULL,
     CONSTRAINT content_versions_pk PRIMARY KEY (id),

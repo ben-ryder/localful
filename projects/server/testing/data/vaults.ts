@@ -14,6 +14,7 @@ export const testUser1Vault1: VaultEntity = {
   protectedData: "protectedData",
   createdAt: "2022-07-11T18:17:43.784Z",
   updatedAt: "2022-07-11T18:20:32.482Z",
+  deletedAt: null
 }
 
 export const testUser1Vault2: VaultEntity = {
@@ -23,6 +24,7 @@ export const testUser1Vault2: VaultEntity = {
   protectedEncryptionKey: "protectedEncryptionKey",
   createdAt: "2022-07-11T18:17:43.784Z",
   updatedAt: "2022-07-11T18:20:32.482Z",
+  deletedAt: null
 }
 
 export const testAdminUser1Vault1: VaultEntity = {
@@ -33,6 +35,7 @@ export const testAdminUser1Vault1: VaultEntity = {
   protectedData: "protectedData",
   createdAt: "2022-07-11T18:17:43.784Z",
   updatedAt: "2022-07-11T18:20:32.482Z",
+  deletedAt: null
 }
 
 /**
@@ -48,5 +51,6 @@ export const exampleVault1: Omit<VaultEntity, "ownerId"> = {
   protectedData: "protectedData",
   createdAt: "2022-07-11T18:17:43.784Z",
   updatedAt: "2022-07-11T18:20:32.482Z",
+  deletedAt: null
 }
 

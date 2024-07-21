@@ -25,8 +25,10 @@ export class UsersDatabaseService {
         return "updated_at";
       case "displayName":
         return "display_name"
-      case "isVerified":
-        return "is_verified"
+      case "verifiedAt":
+        return "verified_at"
+      case "firstVerifiedAt":
+        return "first_verified_at"
       default:
         return fieldName;
     }
@@ -38,7 +40,8 @@ export class UsersDatabaseService {
       email: user.email,
       displayName: user.display_name,
       passwordHash: user.password_hash,
-      isVerified: user.is_verified,
+      verifiedAt: user.verified_at,
+      firstVerifiedAt: user.first_verified_at,
       role: user.role,
       createdAt: user.created_at,
       updatedAt: user.updated_at,
@@ -113,8 +116,8 @@ export class UsersDatabaseService {
     let result: RawDatabaseUser[] = [];
     try {
       result = await sql<RawDatabaseUser[]>`
-        INSERT INTO users(id, email, display_name, password_hash, is_verified, role, created_at, updated_at) 
-        VALUES (DEFAULT, ${user.email}, ${user.displayName}, ${user.passwordHash}, DEFAULT, ${user.role}, DEFAULT, DEFAULT)
+        INSERT INTO users(id, email, display_name, password_hash, verified_at, first_verified_at, role, created_at, updated_at) 
+        VALUES (DEFAULT, ${user.email}, ${user.displayName}, ${user.passwordHash}, DEFAULT, DEFAULT, ${user.role}, DEFAULT, DEFAULT)
         RETURNING *;
        `;
     }
