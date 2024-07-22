@@ -16,6 +16,7 @@ import {ConfigSchema} from "./config-schema";
 export class ConfigService {
   readonly config: ConfigSchema = ConfigSchema.parse({
     general: {
+      applicationName: process.env.APPLICATION_NAME,
       port: parseInt(process.env.NODE_PORT as string) || 3000,
       environment: process.env.NODE_ENV || "production"
     },
@@ -40,8 +41,14 @@ export class ConfigService {
         secret: process.env.AUTH_REFRESH_TOKEN_SECRET,
         expiry: "7 days"
       },
-      accountVerification: {
-        secret: process.env.AUTH_ACCOUNT_VERIFICATION_SECRET,
+      emailVerification: {
+        secret: process.env.AUTH_EMAIL_VERIFICATION_SECRET,
+        url: process.env.AUTH_EMAIL_VERIFICATION_URL,
+        expiry: "15 mins"
+      },
+      passwordReset: {
+        secret: process.env.AUTH_PASSWORD_RESET_SECRET,
+        url: process.env.AUTH_PASSWORD_RESET_URL,
         expiry: "15 mins"
       }
     },

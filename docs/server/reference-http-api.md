@@ -24,22 +24,25 @@ Any errors will be returned with the appropriate status code and the following J
 
 ### Users
 - `/v1/users [POST, GET]`
-- `/v1/users/:id [GET, PATCH, DELETE]`
+- `/v1/users/:userId [GET, PATCH, DELETE]`
 
 ### Authentication
 - `/v1/auth/login [POST]`
 - `/v1/auth/refresh [POST]`
 - `/v1/auth/logout [POST]`
-- `/v1/auth/verify [GET, POST]`
+- `/v1/auth/verify-email [GET, POST]`
+- `/v1/auth/change-email [GET, POST]`
+- `/v1/auth/reset-password [GET, POST]`
 
-### Databases
-- `/v1/databases [GET, POST]`
-- `/v1/databases/:id [GET, PATCH, DELETE]`
+### Vaults
+- `/v1/vaults [GET, POST]`
+- `/v1/vaults/:vaultId [GET, PATCH, DELETE]`
+- `/v1/vaults/:vaultId/summary [GET]`
 
-### Entities
-- `/v1/entities [GET, POST]`
-- `/v1/entities/:id [GET, DELETE]`
+### Items
+- `/v1/items [GET, POST]`
+- `/v1/items/:itemId [GET, DELETE]`
 
-### Entity Versions
+### Item Versions
 - `/v1/versions [GET, POST]`
-- `/v1/versions/:id [GET, DELETE]`
+- `/v1/versions/:versionId [GET, DELETE]`

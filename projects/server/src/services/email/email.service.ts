@@ -29,7 +29,7 @@ export class EmailService {
     this.senderString = `${this.configService.config.email.mailgun.sender.name} <${this.configService.config.email.mailgun.sender.address}@${this.configService.config.email.mailgun.domain}>`;
   }
 
-  private async sendEmail(data: EmailData) {
+  async sendEmail(data: EmailData) {
     if (this.configService.config.email.testMode) {
       console.log(`[EMAIL]: ${data.to}`);
       console.table(data);

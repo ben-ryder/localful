@@ -49,9 +49,9 @@ export class AuthController {
    *
    * @param res
    */
-  @Get("/verify")
+  @Get("/verify-email")
   @UseGuards(AuthenticationGuard)
-  async requestVerificationEmail(@Response() res: ExpressResponse) {
+  async requestEmailVerification(@Response() res: ExpressResponse) {
     // todo: implement /v1/auth/verify [GET]
     return res.status(HttpStatus.NOT_IMPLEMENTED).send({
       statusCode: HttpStatus.NOT_IMPLEMENTED,
@@ -64,13 +64,51 @@ export class AuthController {
    *
    * @param res
    */
-  @Post("/verify")
+  @Post("/verify-email")
   @UseGuards(AuthenticationGuard)
-  async verifyAccountEmail(@Response() res: ExpressResponse) {
+  async verifyEmail(@Response() res: ExpressResponse) {
     // todo: implement /v1/auth/verify [GET]
     return res.status(HttpStatus.NOT_IMPLEMENTED).send({
       statusCode: HttpStatus.NOT_IMPLEMENTED,
       message: "Account verification has not been implemented yet"
+    });
+  }
+
+  @Get("/change-email")
+  @UseGuards(AuthenticationGuard)
+  async requestEmailChange(@Response() res: ExpressResponse) {
+    // todo: implement /v1/auth/verify [GET]
+    return res.status(HttpStatus.NOT_IMPLEMENTED).send({
+      statusCode: HttpStatus.NOT_IMPLEMENTED,
+      message: "Email changing has not been implemented yet"
+    });
+  }
+
+  @Post("/change-email")
+  @UseGuards(AuthenticationGuard)
+  async changeEmail(@Response() res: ExpressResponse) {
+    // todo: implement /v1/auth/verify [GET]
+    return res.status(HttpStatus.NOT_IMPLEMENTED).send({
+      statusCode: HttpStatus.NOT_IMPLEMENTED,
+      message: "Email changing has not been implemented yet"
+    });
+  }
+
+  @Get("/password-reset")
+  async requestPasswordReset(@Response() res: ExpressResponse) {
+    // todo: implement /v1/auth/verify [GET]
+    return res.status(HttpStatus.NOT_IMPLEMENTED).send({
+      statusCode: HttpStatus.NOT_IMPLEMENTED,
+      message: "Password reset has not been implemented yet"
+    });
+  }
+
+  @Post("/password-reset")
+  async resetPassword(@Response() res: ExpressResponse) {
+    // todo: implement /v1/auth/verify [GET]
+    return res.status(HttpStatus.NOT_IMPLEMENTED).send({
+      statusCode: HttpStatus.NOT_IMPLEMENTED,
+      message: "Password reset has not been implemented yet"
     });
   }
 }

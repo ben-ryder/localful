@@ -6,6 +6,7 @@ import {z} from "zod";
  */
 export const ConfigSchema = z.object({
   general: z.object({
+    applicationName: z.string(),
     port: z.number(),
     environment: z.string()
   }),
@@ -30,8 +31,14 @@ export const ConfigSchema = z.object({
       secret: z.string(),
       expiry: z.string()
     }),
-    accountVerification: z.object({
+    emailVerification: z.object({
       secret: z.string(),
+      url: z.string().url(),
+      expiry: z.string()
+    }),
+    passwordReset: z.object({
+      secret: z.string(),
+      url: z.string().url(),
       expiry: z.string()
     })
   }),
