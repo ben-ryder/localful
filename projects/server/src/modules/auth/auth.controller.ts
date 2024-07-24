@@ -53,7 +53,7 @@ export class AuthController {
   @Get("/verify-email")
   @UseGuards(AuthenticationGuard)
   async requestEmailVerification(@RequestContext() context: RequestContext) {
-    return this.authService.requestEmailVerification(context.user)
+    return this.authService.requestEmailVerification(context.user.id)
   }
 
   /**

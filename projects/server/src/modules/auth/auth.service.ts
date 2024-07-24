@@ -187,8 +187,8 @@ export class AuthService {
     return permissions
   }
 
-  async requestEmailVerification(userContext: UserContext) {
-    const user = await this.usersService._UNSAFE_get(userContext.id)
+  async requestEmailVerification(userId: string) {
+    const user = await this.usersService._UNSAFE_get(userId)
     if (user.verifiedAt) {
       throw new UserRequestError({
         identifier: ErrorIdentifiers.AUTH_NOT_VERIFIED,

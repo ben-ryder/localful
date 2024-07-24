@@ -7,6 +7,7 @@ import {UsersService} from "../src/modules/users/users.service";
 import {TokenPair} from "@localful/common";
 import {DataStoreService} from "../src/services/data-store/data-store.service";
 import {resetTestData} from "./database-scripts";
+import {ConfigService} from "../src/services/config/config";
 
 
 export class TestHelper {
@@ -44,6 +45,18 @@ export class TestHelper {
   async getUserAccessToken(userId: string): Promise<string> {
     const tokenPair = await this.getUserTokens(userId);
     return tokenPair.accessToken
+  }
+
+  async getEmailVerificationToken(userId: string): Promise<string> {
+    const tokenService = this.app.get(TokenService);
+    const configService = this.app.get(ConfigService);
+
+    return await tokenService.getActionToken({
+      userId: userId,
+      actionType: "verify-email",
+      secret: configService.config.auth.emailVerification.secret,
+      expiry: configService.config.auth.emailVerification.expiry
+    })
   }
 
   /**

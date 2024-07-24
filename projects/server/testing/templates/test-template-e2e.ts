@@ -1,5 +1,5 @@
 import {TestHelper} from "../test-helper";
-import {testUsers} from "../data/test-data";
+import {testUser1} from "../data/users";
 
 
 describe("Short Description - /v1/path [METHOD]",() => {
