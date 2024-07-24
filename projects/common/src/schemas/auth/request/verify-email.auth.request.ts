@@ -1,9 +1,9 @@
 import {z} from "zod";
 import isJWT from "validator/lib/isJWT";
 
-export const VerifyUserRequest = z.object({
+export const VerifyEmailDto = z.object({
     token: z.string()
       .refine(isJWT, {message: "token must be a JWT"})
 }).strict();
 
-export type VerifyUserRequest = z.infer<typeof VerifyUserRequest>;
+export type VerifyEmailDto = z.infer<typeof VerifyEmailDto>;

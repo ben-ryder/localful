@@ -12,7 +12,7 @@ export * from "./schemas/auth/permissions";
 export * from "./schemas/auth/request/login.auth.request";
 export * from "./schemas/auth/request/logout.auth.request";
 export * from "./schemas/auth/request/refresh.auth.request";
-export * from "./schemas/auth/request/verify.auth.request";
+export * from "./schemas/auth/request/verify-email.auth.request";
 export * from "./schemas/auth/response/auth-user-response";
 
 export * from "./schemas/vaults/vaults"

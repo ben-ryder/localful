@@ -1,11 +1,11 @@
 import {Injectable} from "@nestjs/common";
 
 import jsonwebtoken from "jsonwebtoken";
-const {sign, verify} = jsonwebtoken
-
 import {ConfigService} from "../config/config";
 import {
   AccessTokenPayload,
+  ActionTokenOptions,
+  ActionTokenPayload,
   RefreshTokenPayload,
   TokenPair,
   UserDto
@@ -98,7 +98,7 @@ export class TokenService {
       verifiedAt: userDto.verifiedAt,
       role: userDto.role
     };
-    const accessToken = sign(
+    const accessToken = jsonwebtoken.sign(
       accessTokenPayload,
       this.configService.config.auth.accessToken.secret,
       { expiresIn: this.configService.config.auth.accessToken.expiry },
@@ -108,7 +108,7 @@ export class TokenService {
       ...basicPayload,
       type: "refreshToken"
     };
-    const refreshToken = sign(
+    const refreshToken = jsonwebtoken.sign(
       refreshTokenPayload,
       this.configService.config.auth.refreshToken.secret,
       { expiresIn: this.configService.config.auth.refreshToken.expiry },
@@ -126,14 +126,14 @@ export class TokenService {
    */
   async validateAndDecodeAccessToken(accessToken: string): Promise<AccessTokenPayload|null> {
     try {
-      const payload = verify(accessToken, this.configService.config.auth.accessToken.secret) as unknown as AccessTokenPayload;
+      const payload = jsonwebtoken.verify(accessToken, this.configService.config.auth.accessToken.secret) as unknown as AccessTokenPayload;
       const isValidToken = await this._validateCustomAuthClaims(payload.gid, payload.cid);
       if (isValidToken) {
         return payload;
       }
     }
     catch (err) {
-      // verify will throw an error if it fails
+      // verify will throw an error if it fails, but we want to return null in this situation.
     }
 
     return null;
@@ -145,7 +145,7 @@ export class TokenService {
    */
   async validateAndDecodeRefreshToken(refreshToken: string): Promise<RefreshTokenPayload|null> {
     try {
-      const payload = verify(refreshToken, this.configService.config.auth.refreshToken.secret) as unknown as RefreshTokenPayload;
+      const payload = jsonwebtoken.verify(refreshToken, this.configService.config.auth.refreshToken.secret) as unknown as RefreshTokenPayload;
       const isValidToken = await this._validateCustomAuthClaims(payload.gid, payload.cid);
       if (isValidToken) {
         return payload;
@@ -229,5 +229,48 @@ export class TokenService {
       // todo: should do special handling if the data is invalid?
       return null;
     }
+  }
+
+  /**
+   * Fetch an action token which can authenticated a user for actions like password
+   *
+   * @param options
+   */
+  async getActionToken(options: ActionTokenOptions) {
+    const basicPayload = {
+      iss: this.configService.config.auth.issuer || "localful",
+      aud: this.configService.config.auth.audience || "localful",
+      sub: options.userId,
+    };
+
+    const actionTokenPayload = {
+      ...basicPayload,
+      type: options.actionType,
+    };
+
+    return jsonwebtoken.sign(
+        actionTokenPayload,
+        options.secret,
+        {expiresIn: options.expiry},
+    );
+  }
+
+  /**
+   * Validate if an action token is valid.
+   * This method DOES NOT VALIDATE THE PAYLOAD to check the userId/'sub' claim, as the decision on if that logical check
+   * is required is better suited to the service in which this method is used.
+   *
+   * @param actionToken
+   * @param secret
+   */
+  async validateAndDecodeActionToken(actionToken: string, secret: string): Promise<ActionTokenPayload|null> {
+    try {
+      return jsonwebtoken.verify(actionToken, secret) as unknown as ActionTokenPayload
+    }
+    catch (err) {
+      // verify will throw an error if it fails, but we want to return null in this situation.
+    }
+
+    return null;
   }
 }

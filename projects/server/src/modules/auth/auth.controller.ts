@@ -1,9 +1,10 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service";
-import {LoginRequest, LogoutRequest, RefreshRequest} from "@localful/common";
+import {CreateVaultDto, LoginRequest, LogoutRequest, RefreshRequest, VerifyEmailDto} from "@localful/common";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 import {AuthenticationGuard} from "./auth.guards";
+import {RequestContext} from "../../common/request-context.decorator";
 
 @Controller({
   path: "/auth",
@@ -47,31 +48,27 @@ export class AuthController {
    * An endpoint where users can request email verification emails.
    * Will always succeed regardless of if the email address supplied was valid and/or an email was actually sent
    *
-   * @param res
+   * @param context
    */
   @Get("/verify-email")
   @UseGuards(AuthenticationGuard)
-  async requestEmailVerification(@Response() res: ExpressResponse) {
-    // todo: implement /v1/auth/verify [GET]
-    return res.status(HttpStatus.NOT_IMPLEMENTED).send({
-      statusCode: HttpStatus.NOT_IMPLEMENTED,
-      message: "Account verification has not been implemented yet"
-    });
+  async requestEmailVerification(@RequestContext() context: RequestContext) {
+    return this.authService.requestEmailVerification(context.user)
   }
 
   /**
    * An endpoint where users can verify their account
    *
-   * @param res
+   * @param context
+   * @param verifyEmailDto
    */
   @Post("/verify-email")
   @UseGuards(AuthenticationGuard)
-  async verifyEmail(@Response() res: ExpressResponse) {
-    // todo: implement /v1/auth/verify [GET]
-    return res.status(HttpStatus.NOT_IMPLEMENTED).send({
-      statusCode: HttpStatus.NOT_IMPLEMENTED,
-      message: "Account verification has not been implemented yet"
-    });
+  async verifyEmail(
+      @RequestContext() context: RequestContext,
+      @Body(new ZodValidationPipe(CreateVaultDto)) verifyEmailDto: VerifyEmailDto,
+  ) {
+    return this.authService.verifyEmail(context.user, verifyEmailDto.token)
   }
 
   @Get("/change-email")

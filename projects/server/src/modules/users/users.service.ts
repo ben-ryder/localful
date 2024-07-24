@@ -70,7 +70,7 @@ export class UsersService {
         return this.convertDatabaseDto(databaseUser);
     }
 
-    private async _UNSAFE_update(userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
+    async _UNSAFE_update(userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
         const databaseUpdateDto: DatabaseUpdateUserDto = {}
 
         if (updateUserDto.displayName) {
@@ -110,5 +110,19 @@ export class UsersService {
         })
 
         return this._UNSAFE_delete(userId);
+    }
+
+    async verifyUser(userDto: UserDto): Promise<UserDto> {
+        const timestamp = new Date().toISOString();
+
+        let updatedUser: UserDto
+        if (userDto.firstVerifiedAt) {
+            updatedUser = await this.usersDatabaseService.update(userDto.id, {verifiedAt: timestamp })
+        }
+        else {
+            updatedUser = await this.usersDatabaseService.update(userDto.id, {verifiedAt: timestamp, firstVerifiedAt: timestamp })
+        }
+
+        return updatedUser
     }
 }

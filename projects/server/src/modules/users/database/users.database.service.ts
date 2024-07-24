@@ -173,6 +173,10 @@ export class UsersDatabaseService {
     }
   }
 
+  async _UNSAFE_update() {
+
+  }
+
   async delete(userId: string): Promise<void> {
     const sql = await this.databaseService.getSQL();
 
