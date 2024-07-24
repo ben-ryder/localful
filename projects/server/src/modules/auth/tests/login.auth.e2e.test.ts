@@ -21,7 +21,7 @@ describe("Login Auth",() => {
   });
 
   describe("Success Cases", () => {
-    test("When supplying valid credentials, the user data and tokens should be returned", async () => {
+    test("login returns user data and token pair", async () => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/login")
         .send({
@@ -57,7 +57,7 @@ describe("Login Auth",() => {
   })
 
   describe("Fail Cases", () => {
-    test("When supplying completely invalid credentials, the request should fail", async () => {
+    test("invalid email and password is forbidden ", async () => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/login")
         .send({
@@ -68,7 +68,7 @@ describe("Login Auth",() => {
       expectForbidden(body, statusCode, ErrorIdentifiers.AUTH_CREDENTIALS_INVALID)
     })
 
-    test("When supplying the wrong password, the request should fail", async () => {
+    test("valid email and invalid password is forbidden", async () => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/login")
         .send({
@@ -79,7 +79,7 @@ describe("Login Auth",() => {
       expectForbidden(body, statusCode, ErrorIdentifiers.AUTH_CREDENTIALS_INVALID)
     })
 
-    test("When supplying a correct password but wrong email, the request should fail", async () => {
+    test("invalid email and valid password is forbidden", async () => {
       const {body, statusCode} = await testHelper.client
         .post("/v1/auth/login")
         .send({

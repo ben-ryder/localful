@@ -18,7 +18,7 @@ describe("Check Auth",() => {
     await testHelper.beforeEach()
   });
 
-  test("When authenticated, the request should succeed", async () => {
+  test("authenticated request succeeds", async () => {
     const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
     const {statusCode} = await testHelper.client
@@ -28,14 +28,14 @@ describe("Check Auth",() => {
     expect(statusCode).toEqual(200);
   })
 
-  test("When not authenticated, the request should fail", async () => {
+  test("unauthenticated request is unauthorized", async () => {
     const {body, statusCode} = await testHelper.client
       .get("/v1/auth/check")
 
     expectUnauthorized(body, statusCode);
   })
 
-  test("When supplying an incorrectly signed accessToken, the request should fail", async () => {
+  test("incorrectly signed access token is unauthorized", async () => {
     const accessToken = sign(
       {type: "accessToken", userId: testUser1.id, role: testUser1.role},
       "qethwrthwrthr",
@@ -49,7 +49,7 @@ describe("Check Auth",() => {
     expectUnauthorized(body, statusCode);
   })
 
-  test("When supplying an invalid accessToken, the request should fail", async () => {
+  test("invalid access token is unauthorized", async () => {
     const {body, statusCode} = await testHelper.client
       .get("/v1/auth/check")
       .set("Authorization", "Bearer SWFubawgrlkx")
@@ -57,7 +57,7 @@ describe("Check Auth",() => {
     expectUnauthorized(body, statusCode);
   })
 
-  test("When supplying an expired accessToken, the request should fail", async () => {
+  test("expired access token is unauthorized", async () => {
     const configService = testHelper.app.get(ConfigService);
 
     const accessToken = sign(
