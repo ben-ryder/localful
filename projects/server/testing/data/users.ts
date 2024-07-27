@@ -45,8 +45,8 @@ export const testAdminUser1: TestUserEntity = Object.freeze({
   verifiedAt: "2022-07-11T18:20:32.482Z",
   firstVerifiedAt: "2022-07-11T18:20:32.482Z",
   role: "admin",
-  createdAt: "2022-07-11 20:15:20.301649",
-  updatedAt: "2022-07-11 20:34:12.274037",
+  createdAt: "2022-07-11T18:17:43.784Z",
+  updatedAt: "2022-07-11T19:25:43.784Z",
   passwordHash: "$2a$12$l9N5AAFSrCG0/3e/NkBfIe0ZIMZsqs8jpA2H4ggS.wn.dPSvm/BG6",
   serverPassword: "c12839374d464214f64e9ce2d7f9eb93cf8f8fd66cea4d448df5dc025f316bc666b0813ec5c4110389dabb1bd68e13e14bb2c3d75877322c06200c8c5515a42",
 })
@@ -59,8 +59,8 @@ export const testAdminUser2Unverified: TestUserEntity = Object.freeze({
   verifiedAt: null,
   firstVerifiedAt: null,
   role: "admin",
-  createdAt: "2022-07-11 20:15:20.301649",
-  updatedAt: "2022-07-11 20:34:12.274037",
+  createdAt: "2022-07-11T18:17:43.784Z",
+  updatedAt: "2022-07-11T19:25:43.784Z",
   passwordHash: "$2a$12$l9N5AAFSrCG0/3e/NkBfIe0ZIMZsqs8jpA2H4ggS.wn.dPSvm/BG6",
   serverPassword: "c12839374d464214f64e9ce2d7f9eb93cf8f8fd66cea4d448df5dc025f316bc666b0813ec5c4110389dabb1bd68e13e14bb2c3d75877322c06200c8c5515a42",
 })

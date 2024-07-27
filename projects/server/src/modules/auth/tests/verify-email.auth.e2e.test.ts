@@ -1,5 +1,5 @@
 import {TestHelper} from "../../../../testing/test-helper";
-import {testAdminUser2Unverified, testUser1, testUser2Unverified} from "../../../../testing/data/users";
+import {testAdminUser2Unverified, testUser2Unverified} from "../../../../testing/data/users";
 
 
 describe("Email Verification - /v1/auth/verify-email [GET, POST]",() => {

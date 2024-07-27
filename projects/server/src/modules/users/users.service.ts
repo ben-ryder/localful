@@ -115,7 +115,7 @@ export class UsersService {
     async verifyUser(userDto: UserDto): Promise<UserDto> {
         const timestamp = new Date().toISOString();
 
-        let updatedUser: UserDto
+        let updatedUser: DatabaseUserDto
         if (userDto.firstVerifiedAt) {
             updatedUser = await this.usersDatabaseService.update(userDto.id, {verifiedAt: timestamp })
         }
@@ -123,6 +123,6 @@ export class UsersService {
             updatedUser = await this.usersDatabaseService.update(userDto.id, {verifiedAt: timestamp, firstVerifiedAt: timestamp })
         }
 
-        return updatedUser
+        return this.convertDatabaseDto(updatedUser)
     }
 }

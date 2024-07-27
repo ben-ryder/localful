@@ -1,7 +1,7 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards} from "@nestjs/common";
 import {Response as ExpressResponse} from "express";
 import {AuthService} from "./auth.service";
-import {CreateVaultDto, LoginRequest, LogoutRequest, RefreshRequest, VerifyEmailDto} from "@localful/common";
+import {LoginRequest, LogoutRequest, RefreshRequest, VerifyEmailDto} from "@localful/common";
 import {ZodValidationPipe} from "../../common/zod-validation.pipe";
 import {AuthenticationGuard} from "./auth.guards";
 import {RequestContext} from "../../common/request-context.decorator";
@@ -64,15 +64,17 @@ export class AuthController {
    */
   @Post("/verify-email")
   @UseGuards(AuthenticationGuard)
+  @HttpCode(HttpStatus.OK)
   async verifyEmail(
       @RequestContext() context: RequestContext,
-      @Body(new ZodValidationPipe(CreateVaultDto)) verifyEmailDto: VerifyEmailDto,
+      @Body(new ZodValidationPipe(VerifyEmailDto)) verifyEmailDto: VerifyEmailDto,
   ) {
     return this.authService.verifyEmail(context.user, verifyEmailDto.token)
   }
 
   @Get("/change-email")
   @UseGuards(AuthenticationGuard)
+  @HttpCode(HttpStatus.OK)
   async requestEmailChange(@Response() res: ExpressResponse) {
     // todo: implement /v1/auth/verify [GET]
     return res.status(HttpStatus.NOT_IMPLEMENTED).send({
@@ -83,6 +85,7 @@ export class AuthController {
 
   @Post("/change-email")
   @UseGuards(AuthenticationGuard)
+  @HttpCode(HttpStatus.OK)
   async changeEmail(@Response() res: ExpressResponse) {
     // todo: implement /v1/auth/verify [GET]
     return res.status(HttpStatus.NOT_IMPLEMENTED).send({
@@ -92,6 +95,7 @@ export class AuthController {
   }
 
   @Get("/password-reset")
+  @HttpCode(HttpStatus.OK)
   async requestPasswordReset(@Response() res: ExpressResponse) {
     // todo: implement /v1/auth/verify [GET]
     return res.status(HttpStatus.NOT_IMPLEMENTED).send({
@@ -101,6 +105,7 @@ export class AuthController {
   }
 
   @Post("/password-reset")
+  @HttpCode(HttpStatus.OK)
   async resetPassword(@Response() res: ExpressResponse) {
     // todo: implement /v1/auth/verify [GET]
     return res.status(HttpStatus.NOT_IMPLEMENTED).send({
