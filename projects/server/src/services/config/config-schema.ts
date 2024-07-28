@@ -43,7 +43,9 @@ export const ConfigSchema = z.object({
     })
   }),
   email: z.object({
-    testMode: z.boolean().optional(),
+    sendMode: z.union([
+        z.literal("mailgun"), z.literal("log"), z.literal("silent")
+    ]),
     mailgun: z.object({
       domain: z.string(),
       apiKey: z.string(),

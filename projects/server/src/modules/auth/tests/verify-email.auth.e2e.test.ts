@@ -1,5 +1,8 @@
 import {TestHelper} from "../../../../testing/test-helper";
-import {testAdminUser2Unverified, testUser2Unverified} from "../../../../testing/data/users";
+import {testAdminUser2Unverified, testUser1, testUser2Unverified} from "../../../../testing/data/users";
+import {exampleVault1} from "../../../../testing/data/vaults";
+import {ErrorIdentifiers} from "@localful/common";
+import {expectForbidden} from "../../../../testing/common/expect-forbidden";
 
 
 describe("Email Verification - /v1/auth/verify-email [GET, POST]",() => {
@@ -98,6 +101,40 @@ describe("Email Verification - /v1/auth/verify-email [GET, POST]",() => {
           refreshToken: expect.any(String),
         }
       }))
+    });
+
+    test("user can perform actions once verified ", async () => {
+      const accessToken = await testHelper.getUserAccessToken(testUser2Unverified.id);
+      const verificationToken = await testHelper.getEmailVerificationToken(testUser2Unverified.id)
+
+      // Initial attempt to create vault should fail as unverified (technically a repeat test, but included here to illustrate scenario)
+      const {statusCode: initialCreateStatusCode, body: initialCreateBody} = await testHelper.client
+          .post("/v1/vaults")
+          .set("Authorization", `Bearer ${accessToken}`)
+          .send({
+            ...exampleVault1,
+            ownerId: testUser1.id,
+          });
+      expectForbidden(initialCreateBody, initialCreateStatusCode, ErrorIdentifiers.AUTH_NOT_VERIFIED)
+
+      // Now verify user
+      const {statusCode: verifyStatusCode, body: verifyBody} = await testHelper.client
+          .post("/v1/auth/verify-email")
+          .set("Authorization", `Bearer ${accessToken}`)
+          .send({
+            token: verificationToken
+          });
+      expect(verifyStatusCode).toEqual(200);
+
+      // Now user should be able to create vault
+      const {statusCode: verifiedCreateStatusCode} = await testHelper.client
+          .post("/v1/vaults")
+          .set("Authorization", `Bearer ${verifyBody.tokens.accessToken}`)
+          .send({
+            ...exampleVault1,
+            ownerId: testUser2Unverified.id,
+          });
+      expect(verifiedCreateStatusCode).toEqual(201);
     });
 
   })

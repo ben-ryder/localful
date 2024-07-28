@@ -19,6 +19,10 @@ export class TestHelper {
     this.app = await createApp({logger: false})
     await this.app.init();
 
+    // Overwrite the email mode to silence output and prevent actual email sending during test runs.
+    const configService = this.app.get(ConfigService);
+    configService.config.email.sendMode = "silent"
+
     // Setup supertest agent for test requests
     const httpServer = this.app.getHttpServer();
     this.client = agent(httpServer);

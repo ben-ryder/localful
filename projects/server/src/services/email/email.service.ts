@@ -30,7 +30,11 @@ export class EmailService {
   }
 
   async sendEmail(data: EmailData) {
-    if (this.configService.config.email.testMode) {
+    if (this.configService.config.email.sendMode === "silent") {
+      return
+    }
+
+    if (this.configService.config.email.sendMode === "log") {
       console.log(`[EMAIL]: ${data.to}`);
       console.table(data);
       return;

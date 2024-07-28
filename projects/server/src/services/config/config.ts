@@ -18,7 +18,7 @@ export class ConfigService {
     general: {
       applicationName: process.env.APPLICATION_NAME,
       port: parseInt(process.env.NODE_PORT as string) || 3000,
-      environment: process.env.NODE_ENV || "production"
+      environment: process.env.NODE_ENV ?? "production"
     },
     app: {
       registrationEnabled: process.env.APP_REGISTRATION_ENABLED === "true",
@@ -31,8 +31,8 @@ export class ConfigService {
       redisUrl: process.env.DATA_STORE_REDIS_URL
     },
     auth: {
-      issuer: process.env.AUTH_ISSUER || null,
-      audience: process.env.AUTH_AUDIENCE || null,
+      issuer: process.env.AUTH_ISSUER ?? null,
+      audience: process.env.AUTH_AUDIENCE ?? null,
       accessToken: {
         secret: process.env.AUTH_ACCESS_TOKEN_SECRET,
         expiry: "15 mins",
@@ -53,7 +53,7 @@ export class ConfigService {
       }
     },
     email:{
-      testMode: process.env.EMAIL_TEST_MODE === "true",
+      sendMode: process.env.EMAIL_SEND_MODE ?? "mailgun",
       mailgun: {
         domain: process.env.EMAIL_MAILGUN_DOMAIN,
         apiKey: process.env.EMAIL_MAILGUN_API_KEY,
@@ -61,7 +61,7 @@ export class ConfigService {
           name: process.env.EMAIL_MAILGUN_SENDER_NAME,
           address: process.env.EMAIL_MAILGUN_SENDER_ADDRESS
         },
-        isEu: process.env.EMAIL_MAILGUN_IS_EU === "true",
+        isEu: process.env.EMAIL_MAILGUN_IS_EU === "true"
       }
     },
   });
