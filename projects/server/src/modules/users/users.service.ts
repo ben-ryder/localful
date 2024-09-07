@@ -67,6 +67,10 @@ export class UsersService {
         }
 
         const databaseUser = await this.usersDatabaseService.create(databaseCreateUserDto);
+
+        // todo: add test that email verification fires when creating an account?
+        await this.authService.requestEmailVerification(databaseUser.id)
+
         return this.convertDatabaseDto(databaseUser);
     }
 

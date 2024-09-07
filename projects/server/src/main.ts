@@ -7,6 +7,9 @@ async function bootstrap() {
   const app = await createApp();
 
   const configService = app.get(ConfigService);
+
+  // todo: add check for Postgres and Redis connection before starting the server.
+
   await app.listen(configService.config.general.port);
 
   if (configService.config.general.environment !== "production") {
