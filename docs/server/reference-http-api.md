@@ -4,7 +4,7 @@ An overview of the HTTP API provided by the Localful server.
 ## Errors
 Any errors will be returned with the appropriate status code and the following JSON data:
 
-```json
+```json5
 {
   "statusCode": 404, // a copy of the HTTP status code.
   "identifier": "RESOURCE_NOT_FOUND", // an identifier for the specific error.
@@ -19,7 +19,7 @@ Any errors will be returned with the appropriate status code and the following J
 - `/ [GET]`
 - `/v1 [GET]`
 
-### Info
+### Server Info
 - `/info [GET]`
 
 ### Users
