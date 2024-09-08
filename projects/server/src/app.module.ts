@@ -5,6 +5,7 @@ import {ServicesModule} from "./services/services.module";
 import {UsersModule} from "./modules/users/users.module";
 import {AuthModule} from "./modules/auth/auth.module";
 import {VaultsModule} from "./modules/vaults/vaults.module";
+import {EventsModule} from "./modules/events/events.module";
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import {VaultsModule} from "./modules/vaults/vaults.module";
     AuthModule,
     UsersModule,
     VaultsModule,
+    EventsModule,
   ],
 })
 export class AppModule {}

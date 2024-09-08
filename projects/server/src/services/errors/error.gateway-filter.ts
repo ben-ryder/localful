@@ -5,16 +5,15 @@ import {
 } from "@nestjs/common";
 import { BaseError } from "./base/base.error";
 import { fallbackMapping, errorHttpMapping } from "./error-http-mappings";
-import {Socket} from "socket.io";
 
 @Catch(BaseError)
 export class GatewayErrorFilter implements ExceptionFilter {
   catch(error: BaseError, host: ArgumentsHost) {
-    const socket = host.switchToWs().getClient<Socket>();
+    const socket = host.switchToWs().getClient<WebSocket>();
     return this.sendSocketErrorAcknowledgement(error, socket);
   }
 
-  async sendSocketErrorAcknowledgement(err: Error, socket: Socket) {
+  async sendSocketErrorAcknowledgement(err: Error, socket: WebSocket) {
     const errorName = err.constructor.name;
     let message = fallbackMapping.defaultMessage;
     let identifier = fallbackMapping.identifier;
