@@ -1,8 +1,10 @@
 import { hash, compare } from "bcrypt";
 
 import {SystemError} from "@services/errors/base/system.error.js";
+import {Injectable} from "@common/injection/injectable-decorator.js";
 
 
+@Injectable()
 export class PasswordService {
   static SALT_ROUNDS = 12;
 

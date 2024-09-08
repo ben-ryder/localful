@@ -4,13 +4,15 @@ import {sign} from "jsonwebtoken";
 
 import {ErrorIdentifiers} from "@localful/common";
 
-import configService from "@services/config/config.service.js";
-
 import {TestHelper} from "@testing/test-helper.js";
 import {testUser1} from "@testing/data/users.js";
 import {expectUnauthorized} from "@testing/common/expect-unauthorized.js";
 import {expectBadRequest} from "@testing/common/expect-bad-request.js";
 import {testInvalidDataTypes} from "@testing/common/test-invalid-data-types.js";
+import {ConfigService} from "@services/config/config.service.js";
+import container from "@common/injection/container.js";
+
+// todo: remove direct use of DI container?
 
 const testHelper = new TestHelper();
 beforeAll(async () => {
@@ -97,6 +99,7 @@ describe("Refresh Auth",() => {
 
     test("When supplying an expired refreshToken, the request should fail", async () => {
       // Create an expired token with the correct payload & sign it correctly
+      const configService = container.use(ConfigService);
       const refreshToken = sign(
         {userId: testUser1.id, type: "refreshToken"},
         configService.config.auth.refreshToken.secret,

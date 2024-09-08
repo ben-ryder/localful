@@ -1,7 +1,7 @@
-import usersService, {UsersService} from "@modules/users/users.service.js";
-import tokenService, {TokenService} from "@services/token/token.service.js";
-import configService, {ConfigService} from "@services/config/config.service.js";
-import emailService, {EmailService} from "@services/email/email.service.js";
+import type {UsersService} from "@modules/users/users.service.js";
+import {TokenService} from "@services/token/token.service.js";
+import {ConfigService} from "@services/config/config.service.js";
+import {EmailService} from "@services/email/email.service.js";
 import {AuthUserResponse, ErrorIdentifiers, RolePermissions, Roles, TokenPair} from "@localful/common";
 import {DatabaseUserDto} from "@modules/users/database/database-user.js";
 import {AccessForbiddenError} from "@services/errors/access/access-forbidden.error.js";
@@ -12,8 +12,10 @@ import {ResourceNotFoundError} from "@services/errors/resource/resource-not-foun
 import {UserContext} from "@common/request-context.js";
 import {Permissions} from "@localful/common";
 import {AccessControlOptions} from "@modules/auth/validate-authentication.js";
+import {Injectable} from "@common/injection/injectable-decorator.js";
 
 
+@Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
@@ -167,12 +169,12 @@ export class AuthService {
    *
    * @param role
    */
-  resolveRolePermissions(role: Roles): Permissions[] {
+  static resolveRolePermissions(role: Roles): Permissions[] {
     const permissionProfile = RolePermissions[role]
     let permissions = permissionProfile.permissions
 
     if (permissionProfile.inherit) {
-      permissions = permissions.concat(this.resolveRolePermissions(permissionProfile.inherit))
+      permissions = permissions.concat(AuthService.resolveRolePermissions(permissionProfile.inherit))
     }
 
     return permissions
@@ -237,6 +239,3 @@ export class AuthService {
     }
   }
 }
-
-const authService = new AuthService(usersService, tokenService, configService, emailService)
-export default authService

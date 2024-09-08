@@ -1,9 +1,8 @@
-import "reflect-metadata";
 import express, {NextFunction, Request, Response} from "express";
 import http, {Server} from "node:http";
 import {httpErrorHandler} from "@services/errors/http-error-handler.js";
 import cors from "cors";
-import {corsOptions} from "@common/validate-cors.js";
+import {createCorsOptions} from "@common/validate-cors.js";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
 import {ErrorIdentifiers} from "@localful/common";
 
@@ -12,6 +11,8 @@ import InfoController from "@modules/info/info.http.js";
 import AuthController from "@modules/auth/auth.http.js";
 import UsersController from "@modules/users/users.http.js";
 import VaultsController from "@modules/vaults/vaults.http.js";
+import {ConfigService} from "@services/config/config.service.js";
+import container from "@common/injection/container.js";
 
 
 export async function createServer(): Promise<Server> {
@@ -25,6 +26,8 @@ export async function createServer(): Promise<Server> {
   app.use(express.urlencoded({extended: true}));
 
   // Cors setup
+  const configService = container.use(ConfigService);
+  const corsOptions = createCorsOptions(configService)
   app.use(cors(corsOptions))
   app.options("*", cors(corsOptions))
 

@@ -1,13 +1,15 @@
-import databaseService, {DatabaseService} from "@services/database/database.service.js";
+import {DatabaseService} from "@services/database/database.service.js";
 import {RawDatabaseVault} from "@modules/vaults/database/database-vault.js";
 import {CreateVaultDto, ErrorIdentifiers, UpdateVaultDto, VaultDto} from "@localful/common";
-import {PostgresError, Row, RowList} from "postgres";
+import Postgres from "postgres";
 import {PG_FOREIGN_KEY_VIOLATION, PG_UNIQUE_VIOLATION} from "@services/database/database-error-codes.js";
 import {ResourceRelationshipError} from "@services/errors/resource/resource-relationship.error.js";
 import {SystemError} from "@services/errors/base/system.error.js";
 import {ResourceNotFoundError} from "@services/errors/resource/resource-not-found.error.js";
+import {Injectable} from "@common/injection/injectable-decorator.js";
 
 
+@Injectable()
 export class VaultsDatabaseService {
   constructor(
     private readonly databaseService: DatabaseService
@@ -48,7 +50,7 @@ export class VaultsDatabaseService {
   }
 
   private static getDatabaseError(e: any) {
-    if (e instanceof PostgresError && e.code) {
+    if (e instanceof Postgres.PostgresError && e.code) {
       if (e.code === PG_FOREIGN_KEY_VIOLATION) {
         if (e.constraint_name === "vault_owner") {
           return new ResourceRelationshipError({
@@ -167,7 +169,7 @@ export class VaultsDatabaseService {
   async delete(id: string): Promise<void> {
     const sql = await this.databaseService.getSQL();
 
-    let result: RowList<Row[]>;
+    let result: Postgres.RowList<Postgres.Row[]>;
     try {
       result = await sql`DELETE FROM vaults WHERE id = ${id}`;
     }
@@ -188,6 +190,3 @@ export class VaultsDatabaseService {
     }
   }
 }
-
-const vaultsDatabaseService = new VaultsDatabaseService(databaseService)
-export default vaultsDatabaseService

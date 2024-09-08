@@ -1,14 +1,15 @@
-import usersDatabaseService, {UsersDatabaseService} from "@modules/users/database/users.database.service.js";
-import authService, {AuthService} from "@modules/auth/auth.service.js";
-import configService, {ConfigService} from "@services/config/config.service.js";
+import {UsersDatabaseService} from "@modules/users/database/users.database.service.js";
+import type {AuthService} from "@modules/auth/auth.service.js";
+import {ConfigService} from "@services/config/config.service.js";
 import {CreateUserDto, ErrorIdentifiers, UpdateUserDto, UserDto} from "@localful/common";
 import {UserContext} from "@common/request-context.js";
 import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto} from "@modules/users/database/database-user.js";
 import {AccessForbiddenError} from "@services/errors/access/access-forbidden.error.js";
 import {PasswordService} from "@services/password/password.service.js";
-import {Service} from "typedi";
+import {Injectable} from "@common/injection/injectable-decorator.js";
 
-@Service()
+
+@Injectable()
 export class UsersService {
     constructor(
        private usersDatabaseService: UsersDatabaseService,
@@ -127,6 +128,3 @@ export class UsersService {
         return this.convertDatabaseDto(updatedUser)
     }
 }
-
-export const usersService: UsersService = new UsersService(usersDatabaseService, authService, configService);
-export default usersService;

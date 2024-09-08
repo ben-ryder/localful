@@ -1,14 +1,15 @@
 import {Redis} from "ioredis";
 
-import configService, {ConfigService} from "@services/config/config.service.js";
+import {ConfigService} from "@services/config/config.service.js";
 import {SystemError} from "@services/errors/base/system.error.js";
+import {Injectable} from "@common/injection/injectable-decorator.js";
 
 
 export interface CacheOptions {
   epochExpiry: number;
 }
 
-
+@Injectable()
 export class DataStoreService {
   private redis: Redis;
 
@@ -74,7 +75,3 @@ export class DataStoreService {
     this.redis.disconnect();
   }
 }
-
-
-const dataStoreService = new DataStoreService(configService)
-export default dataStoreService;

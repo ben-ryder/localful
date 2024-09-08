@@ -2,7 +2,8 @@ import Mailgun, {MailgunClientOptions} from "mailgun.js";
 import formData from "form-data";
 import {IMailgunClient} from "mailgun.js/Interfaces";
 
-import configService, {ConfigService} from "@services/config/config.service.js";
+import {ConfigService} from "@services/config/config.service.js";
+import {Injectable} from "@common/injection/injectable-decorator.js";
 
 
 export interface EmailData {
@@ -12,6 +13,7 @@ export interface EmailData {
 }
 
 
+@Injectable()
 export class EmailService {
   private readonly mailgunClient: IMailgunClient;
   private readonly senderString: string;
@@ -52,6 +54,3 @@ export class EmailService {
     )
   }
 }
-
-const emailService = new EmailService(configService);
-export default emailService;

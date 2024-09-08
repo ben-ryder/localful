@@ -12,10 +12,13 @@ import {
   UserDto
 } from "@localful/common";
 
-import dataStoreService, {DataStoreService} from "@services/data-store/data-store.service.js";
+import {DataStoreService} from "@services/data-store/data-store.service.js";
 import {SystemError} from "@services/errors/base/system.error.js";
-import configService, {ConfigService} from "@services/config/config.service.js";
+import {ConfigService} from "@services/config/config.service.js";
+import {Injectable} from "@common/injection/injectable-decorator.js";
 
+
+@Injectable()
 export class TokenService {
   constructor(
     private configService: ConfigService,
@@ -273,6 +276,3 @@ export class TokenService {
     return null;
   }
 }
-
-const tokenService = new TokenService(configService, dataStoreService)
-export default tokenService

@@ -1,8 +1,8 @@
 import {UserContext} from "@common/request-context.js";
 import {Request} from "express"
 import {AccessUnauthorizedError} from "@services/errors/access/access-unauthorized.error.js";
-import authService from "@modules/auth/auth.service.js";
 import {Permissions} from "@localful/common";
+import {AuthService} from "@modules/auth/auth.service.js";
 
 
 export interface AccessControlOptions {
@@ -42,7 +42,7 @@ export async function validateAuthentication(req: Request): Promise<UserContext>
         return {
           id: tokenPayload.sub,
           verifiedAt: tokenPayload.verifiedAt,
-          permissions: authService.resolveRolePermissions(tokenPayload.role)
+          permissions: AuthService.resolveRolePermissions(tokenPayload.role)
         }
       }
     }

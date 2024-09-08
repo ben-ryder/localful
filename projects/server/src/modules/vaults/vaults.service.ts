@@ -1,9 +1,11 @@
-import vaultsDatabaseService, {VaultsDatabaseService} from "@modules/vaults/database/vaults.database.service.js";
-import authService, {AuthService} from "@modules/auth/auth.service.js";
+import {VaultsDatabaseService} from "@modules/vaults/database/vaults.database.service.js";
+import {AuthService} from "@modules/auth/auth.service.js";
 import {UserContext} from "@common/request-context.js";
 import {CreateVaultDto, UpdateVaultDto, VaultDto} from "@localful/common";
+import {Injectable} from "@common/injection/injectable-decorator.js";
 
 
+@Injectable()
 export class VaultsService {
     constructor(
        private vaultsDatabaseService: VaultsDatabaseService,
@@ -76,6 +78,3 @@ export class VaultsService {
         return this._UNSAFE_delete(id);
     }
 }
-
-const vaultsService = new VaultsService(vaultsDatabaseService, authService);
-export default vaultsService;

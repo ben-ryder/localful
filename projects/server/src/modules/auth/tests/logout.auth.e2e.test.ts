@@ -2,13 +2,12 @@ import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
 
 import {sign} from "jsonwebtoken";
 
-import configService from "@services/config/config.service.js";
-
 import {TestHelper} from "@testing/test-helper.js";
 import {testUser1} from "@testing/data/users.js";
 import {expectBadRequest} from "@testing/common/expect-bad-request.js";
 import {testInvalidDataTypes} from "@testing/common/test-invalid-data-types.js";
-
+import {ConfigService} from "@services/config/config.service.js";
+import container from "@common/injection/container.js";
 
 const testHelper = new TestHelper();
 beforeAll(async () => {
@@ -21,8 +20,9 @@ beforeEach(async () => {
   await testHelper.beforeEach()
 });
 
-
+// todo: remove direct use of DI container?
 // todo: add data that revoked tokens actually are revoked and no longer work (when some are expired and some not)!!!!!
+
 describe("Logout Auth",() => {
 
   describe("Success Cases", () => {
@@ -51,6 +51,7 @@ describe("Logout Auth",() => {
 
   describe("Invalid/Expired Tokens", () => {
     test("When an expired refresh token is supplied, the request should fail", async () => {
+      const configService = container.use(ConfigService);
       const refreshToken = sign(
         {userId: testUser1.id, type: "refreshToken"},
         configService.config.auth.refreshToken.secret,

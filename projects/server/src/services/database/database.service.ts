@@ -1,8 +1,10 @@
 import postgres, { Sql } from "postgres";
 
-import configService, {ConfigService} from "@services/config/config.service.js";
+import {ConfigService} from "@services/config/config.service.js";
+import {Injectable} from "@common/injection/injectable-decorator.js";
 
 
+@Injectable()
 export class DatabaseService {
   private sql: Sql<any> | null = null;
 
@@ -29,6 +31,3 @@ export class DatabaseService {
     }
   }
 }
-
-const databaseService = new DatabaseService(configService);
-export default databaseService;

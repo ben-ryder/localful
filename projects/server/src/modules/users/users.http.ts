@@ -3,16 +3,17 @@ import express, {NextFunction, Request, Response} from "express";
 import {validateSchema} from "@common/schema-validator.js";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
 import {validateAuthentication} from "@modules/auth/validate-authentication.js";
-import usersService, {UsersService} from "@modules/users/users.service.js";
-import tokenService, {TokenService} from "@services/token/token.service.js";
+import {UsersService} from "@modules/users/users.service.js";
+import {TokenService} from "@services/token/token.service.js";
+import {Injectable} from "@common/injection/injectable-decorator.js";
+import container from "@common/injection/container.js";
 
-class UserController {
+@Injectable()
+export class UserController {
   constructor(
       private usersService: UsersService,
       private tokenService: TokenService
-  ) {
-    this.createUser = this.createUser.bind(this);
-  }
+  ) {}
 
   async createUser(req: Request, res: Response, next: NextFunction) {
     try {
@@ -76,7 +77,7 @@ class UserController {
   }
 }
 
-const userController = new UserController(usersService, tokenService);
+const userController = container.use(UserController);
 
 const UsersRouter = express.Router();
 UsersRouter
