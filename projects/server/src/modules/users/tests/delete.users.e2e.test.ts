@@ -1,24 +1,23 @@
 import {ErrorIdentifiers} from "@localful/common";
-import {TestHelper} from "../../../../testing/test-helper";
-import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
-import {expectForbidden} from "../../../../testing/common/expect-forbidden";
-import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
-import {testUser1, testUser2Unverified} from "../../../../testing/data/users";
+import {TestHelper} from "@testing/test-helper.js";
+import {expectUnauthorized} from "@testing/common/expect-unauthorized.js";
+import {expectForbidden} from "@testing/common/expect-forbidden.js";
+import {expectBadRequest} from "@testing/common/expect-bad-request.js";
+import {testUser1, testUser2Unverified} from "@testing/data/users.js";
+import {describe, test, expect, afterAll, beforeAll, beforeEach} from "vitest";
 
+const testHelper: TestHelper = new TestHelper();
+beforeAll(async () => {
+  await testHelper.beforeAll();
+});
+afterAll(async () => {
+  await testHelper.afterAll()
+});
+beforeEach(async () => {
+  await testHelper.beforeEach()
+});
 
 describe("Delete User - /v1/users/:id [DELETE]",() => {
-  const testHelper: TestHelper = new TestHelper();
-
-  beforeAll(async () => {
-    await testHelper.beforeAll();
-  });
-  afterAll(async () => {
-    await testHelper.afterAll()
-  });
-  beforeEach(async () => {
-    await testHelper.beforeEach()
-  });
-
   test("When unauthorized, the request should fail", async () => {
     const {body, statusCode} = await testHelper.client.delete(`/v1/users/${testUser1.id}`);
 

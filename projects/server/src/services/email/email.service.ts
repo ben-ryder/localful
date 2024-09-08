@@ -1,8 +1,9 @@
-import { ConfigService } from "../config/config";
-import { Injectable } from "@nestjs/common";
 import Mailgun, {MailgunClientOptions} from "mailgun.js";
 import formData from "form-data";
 import {IMailgunClient} from "mailgun.js/Interfaces";
+
+import configService, {ConfigService} from "@services/config/config.service.js";
+
 
 export interface EmailData {
   to: string,
@@ -10,7 +11,7 @@ export interface EmailData {
   message: string
 }
 
-@Injectable()
+
 export class EmailService {
   private readonly mailgunClient: IMailgunClient;
   private readonly senderString: string;
@@ -51,3 +52,6 @@ export class EmailService {
     )
   }
 }
+
+const emailService = new EmailService(configService);
+export default emailService;

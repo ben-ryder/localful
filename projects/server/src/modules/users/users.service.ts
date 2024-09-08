@@ -1,26 +1,23 @@
-import {PasswordService} from "../../services/password/password.service";
-import {UsersDatabaseService} from "./database/users.database.service";
-import {forwardRef, Inject, Injectable} from "@nestjs/common";
-import {
-    CreateUserDto, ErrorIdentifiers,
-    UpdateUserDto,
-    UserDto,
-} from "@localful/common";
-import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
-import {UserContext} from "../../common/request-context.decorator";
-import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto} from "./database/database-user";
-import {AuthService} from "../auth/auth.service";
-import {ConfigService} from "../../services/config/config";
+import usersDatabaseService, {UsersDatabaseService} from "@modules/users/database/users.database.service.js";
+import authService, {AuthService} from "@modules/auth/auth.service.js";
+import configService, {ConfigService} from "@services/config/config.service.js";
+import {CreateUserDto, ErrorIdentifiers, UpdateUserDto, UserDto} from "@localful/common";
+import {UserContext} from "@common/request-context.js";
+import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto} from "@modules/users/database/database-user.js";
+import {AccessForbiddenError} from "@services/errors/access/access-forbidden.error.js";
+import {PasswordService} from "@services/password/password.service.js";
+import {Service} from "typedi";
 
-
-@Injectable()
+@Service()
 export class UsersService {
     constructor(
        private usersDatabaseService: UsersDatabaseService,
-       @Inject(forwardRef(() => AuthService))
-       public authService: AuthService,
-       public configService: ConfigService,
-    ) {}
+       private authService: AuthService,
+       private configService: ConfigService,
+    ) {
+        this._UNSAFE_get = this._UNSAFE_get.bind(this);
+        this.create = this.create.bind(this);
+    }
 
     async _UNSAFE_get(userId: string): Promise<UserDto> {
         const user = await this.usersDatabaseService.get(userId);
@@ -130,3 +127,6 @@ export class UsersService {
         return this.convertDatabaseDto(updatedUser)
     }
 }
+
+export const usersService: UsersService = new UsersService(usersDatabaseService, authService, configService);
+export default usersService;

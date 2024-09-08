@@ -1,6 +1,6 @@
-import { BaseError } from "./base.error";
+import {BaseError} from "./base.error.js";
 
-/**
+/*.
  * An expected error thrown by the application.
  *
  * This can be used when the error could occur

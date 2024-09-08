@@ -1,8 +1,12 @@
-import {HttpStatus} from "@nestjs/common";
+import { expect } from "vitest"
+
 import {ErrorIdentifiers} from "@localful/common";
 
+import {HttpStatusCodes} from "@common/http-status-codes.js";
+
+
 export function expectBadRequest(body: any, statusCode: any, identifier: any = ErrorIdentifiers.REQUEST_INVALID) {
-  expect(statusCode).toEqual(HttpStatus.BAD_REQUEST);
+  expect(statusCode).toEqual(HttpStatusCodes.BAD_REQUEST);
   expect(body).toEqual(expect.objectContaining({
     identifier: identifier
   }))

@@ -1,18 +1,19 @@
-import {TestHelper} from "../../../../testing/test-helper";
+import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
+import {TestHelper} from "@testing/test-helper.js";
+
+const testHelper = new TestHelper();
+beforeAll(async () => {
+  await testHelper.beforeAll();
+});
+afterAll(async () => {
+  await testHelper.afterAll()
+});
+beforeEach(async () => {
+  await testHelper.beforeEach()
+});
+
 
 describe("Base Module",() => {
-  const testHelper = new TestHelper();
-
-  beforeAll(async () => {
-    await testHelper.beforeAll();
-  });
-  afterAll(async () => {
-    await testHelper.afterAll()
-  });
-  beforeEach(async () => {
-    await testHelper.beforeEach()
-  });
-
   /**
    * Base Route (/)
    */

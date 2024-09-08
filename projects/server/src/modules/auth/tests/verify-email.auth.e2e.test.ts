@@ -1,23 +1,25 @@
-import {TestHelper} from "../../../../testing/test-helper";
-import {testAdminUser2Unverified, testUser1, testUser2Unverified} from "../../../../testing/data/users";
-import {exampleVault1} from "../../../../testing/data/vaults";
+import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
+
 import {ErrorIdentifiers} from "@localful/common";
-import {expectForbidden} from "../../../../testing/common/expect-forbidden";
+
+import {TestHelper} from "@testing/test-helper.js";
+import {testAdminUser2Unverified, testUser1, testUser2Unverified} from "@testing/data/users.js";
+import {exampleVault1} from "@testing/data/vaults.js";
+import {expectForbidden} from "@testing/common/expect-forbidden.js";
+
+const testHelper = new TestHelper();
+beforeAll(async () => {
+  await testHelper.beforeAll()
+})
+afterAll(async () => {
+  await testHelper.afterAll()
+});
+beforeEach(async () => {
+  await testHelper.beforeEach()
+});
 
 
 describe("Email Verification - /v1/auth/verify-email [GET, POST]",() => {
-  const testHelper = new TestHelper();
-
-  beforeAll(async () => {
-    await testHelper.beforeAll()
-  })
-  afterAll(async () => {
-    await testHelper.afterAll()
-  });
-  beforeEach(async () => {
-    await testHelper.beforeEach()
-  });
-
   // Testing success cases/happy paths work.
   describe("Success Cases", () => {
 

@@ -1,17 +1,13 @@
-import { PipeTransform, Injectable, ArgumentMetadata } from "@nestjs/common";
-import { Schema } from "zod";
-import {UserRequestError} from "../services/errors/base/user-request.error";
+import {z} from "zod";
+
+import {UserRequestError} from "@services/errors/base/user-request.error.js";
 
 
-@Injectable()
-export class ZodValidationPipe implements PipeTransform {
-  constructor(private schema: Schema) {}
-
-  transform(data: any, metadata: ArgumentMetadata) {
-    const result = this.schema.safeParse(data);
+export async function validateSchema<Schema extends z.Schema>(data: any, schema: Schema): Promise<z.infer<Schema>> {
+    const result = await schema.safeParseAsync(data);
 
     if (result.success) {
-      return data;
+      return result.data
     }
     else {
       // todo: format used to always work, but now the extra .flatten logic is sometimes required?
@@ -30,6 +26,5 @@ export class ZodValidationPipe implements PipeTransform {
         message: "Request data failed validation",
         applicationMessage: errorMessage
       })
-    }
   }
 }

@@ -1,8 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { Injectable } from "@nestjs/common";
-import {ConfigSchema} from "./config-schema";
+import {ConfigSchema} from "./config-schema.js";
 
 
 /**
@@ -12,7 +11,6 @@ import {ConfigSchema} from "./config-schema";
  * to be used in the NestJS DI system.
  * The config uses a zod schema, so it will throw an error if the config doesn't follow the schema.
  */
-@Injectable()
 export class ConfigService {
   readonly config: ConfigSchema = ConfigSchema.parse({
     general: {
@@ -66,3 +64,6 @@ export class ConfigService {
     },
   });
 }
+
+const configService = new ConfigService();
+export default configService;

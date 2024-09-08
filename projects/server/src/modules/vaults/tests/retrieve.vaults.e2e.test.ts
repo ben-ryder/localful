@@ -1,27 +1,30 @@
+import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
 
-import {HttpStatus} from "@nestjs/common";
-import {TestHelper} from "../../../../testing/test-helper";
-import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
-import {expectForbidden} from "../../../../testing/common/expect-forbidden";
-import {expectNotFound} from "../../../../testing/common/expect-not-found";
-import {testAdminUser1, testAdminUser2Unverified, testUser1} from "../../../../testing/data/users";
-import {testAdminUser1Vault1, testUser1Vault1} from "../../../../testing/data/vaults";
 import {ErrorIdentifiers} from "@localful/common";
-import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
+
+import {HttpStatusCodes} from "@common/http-status-codes.js";
+
+import {TestHelper} from "@testing/test-helper.js";
+import {expectUnauthorized} from "@testing/common/expect-unauthorized.js";
+import {expectForbidden} from "@testing/common/expect-forbidden.js";
+import {expectNotFound} from "@testing/common/expect-not-found.js";
+import {testAdminUser1, testAdminUser2Unverified, testUser1} from "@testing/data/users.js";
+import {testAdminUser1Vault1, testUser1Vault1} from "@testing/data/vaults.js";
+import {expectBadRequest} from "@testing/common/expect-bad-request.js";
+
+const testHelper = new TestHelper();
+beforeAll(async () => {
+  await testHelper.beforeAll();
+});
+afterAll(async () => {
+  await testHelper.afterAll()
+});
+beforeEach(async () => {
+  await testHelper.beforeEach()
+});
 
 
 describe("Retrieve Vaults - /v1/vaults/:vaultId [GET]",() => {
-  const testHelper = new TestHelper();
-
-  beforeAll(async () => {
-    await testHelper.beforeAll();
-  });
-  afterAll(async () => {
-    await testHelper.afterAll()
-  });
-  beforeEach(async () => {
-    await testHelper.beforeEach()
-  });
 
   // Testing success cases/happy paths work.
   describe("Success Cases", () => {
@@ -34,7 +37,7 @@ describe("Retrieve Vaults - /v1/vaults/:vaultId [GET]",() => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send();
 
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(HttpStatusCodes.OK);
       expect(body).toEqual(expect.objectContaining({
           ...testUser1Vault1
       }))
@@ -60,7 +63,7 @@ describe("Retrieve Vaults - /v1/vaults/:vaultId [GET]",() => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send();
 
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(HttpStatusCodes.OK);
       expect(body).toEqual(expect.objectContaining({
           ...testAdminUser1Vault1
       }))
@@ -74,7 +77,7 @@ describe("Retrieve Vaults - /v1/vaults/:vaultId [GET]",() => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send();
 
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(HttpStatusCodes.OK);
       expect(body).toEqual(expect.objectContaining({
           ...testUser1Vault1
       }))

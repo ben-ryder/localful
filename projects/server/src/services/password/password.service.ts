@@ -1,8 +1,8 @@
 import { hash, compare } from "bcrypt";
-import { Injectable } from "@nestjs/common";
-import {SystemError} from "../errors/base/system.error";
 
-@Injectable()
+import {SystemError} from "@services/errors/base/system.error.js";
+
+
 export class PasswordService {
   static SALT_ROUNDS = 12;
 
@@ -30,3 +30,6 @@ export class PasswordService {
     }
   }
 }
+
+const passwordService = new PasswordService();
+export default passwordService;

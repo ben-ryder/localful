@@ -1,9 +1,11 @@
-import { HttpStatus } from "@nestjs/common";
 import { ErrorIdentifiers } from "@localful/common";
+
+import {HttpStatusCodes} from "@common/http-status-codes.js";
+
 
 export interface ErrorHttpMapping {
   identifier: string;
-  statusCode: HttpStatus;
+  statusCode: HttpStatusCodes;
   defaultMessage: string;
 }
 
@@ -16,7 +18,7 @@ export interface ErrorHttpMappings {
 
 export const fallbackMapping: ErrorHttpMapping = {
   identifier: ErrorIdentifiers.SYSTEM_UNEXPECTED,
-  statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+  statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
   defaultMessage:
     "An unexpected error occurred while processing your request. Please try again later.",
 };
@@ -24,33 +26,33 @@ export const fallbackMapping: ErrorHttpMapping = {
 export const errorHttpMapping: ErrorHttpMappings = {
   UserRequestError: {
     identifier: ErrorIdentifiers.REQUEST_INVALID,
-    statusCode: HttpStatus.BAD_REQUEST,
+    statusCode: HttpStatusCodes.BAD_REQUEST,
     defaultMessage: "Your request was invalid.",
   },
   ResourceNotFoundError: {
     identifier: ErrorIdentifiers.RESOURCE_NOT_FOUND,
-    statusCode: HttpStatus.NOT_FOUND,
+    statusCode: HttpStatusCodes.NOT_FOUND,
     defaultMessage: "The requested resource could not be found.",
   },
   ResourceNotUniqueError: {
     identifier: ErrorIdentifiers.RESOURCE_NOT_UNIQUE,
-    statusCode: HttpStatus.BAD_REQUEST,
+    statusCode: HttpStatusCodes.BAD_REQUEST,
     defaultMessage: "Your request would make a resource that is not unique.",
   },
   ResourceRelationshipError: {
     identifier: ErrorIdentifiers.RESOURCE_RELATIONSHIP_INVALID,
-    statusCode: HttpStatus.BAD_REQUEST,
+    statusCode: HttpStatusCodes.BAD_REQUEST,
     defaultMessage:
       "Your request includes an invalid relationship to another resource.",
   },
   AccessUnauthorizedError: {
     identifier: ErrorIdentifiers.ACCESS_UNAUTHORIZED,
-    statusCode: HttpStatus.UNAUTHORIZED,
+    statusCode: HttpStatusCodes.UNAUTHORIZED,
     defaultMessage: "Your are not authorized to access the given resource.",
   },
   AccessForbiddenError: {
     identifier: ErrorIdentifiers.ACCESS_FORBIDDEN,
-    statusCode: HttpStatus.FORBIDDEN,
+    statusCode: HttpStatusCodes.FORBIDDEN,
     defaultMessage: "Your are forbidden from accessing the given resource.",
   },
 };

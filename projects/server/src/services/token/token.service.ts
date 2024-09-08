@@ -1,7 +1,8 @@
-import {Injectable} from "@nestjs/common";
-
 import jsonwebtoken from "jsonwebtoken";
-import {ConfigService} from "../config/config";
+import {v4 as createUUID} from "uuid";
+import ms from "ms";
+
+
 import {
   AccessTokenPayload,
   ActionTokenOptions,
@@ -10,13 +11,11 @@ import {
   TokenPair,
   UserDto
 } from "@localful/common";
-import {DataStoreService} from "../data-store/data-store.service";
-import {v4 as createUUID} from "uuid";
-import {SystemError} from "../errors/base/system.error";
-import ms, {StringValue} from "ms";
 
+import dataStoreService, {DataStoreService} from "@services/data-store/data-store.service.js";
+import {SystemError} from "@services/errors/base/system.error.js";
+import configService, {ConfigService} from "@services/config/config.service.js";
 
-@Injectable()
 export class TokenService {
   constructor(
     private configService: ConfigService,
@@ -31,7 +30,7 @@ export class TokenService {
    */
   private _parseTokenExpiry(expiryString: string) {
     const currentTime = new Date().getTime();
-    const timeToExpiry = ms(expiryString as StringValue);
+    const timeToExpiry = ms(expiryString);
     return currentTime + timeToExpiry;
   }
 
@@ -274,3 +273,6 @@ export class TokenService {
     return null;
   }
 }
+
+const tokenService = new TokenService(configService, dataStoreService)
+export default tokenService

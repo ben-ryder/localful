@@ -1,24 +1,28 @@
-import {TestHelper} from "../../../../testing/test-helper";
-import {HttpStatus} from "@nestjs/common";
-import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
-import {expectForbidden} from "../../../../testing/common/expect-forbidden";
-import {testAdminUser1, testUser1, testUser2Unverified} from "../../../../testing/data/users";
-import {testAdminUser1Vault1, testUser1Vault1} from "../../../../testing/data/vaults";
-import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
+import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
+
+import {HttpStatusCodes} from "@common/http-status-codes.js";
+
+import {TestHelper} from "@testing/test-helper.js";
+import {expectUnauthorized} from "@testing/common/expect-unauthorized.js";
+import {expectForbidden} from "@testing/common/expect-forbidden.js";
+import {testAdminUser1, testUser1, testUser2Unverified} from "@testing/data/users.js";
+import {testAdminUser1Vault1, testUser1Vault1} from "@testing/data/vaults.js";
+import {expectBadRequest} from "@testing/common/expect-bad-request.js";
+
+
+const testHelper = new TestHelper();
+beforeAll(async () => {
+  await testHelper.beforeAll();
+});
+afterAll(async () => {
+  await testHelper.afterAll()
+});
+beforeEach(async () => {
+  await testHelper.beforeEach()
+});
 
 
 describe("Update Profile - /v1/vaults [PATCH]",() => {
-  const testHelper = new TestHelper();
-
-  beforeAll(async () => {
-    await testHelper.beforeAll();
-  });
-  afterAll(async () => {
-    await testHelper.afterAll()
-  });
-  beforeEach(async () => {
-    await testHelper.beforeEach()
-  });
 
   // Testing success cases/happy paths work.
   describe("Success Cases", () => {
@@ -37,14 +41,14 @@ describe("Update Profile - /v1/vaults [PATCH]",() => {
           protectedEncryptionKey,
           protectedData
         });
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(HttpStatusCodes.OK);
 
       const {statusCode: checkStatusCode, body: checkBody} = await testHelper.client
         .get(`/v1/vaults/${testUser1Vault1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send();
 
-      expect(checkStatusCode).toEqual(HttpStatus.OK);
+      expect(checkStatusCode).toEqual(HttpStatusCodes.OK);
       expect(checkBody).toEqual(expect.objectContaining({
         ...testUser1Vault1,
         name,
@@ -67,14 +71,14 @@ describe("Update Profile - /v1/vaults [PATCH]",() => {
             protectedEncryptionKey,
             protectedData
           });
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(HttpStatusCodes.OK);
 
       const {statusCode: checkStatusCode, body: checkBody} = await testHelper.client
           .get(`/v1/vaults/${testAdminUser1Vault1.id}`)
           .set("Authorization", `Bearer ${accessToken}`)
           .send();
 
-      expect(checkStatusCode).toEqual(HttpStatus.OK);
+      expect(checkStatusCode).toEqual(HttpStatusCodes.OK);
       expect(checkBody).toEqual(expect.objectContaining({
         ...testAdminUser1Vault1,
         name,
@@ -97,14 +101,14 @@ describe("Update Profile - /v1/vaults [PATCH]",() => {
             protectedEncryptionKey,
             protectedData
           });
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(HttpStatusCodes.OK);
 
       const {statusCode: checkStatusCode, body: checkBody} = await testHelper.client
           .get(`/v1/vaults/${testUser1Vault1.id}`)
           .set("Authorization", `Bearer ${accessToken}`)
           .send();
 
-      expect(checkStatusCode).toEqual(HttpStatus.OK);
+      expect(checkStatusCode).toEqual(HttpStatusCodes.OK);
       expect(checkBody).toEqual(expect.objectContaining({
         ...testUser1Vault1,
         name,

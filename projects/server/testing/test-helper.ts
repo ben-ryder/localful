@@ -1,31 +1,31 @@
-import {INestApplication} from "@nestjs/common";
 import {agent, SuperAgentTest} from "supertest";
-import {createApp} from "../src/create-app";
-import {DatabaseService} from "../src/services/database/database.service";
-import {TokenService} from "../src/services/token/token.service";
-import {UsersService} from "../src/modules/users/users.service";
+import {Server} from "node:http";
+
 import {TokenPair} from "@localful/common";
-import {DataStoreService} from "../src/services/data-store/data-store.service";
-import {resetTestData} from "./database-scripts";
-import {ConfigService} from "../src/services/config/config";
+
+import databaseService from "@services/database/database.service.js";
+import tokenService from "@services/token/token.service.js";
+import dataStoreService from "@services/data-store/data-store.service.js";
+import configService from "@services/config/config.service.js";
+import userService from "@modules/users/users.service.js";
+
+import {createServer} from "../src/create-server.js";
+import {resetTestData} from "./database-scripts.js";
 
 
 export class TestHelper {
-  app: INestApplication;
+  server: Server;
   client: SuperAgentTest;
 
   async beforeAll() {
     // Create app
-    this.app = await createApp({logger: false})
-    await this.app.init();
+    this.server = await createServer()
 
-    // Overwrite the email mode to silence output and prevent actual email sending during test runs.
-    const configService = this.app.get(ConfigService);
+    // Overwrite the email mode to silence output and prevent actual email sending during test runs.;
     configService.config.email.sendMode = "silent"
 
     // Setup supertest agent for test requests
-    const httpServer = this.app.getHttpServer();
-    this.client = agent(httpServer);
+    this.client = agent(this.server);
   }
 
   /**
@@ -34,8 +34,6 @@ export class TestHelper {
    * @param userId
    */
   async getUserTokens(userId: string): Promise<TokenPair> {
-    const tokenService = this.app.get(TokenService);
-    const userService = this.app.get(UsersService);
     const user = await userService._UNSAFE_get(userId)
     return await tokenService.createNewTokenPair(user);
   }
@@ -52,9 +50,6 @@ export class TestHelper {
   }
 
   async getEmailVerificationToken(userId: string): Promise<string> {
-    const tokenService = this.app.get(TokenService);
-    const configService = this.app.get(ConfigService);
-
     return await tokenService.getActionToken({
       userId: userId,
       actionType: "verify-email",
@@ -67,7 +62,6 @@ export class TestHelper {
    * Reset the db to match the predefined test content.
    */
   async resetDatabase() {
-    const databaseService = this.app.get(DatabaseService);
     const sql = await databaseService.getSQL();
     await resetTestData(sql);
   }
@@ -77,10 +71,7 @@ export class TestHelper {
    */
   async killApplication() {
     // Clean up db connection before exiting
-    const databaseService = this.app.get(DatabaseService);
     await databaseService.onModuleDestroy();
-
-    const dataStoreService = this.app.get(DataStoreService);
     await dataStoreService.onModuleDestroy();
   }
 
@@ -88,7 +79,6 @@ export class TestHelper {
     await this.resetDatabase();
 
     // Purge the data store to ensure things like refresh/access tokens aren't persisted
-    const dataStoreService = this.app.get(DataStoreService);
     await dataStoreService.purge();
   }
 

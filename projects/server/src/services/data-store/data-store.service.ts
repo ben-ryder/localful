@@ -1,13 +1,14 @@
 import {Redis} from "ioredis";
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "../config/config";
-import {SystemError} from "../errors/base/system.error";
+
+import configService, {ConfigService} from "@services/config/config.service.js";
+import {SystemError} from "@services/errors/base/system.error.js";
+
 
 export interface CacheOptions {
   epochExpiry: number;
 }
 
-@Injectable()
+
 export class DataStoreService {
   private redis: Redis;
 
@@ -73,3 +74,7 @@ export class DataStoreService {
     this.redis.disconnect();
   }
 }
+
+
+const dataStoreService = new DataStoreService(configService)
+export default dataStoreService;

@@ -1,26 +1,30 @@
-import {ErrorIdentifiers} from "@localful/common";
+import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
+
 import {sign} from "jsonwebtoken";
-import {ConfigService} from "../../../services/config/config";
-import {TestHelper} from "../../../../testing/test-helper";
-import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
-import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
-import {testInvalidDataTypes} from "../../../../testing/common/test-invalid-data-types";
-import {testUser1} from "../../../../testing/data/users";
+
+import {ErrorIdentifiers} from "@localful/common";
+
+import configService from "@services/config/config.service.js";
+
+import {TestHelper} from "@testing/test-helper.js";
+import {testUser1} from "@testing/data/users.js";
+import {expectUnauthorized} from "@testing/common/expect-unauthorized.js";
+import {expectBadRequest} from "@testing/common/expect-bad-request.js";
+import {testInvalidDataTypes} from "@testing/common/test-invalid-data-types.js";
+
+const testHelper = new TestHelper();
+beforeAll(async () => {
+  await testHelper.beforeAll()
+})
+afterAll(async () => {
+  await testHelper.afterAll()
+});
+beforeEach(async () => {
+  await testHelper.beforeEach()
+});
 
 
 describe("Refresh Auth",() => {
-  const testHelper = new TestHelper();
-
-  beforeAll(async () => {
-    await testHelper.beforeAll()
-  })
-  afterAll(async () => {
-    await testHelper.afterAll()
-  });
-  beforeEach(async () => {
-    await testHelper.beforeEach()
-  });
-
   describe("Success Cases", () => {
     test("When supplying a valid refreshToken, an accessToken and refreshToken should be returned", async () => {
       const { refreshToken } = await testHelper.getUserTokens(testUser1.id);
@@ -92,8 +96,6 @@ describe("Refresh Auth",() => {
     })
 
     test("When supplying an expired refreshToken, the request should fail", async () => {
-      const configService = testHelper.app.get(ConfigService);
-
       // Create an expired token with the correct payload & sign it correctly
       const refreshToken = sign(
         {userId: testUser1.id, type: "refreshToken"},

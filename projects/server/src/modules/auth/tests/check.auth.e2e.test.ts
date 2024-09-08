@@ -1,23 +1,26 @@
+import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
+
 import {sign} from "jsonwebtoken";
-import {ConfigService} from "../../../services/config/config";
-import {TestHelper} from "../../../../testing/test-helper";
-import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
-import {testUser1} from "../../../../testing/data/users";
+
+import configService from "@services/config/config.service.js";
+
+import {TestHelper} from "@testing/test-helper.js";
+import {testUser1} from "@testing/data/users.js";
+import {expectUnauthorized} from "@testing/common/expect-unauthorized.js";
+
+const testHelper = new TestHelper();
+beforeAll(async () => {
+  await testHelper.beforeAll()
+})
+afterAll(async () => {
+  await testHelper.afterAll()
+});
+beforeEach(async () => {
+  await testHelper.beforeEach()
+});
 
 
 describe("Check Auth",() => {
-  const testHelper = new TestHelper();
-
-  beforeAll(async () => {
-    await testHelper.beforeAll()
-  })
-  afterAll(async () => {
-    await testHelper.afterAll()
-  });
-  beforeEach(async () => {
-    await testHelper.beforeEach()
-  });
-
   test("authenticated request succeeds", async () => {
     const accessToken = await testHelper.getUserAccessToken(testUser1.id);
 
@@ -58,8 +61,6 @@ describe("Check Auth",() => {
   })
 
   test("expired access token is unauthorized", async () => {
-    const configService = testHelper.app.get(ConfigService);
-
     const accessToken = sign(
       {type: "accessToken", userId: testUser1.id, role: testUser1.role},
       configService.config.auth.accessToken.secret,

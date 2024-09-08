@@ -1,24 +1,29 @@
-import {ConfigService} from "../../../services/config/config";
+import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
+
 import {sign} from "jsonwebtoken";
-import {TestHelper} from "../../../../testing/test-helper";
-import {testInvalidDataTypes} from "../../../../testing/common/test-invalid-data-types";
-import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
-import {testUser1} from "../../../../testing/data/users";
+
+import configService from "@services/config/config.service.js";
+
+import {TestHelper} from "@testing/test-helper.js";
+import {testUser1} from "@testing/data/users.js";
+import {expectBadRequest} from "@testing/common/expect-bad-request.js";
+import {testInvalidDataTypes} from "@testing/common/test-invalid-data-types.js";
+
+
+const testHelper = new TestHelper();
+beforeAll(async () => {
+  await testHelper.beforeAll()
+})
+afterAll(async () => {
+  await testHelper.afterAll()
+});
+beforeEach(async () => {
+  await testHelper.beforeEach()
+});
+
+
 // todo: add data that revoked tokens actually are revoked and no longer work (when some are expired and some not)!!!!!
-
-
 describe("Logout Auth",() => {
-  const testHelper = new TestHelper();
-
-  beforeAll(async () => {
-    await testHelper.beforeAll()
-  })
-  afterAll(async () => {
-    await testHelper.afterAll()
-  });
-  beforeEach(async () => {
-    await testHelper.beforeEach()
-  });
 
   describe("Success Cases", () => {
     test("When a valid refresh token a supplied, all tokens should be revoked", async () => {
@@ -46,8 +51,6 @@ describe("Logout Auth",() => {
 
   describe("Invalid/Expired Tokens", () => {
     test("When an expired refresh token is supplied, the request should fail", async () => {
-      const configService = testHelper.app.get(ConfigService);
-
       const refreshToken = sign(
         {userId: testUser1.id, type: "refreshToken"},
         configService.config.auth.refreshToken.secret,

@@ -1,24 +1,26 @@
+import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
+
 import {ErrorIdentifiers, Roles} from "@localful/common";
-import {TestHelper} from "../../../../testing/test-helper";
-import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
-import {testMissingField} from "../../../../testing/common/test-missing-field";
-import {testMalformedData} from "../../../../testing/common/test-malformed-data";
-import {testInvalidDataTypes} from "../../../../testing/common/test-invalid-data-types";
-import {exampleUser1, testUser1} from "../../../../testing/data/users";
+import {TestHelper} from "@testing/test-helper.js";
+import {expectBadRequest} from "@testing/common/expect-bad-request.js";
+import {testMissingField} from "@testing/common/test-missing-field.js";
+import {testMalformedData} from "@testing/common/test-malformed-data.js";
+import {testInvalidDataTypes} from "@testing/common/test-invalid-data-types.js";
+import {exampleUser1, testUser1} from "@testing/data/users.js";
+
+const testHelper: TestHelper = new TestHelper();
+beforeAll(async () => {
+  await testHelper.beforeAll();
+});
+afterAll(async () => {
+  await testHelper.afterAll()
+});
+beforeEach(async () => {
+  await testHelper.beforeEach()
+});
+
 
 describe("Create User - /v1/users [POST]",() => {
-  const testHelper: TestHelper = new TestHelper();
-
-  beforeAll(async () => {
-    await testHelper.beforeAll();
-  });
-  afterAll(async () => {
-    await testHelper.afterAll()
-  });
-  beforeEach(async () => {
-    await testHelper.beforeEach()
-  });
-
   describe("Success Cases", () => {
     test("When adding a valid new user, the new user should be added & returned", async () => {
       const {body, statusCode} = await testHelper.client

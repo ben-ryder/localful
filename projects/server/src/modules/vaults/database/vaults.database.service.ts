@@ -1,15 +1,13 @@
-import {DatabaseService} from "../../../services/database/database.service";
-import {PostgresError, Row, RowList} from "postgres";
-import {Injectable} from "@nestjs/common";
-import {SystemError} from "../../../services/errors/base/system.error";
-import {ResourceNotFoundError} from "../../../services/errors/resource/resource-not-found.error";
+import databaseService, {DatabaseService} from "@services/database/database.service.js";
+import {RawDatabaseVault} from "@modules/vaults/database/database-vault.js";
 import {CreateVaultDto, ErrorIdentifiers, UpdateVaultDto, VaultDto} from "@localful/common";
-import {RawDatabaseVault} from "./database-vault";
-import {PG_FOREIGN_KEY_VIOLATION, PG_UNIQUE_VIOLATION} from "../../../services/database/database-error-codes";
-import {ResourceRelationshipError} from "../../../services/errors/resource/resource-relationship.error";
+import {PostgresError, Row, RowList} from "postgres";
+import {PG_FOREIGN_KEY_VIOLATION, PG_UNIQUE_VIOLATION} from "@services/database/database-error-codes.js";
+import {ResourceRelationshipError} from "@services/errors/resource/resource-relationship.error.js";
+import {SystemError} from "@services/errors/base/system.error.js";
+import {ResourceNotFoundError} from "@services/errors/resource/resource-not-found.error.js";
 
 
-@Injectable()
 export class VaultsDatabaseService {
   constructor(
     private readonly databaseService: DatabaseService
@@ -190,3 +188,6 @@ export class VaultsDatabaseService {
     }
   }
 }
+
+const vaultsDatabaseService = new VaultsDatabaseService(databaseService)
+export default vaultsDatabaseService

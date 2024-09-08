@@ -1,26 +1,30 @@
-import {HttpStatus} from "@nestjs/common";
-import {TestHelper} from "../../../../testing/test-helper";
-import {expectUnauthorized} from "../../../../testing/common/expect-unauthorized";
-import {expectForbidden} from "../../../../testing/common/expect-forbidden";
-import {testAdminUser1, testUser1} from "../../../../testing/data/users";
-import {testAdminUser1Vault1, testUser1Vault1} from "../../../../testing/data/vaults";
-import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
-import {expectNotFound} from "../../../../testing/common/expect-not-found";
+import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
+
 import {ErrorIdentifiers} from "@localful/common";
+
+import {HttpStatusCodes} from "@common/http-status-codes.js";
+
+import {TestHelper} from "@testing/test-helper.js";
+import {expectUnauthorized} from "@testing/common/expect-unauthorized.js";
+import {expectForbidden} from "@testing/common/expect-forbidden.js";
+import {testAdminUser1, testUser1} from "@testing/data/users.js";
+import {testAdminUser1Vault1, testUser1Vault1} from "@testing/data/vaults.js";
+import {expectBadRequest} from "@testing/common/expect-bad-request.js";
+import {expectNotFound} from "@testing/common/expect-not-found.js";
+
+const testHelper = new TestHelper();
+beforeAll(async () => {
+  await testHelper.beforeAll();
+});
+afterAll(async () => {
+  await testHelper.afterAll()
+});
+beforeEach(async () => {
+  await testHelper.beforeEach()
+});
 
 
 describe("Delete Profile - /v1/vaults/:userId [DELETE]",() => {
-  const testHelper = new TestHelper();
-
-  beforeAll(async () => {
-    await testHelper.beforeAll();
-  });
-  afterAll(async () => {
-    await testHelper.afterAll()
-  });
-  beforeEach(async () => {
-    await testHelper.beforeEach()
-  });
 
   // Testing success cases/happy paths work.
   describe("Success Cases", () => {
@@ -32,13 +36,13 @@ describe("Delete Profile - /v1/vaults/:userId [DELETE]",() => {
         .delete(`/v1/vaults/${testUser1Vault1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send();
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(HttpStatusCodes.OK);
 
       const {statusCode: checkStatusCode} = await testHelper.client
         .get(`/v1/vaults/${testUser1Vault1.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send();
-      expect(checkStatusCode).toEqual(HttpStatus.NOT_FOUND);
+      expect(checkStatusCode).toEqual(HttpStatusCodes.NOT_FOUND);
     });
 
     test("Given user with 'admin' role, When deleting their own vault, Then the vault should be deleted", async () => {
@@ -48,13 +52,13 @@ describe("Delete Profile - /v1/vaults/:userId [DELETE]",() => {
           .delete(`/v1/vaults/${testAdminUser1Vault1.id}`)
           .set("Authorization", `Bearer ${accessToken}`)
           .send();
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(HttpStatusCodes.OK);
 
       const {statusCode: checkStatusCode} = await testHelper.client
           .get(`/v1/vaults/${testAdminUser1Vault1.id}`)
           .set("Authorization", `Bearer ${accessToken}`)
           .send();
-      expect(checkStatusCode).toEqual(HttpStatus.NOT_FOUND);
+      expect(checkStatusCode).toEqual(HttpStatusCodes.NOT_FOUND);
     });
 
     test("Given user with 'admin' role, When deleting a different user vault, Then the vault should be deleted", async () => {
@@ -64,13 +68,13 @@ describe("Delete Profile - /v1/vaults/:userId [DELETE]",() => {
           .delete(`/v1/vaults/${testUser1Vault1.id}`)
           .set("Authorization", `Bearer ${accessToken}`)
           .send();
-      expect(statusCode).toEqual(HttpStatus.OK);
+      expect(statusCode).toEqual(HttpStatusCodes.OK);
 
       const {statusCode: checkStatusCode} = await testHelper.client
           .get(`/v1/vaults/${testUser1Vault1.id}`)
           .set("Authorization", `Bearer ${accessToken}`)
           .send();
-      expect(checkStatusCode).toEqual(HttpStatus.NOT_FOUND);
+      expect(checkStatusCode).toEqual(HttpStatusCodes.NOT_FOUND);
     });
   })
 

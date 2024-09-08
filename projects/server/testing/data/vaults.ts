@@ -1,5 +1,5 @@
 import {VaultEntity} from "@localful/common";
-import {testAdminUser1, testUser1} from "./users";
+import {testAdminUser1, testUser1} from "./users.js";
 
 /**
  * Test vaults.

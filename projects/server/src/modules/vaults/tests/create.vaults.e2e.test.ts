@@ -1,26 +1,29 @@
-import { TestHelper } from "../../../../testing/test-helper";
-import {expectForbidden} from "../../../../testing/common/expect-forbidden";
-import {expectBadRequest} from "../../../../testing/common/expect-bad-request";
-import {testMalformedData} from "../../../../testing/common/test-malformed-data";
-import {testInvalidDataTypes} from "../../../../testing/common/test-invalid-data-types";
+import {describe, expect, test, beforeAll, beforeEach, afterAll } from "vitest";
+
 import {ErrorIdentifiers} from "@localful/common";
-import {testMissingField} from "../../../../testing/common/test-missing-field";
-import {testAdminUser1, testAdminUser2Unverified, testUser1, testUser2Unverified} from "../../../../testing/data/users";
-import {exampleVault1, testAdminUser1Vault1, testUser1Vault1} from "../../../../testing/data/vaults";
+
+import { TestHelper } from "@testing/test-helper.js";
+import {expectForbidden} from "@testing/common/expect-forbidden.js";
+import {expectBadRequest} from "@testing/common/expect-bad-request.js";
+import {testMalformedData} from "@testing/common/test-malformed-data.js";
+import {testInvalidDataTypes} from "@testing/common/test-invalid-data-types.js";
+import {testMissingField} from "@testing/common/test-missing-field.js";
+import {testAdminUser1, testAdminUser2Unverified, testUser1, testUser2Unverified} from "@testing/data/users.js";
+import {exampleVault1, testAdminUser1Vault1, testUser1Vault1} from "@testing/data/vaults.js";
+
+const testHelper: TestHelper = new TestHelper();
+beforeAll(async () => {
+	await testHelper.beforeAll();
+});
+afterAll(async () => {
+	await testHelper.afterAll()
+});
+beforeEach(async () => {
+	await testHelper.beforeEach()
+});
+
 
 describe("Create Vaults - /v1/vaults [POST]",() => {
-	const testHelper: TestHelper = new TestHelper();
-
-	beforeAll(async () => {
-		await testHelper.beforeAll();
-	});
-	afterAll(async () => {
-		await testHelper.afterAll()
-	});
-	beforeEach(async () => {
-		await testHelper.beforeEach()
-	});
-
 	describe("Success Cases", () => {
 		test("Given user with `user` role, When creating vault with matching ownerId, Then vault should be created & returned", async () => {
 			const accessToken = await testHelper.getUserAccessToken(testUser1.id);

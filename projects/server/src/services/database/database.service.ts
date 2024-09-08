@@ -1,8 +1,8 @@
-import { ConfigService } from "../config/config";
 import postgres, { Sql } from "postgres";
-import { Injectable } from "@nestjs/common";
 
-@Injectable()
+import configService, {ConfigService} from "@services/config/config.service.js";
+
+
 export class DatabaseService {
   private sql: Sql<any> | null = null;
 
@@ -29,3 +29,6 @@ export class DatabaseService {
     }
   }
 }
+
+const databaseService = new DatabaseService(configService);
+export default databaseService;

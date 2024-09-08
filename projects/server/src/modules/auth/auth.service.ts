@@ -1,30 +1,21 @@
-import {ForbiddenException, forwardRef, Inject, Injectable} from "@nestjs/common";
-import {UsersService} from "../users/users.service";
-import {TokenService} from "../../services/token/token.service";
-import {
-  AuthUserResponse,
-  TokenPair,
-  ErrorIdentifiers,
-  Roles,
-  RolePermissions,
-  Permissions,
-} from "@localful/common";
-import {PasswordService} from "../../services/password/password.service";
-import {AccessForbiddenError} from "../../services/errors/access/access-forbidden.error";
-import {AccessUnauthorizedError} from "../../services/errors/access/access-unauthorized.error";
-import {UserRequestError} from "../../services/errors/base/user-request.error";
-import {DatabaseUserDto} from "../users/database/database-user";
-import {AccessControlOptions} from "./auth.guards";
-import {ResourceNotFoundError} from "../../services/errors/resource/resource-not-found.error";
-import {UserContext} from "../../common/request-context.decorator";
-import {ConfigService} from "../../services/config/config";
-import {EmailService} from "../../services/email/email.service";
+import usersService, {UsersService} from "@modules/users/users.service.js";
+import tokenService, {TokenService} from "@services/token/token.service.js";
+import configService, {ConfigService} from "@services/config/config.service.js";
+import emailService, {EmailService} from "@services/email/email.service.js";
+import {AuthUserResponse, ErrorIdentifiers, RolePermissions, Roles, TokenPair} from "@localful/common";
+import {DatabaseUserDto} from "@modules/users/database/database-user.js";
+import {AccessForbiddenError} from "@services/errors/access/access-forbidden.error.js";
+import {PasswordService} from "@services/password/password.service.js";
+import {AccessUnauthorizedError} from "@services/errors/access/access-unauthorized.error.js";
+import {UserRequestError} from "@services/errors/base/user-request.error.js";
+import {ResourceNotFoundError} from "@services/errors/resource/resource-not-found.error.js";
+import {UserContext} from "@common/request-context.js";
+import {Permissions} from "@localful/common";
+import {AccessControlOptions} from "@modules/auth/validate-authentication.js";
 
 
-@Injectable()
 export class AuthService {
   constructor(
-    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     private tokenService: TokenService,
     private configService: ConfigService,
@@ -176,12 +167,12 @@ export class AuthService {
    *
    * @param role
    */
-  static resolveRolePermissions(role: Roles): Permissions[] {
+  resolveRolePermissions(role: Roles): Permissions[] {
     const permissionProfile = RolePermissions[role]
     let permissions = permissionProfile.permissions
 
     if (permissionProfile.inherit) {
-      permissions = permissions.concat(AuthService.resolveRolePermissions(permissionProfile.inherit))
+      permissions = permissions.concat(this.resolveRolePermissions(permissionProfile.inherit))
     }
 
     return permissions
@@ -246,3 +237,6 @@ export class AuthService {
     }
   }
 }
+
+const authService = new AuthService(usersService, tokenService, configService, emailService)
+export default authService
