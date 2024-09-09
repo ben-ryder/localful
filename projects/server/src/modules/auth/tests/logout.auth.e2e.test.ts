@@ -7,7 +7,7 @@ import {testUser1} from "@testing/data/users.js";
 import {expectBadRequest} from "@testing/common/expect-bad-request.js";
 import {testInvalidDataTypes} from "@testing/common/test-invalid-data-types.js";
 import {ConfigService} from "@services/config/config.service.js";
-import container from "@common/injection/container.js";
+import {container} from "@ben-ryder/decoject";
 
 const testHelper = new TestHelper();
 beforeAll(async () => {

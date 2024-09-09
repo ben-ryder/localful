@@ -6,7 +6,7 @@ import {UserContext} from "@common/request-context.js";
 import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto} from "@modules/users/database/database-user.js";
 import {AccessForbiddenError} from "@services/errors/access/access-forbidden.error.js";
 import {PasswordService} from "@services/password/password.service.js";
-import {Injectable} from "@common/injection/injectable-decorator.js";
+import {Injectable} from "@ben-ryder/decoject";
 
 
 @Injectable()

@@ -185,14 +185,18 @@ export class DependencyContainer {
      * @param dependency
      * @param storedDependency
      */
-    forceSet<T>(dependency: Instantiable<T>, storedDependency: StoredDependency<T>) {
+    set<T>(dependency: Instantiable<T>, storedDependency: StoredDependency<T>) {
         const dependencyKey = this.getDependencyKey<T>(dependency);
+        const dependencyConfig = this.getDependencyConfig<T>(dependency);
         if (!dependencyKey) {
             throw new Error("You can't set a dependency that isn't marked as injectable as it can never be used");
+        }
+        if (dependencyConfig?.injectMode === "unique") {
+            throw new Error("You can't set a dependency that has an injectMode of unique, as the provided instance wouldn't be used anyway.");
         }
 
         this.dependencyStore[dependencyKey] = storedDependency;
     }
 }
 
-export default new DependencyContainer()
+export const container = new DependencyContainer()

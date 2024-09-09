@@ -1,17 +1,13 @@
-import "reflect-metadata";
-
 import {ConfigService} from "@services/config/config.service.js";
 import {createServer} from "./create-server.js";
-import container from "@common/injection/container.js";
+import {container} from "@ben-ryder/decoject";
 
 async function bootstrap() {
+  console.debug("[Server] Starting server")
   const server = await createServer()
   const configService = container.use(ConfigService);
 
   server.listen(configService.config.general.port);
-
-  if (configService.config.general.environment !== "production") {
-    console.log(`Server available at: http://localhost:${configService.config.general.port}`);
-  }
+  console.log(`[Server] Listening at http://localhost:${configService.config.general.port}`);
 }
 bootstrap();

@@ -5,8 +5,8 @@ import {HttpStatusCodes} from "@common/http-status-codes.js";
 import {validateAuthentication} from "@modules/auth/validate-authentication.js";
 import {UsersService} from "@modules/users/users.service.js";
 import {TokenService} from "@services/token/token.service.js";
-import {Injectable} from "@common/injection/injectable-decorator.js";
-import container from "@common/injection/container.js";
+import {Injectable, container} from "@ben-ryder/decoject";
+
 
 @Injectable()
 export class UserController {

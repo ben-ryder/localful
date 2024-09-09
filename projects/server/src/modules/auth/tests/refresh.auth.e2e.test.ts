@@ -10,7 +10,7 @@ import {expectUnauthorized} from "@testing/common/expect-unauthorized.js";
 import {expectBadRequest} from "@testing/common/expect-bad-request.js";
 import {testInvalidDataTypes} from "@testing/common/test-invalid-data-types.js";
 import {ConfigService} from "@services/config/config.service.js";
-import container from "@common/injection/container.js";
+import {container} from "@ben-ryder/decoject";
 
 // todo: remove direct use of DI container?
 

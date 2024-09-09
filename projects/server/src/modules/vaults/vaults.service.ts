@@ -2,7 +2,7 @@ import {VaultsDatabaseService} from "@modules/vaults/database/vaults.database.se
 import {AuthService} from "@modules/auth/auth.service.js";
 import {UserContext} from "@common/request-context.js";
 import {CreateVaultDto, UpdateVaultDto, VaultDto} from "@localful/common";
-import {Injectable} from "@common/injection/injectable-decorator.js";
+import {Injectable} from "@ben-ryder/decoject";
 
 
 @Injectable()

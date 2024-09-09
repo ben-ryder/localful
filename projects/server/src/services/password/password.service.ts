@@ -1,7 +1,7 @@
 import { hash, compare } from "bcrypt";
 
 import {SystemError} from "@services/errors/base/system.error.js";
-import {Injectable} from "@common/injection/injectable-decorator.js";
+import {Injectable} from "@ben-ryder/decoject";
 
 
 @Injectable()

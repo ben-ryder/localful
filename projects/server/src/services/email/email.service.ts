@@ -3,7 +3,7 @@ import formData from "form-data";
 import {IMailgunClient} from "mailgun.js/Interfaces";
 
 import {ConfigService} from "@services/config/config.service.js";
-import {Injectable} from "@common/injection/injectable-decorator.js";
+import {Injectable} from "@ben-ryder/decoject";
 
 
 export interface EmailData {

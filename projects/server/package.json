@@ -17,6 +17,7 @@
     "dev:common-rebuild": "(cd ../common && npm run build) && npm i"
   },
   "dependencies": {
+    "@ben-ryder/decoject": "file:../decoject",
     "@localful/common": "file:../common",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",

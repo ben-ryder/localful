@@ -10,7 +10,7 @@ import {UsersService} from "@modules/users/users.service.js";
 import {TokenService} from "@services/token/token.service.js";
 import {DatabaseService} from "@services/database/database.service.js";
 import {DataStoreService} from "@services/data-store/data-store.service.js";
-import container from "@common/injection/container.js";
+import {container} from "@ben-ryder/decoject";
 
 
 export class TestHelper {

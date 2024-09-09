@@ -12,16 +12,33 @@ import AuthController from "@modules/auth/auth.http.js";
 import UsersController from "@modules/users/users.http.js";
 import VaultsController from "@modules/vaults/vaults.http.js";
 import {ConfigService} from "@services/config/config.service.js";
-import container from "@common/injection/container.js";
+import {container} from "@ben-ryder/decoject";
+import {DatabaseService} from "@services/database/database.service.js";
+import {DataStoreService} from "@services/data-store/data-store.service.js";
 
 
 export async function createServer(): Promise<Server> {
+  // Start by running health checks for external services (Postgres and Redis).
+  // This allows any connection errors to be immediately thrown rather than the server being able to start with problems.
+  // todo: allow server to start and expose a /health endpoint protected by a static token for monitoring?
+  const databaseService = container.use(DatabaseService)
+  const dbIsHealth = await databaseService.healthCheck()
+  if (!dbIsHealth) {
+    console.error("Database service failed health check, likely a Postgres connection could not be established.")
+    process.exit(1);
+  }
+
+  const dataStoreService = container.use(DataStoreService)
+  const dataStoreIsHealthy = await dataStoreService.healthCheck()
+  if (!dataStoreIsHealthy) {
+    console.error("Data store service failed health check, likely a Redis connection could not be established.")
+    process.exit(1);
+  }
+  console.debug("[Server] Health checks passed")
+
+  // Basic Express and HTTP server setup
   const app = express()
   const httpServer = http.createServer(app)
-
-  // todo: add check for Postgres and Redis connection before starting the server.
-
-  // Basic setup for request parsing
   app.use(express.json());
   app.use(express.urlencoded({extended: true}));
 
@@ -37,16 +54,14 @@ export async function createServer(): Promise<Server> {
     next();
   });
 
-  // todo: define routes
+  // Load all route controllers
   app.use(BaseController)
   app.use(InfoController)
   app.use(AuthController)
   app.use(UsersController)
   app.use(VaultsController)
 
-  // todo: define websockets
-
-  // 404 response handler
+  // Setup error response handlers for 404 and server errors
   app.use(function (req: Request, res: Response, next: NextFunction) {
     res.status(HttpStatusCodes.NOT_FOUND).send({
       identifier: ErrorIdentifiers.NOT_FOUND,
@@ -54,8 +69,9 @@ export async function createServer(): Promise<Server> {
       message: "The route you requested could not be found.",
     })
   });
-
   app.use(httpErrorHandler)
+
+  // todo: setup websockets
 
   return httpServer
 }

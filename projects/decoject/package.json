@@ -1,0 +1,33 @@
+{
+  "name": "@ben-ryder/decoject",
+  "version": "0.1.0",
+  "description": "A minimal dependency injection system using decorators.",
+  "main": "build/index.js",
+  "types": "./build/index.d.ts",
+  "scripts": {
+    "prebuild": "rimraf ./build",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ben-ryder/decoject.git"
+  },
+  "keywords": [
+    "decorators",
+    "dependency injection"
+  ],
+  "author": "Ben Ryder",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ben-ryder/decoject/issues"
+  },
+  "homepage": "https://github.com/ben-ryder/decoject#readme",
+  "type": "module",
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.2.2"
+  }
+}

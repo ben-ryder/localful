@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import {ConfigSchema} from "./config-schema.js";
-import {Injectable} from "@common/injection/injectable-decorator.js";
+import {Injectable} from "@ben-ryder/decoject";
 
 
 /**

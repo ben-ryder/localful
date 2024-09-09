@@ -7,8 +7,7 @@ import { validateSchema } from "@common/schema-validator.js";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
 import {validateAuthentication} from "@modules/auth/validate-authentication.js";
 import {AuthService} from "@modules/auth/auth.service.js";
-import {Injectable} from "@common/injection/injectable-decorator.js";
-import container from "@common/injection/container.js";
+import {Injectable, container} from "@ben-ryder/decoject";
 
 
 @Injectable()

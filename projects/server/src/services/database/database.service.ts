@@ -1,7 +1,7 @@
 import postgres, { Sql } from "postgres";
 
 import {ConfigService} from "@services/config/config.service.js";
-import {Injectable} from "@common/injection/injectable-decorator.js";
+import {Injectable} from "@ben-ryder/decoject";
 
 
 @Injectable()
@@ -10,7 +10,7 @@ export class DatabaseService {
 
   constructor(private configService: ConfigService) {}
 
-  public async getSQL() {
+  async getSQL() {
     if (this.sql) {
       return this.sql;
     }
@@ -25,7 +25,18 @@ export class DatabaseService {
     return this.sql;
   }
 
-  public async onModuleDestroy() {
+  async healthCheck() {
+    try {
+      const sql = await this.getSQL()
+      await sql`select 1`
+      return true
+    }
+    catch (error) {
+      return false;
+    }
+  }
+
+  async onModuleDestroy() {
     if (this.sql) {
       await this.sql.end();
     }

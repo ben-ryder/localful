@@ -12,7 +12,7 @@ import {ResourceNotFoundError} from "@services/errors/resource/resource-not-foun
 import {UserContext} from "@common/request-context.js";
 import {Permissions} from "@localful/common";
 import {AccessControlOptions} from "@modules/auth/validate-authentication.js";
-import {Injectable} from "@common/injection/injectable-decorator.js";
+import {Injectable} from "@ben-ryder/decoject";
 
 
 @Injectable()

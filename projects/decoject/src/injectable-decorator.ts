@@ -10,7 +10,7 @@ export type InjectMode = "singleton" | "unique";
  */
 export interface DependencyConfig {
     injectMode?: InjectMode;
-    identifier?: string;
+    key?: string;
 }
 
 /**
@@ -21,8 +21,8 @@ export interface DependencyConfig {
  */
 export function Injectable(config?: DependencyConfig) {
     return function(target: any) {
-        const dependencyKey = config?.identifier
-            ? Symbol.for(config.identifier)
+        const dependencyKey = config?.key
+            ? Symbol.for(config.key)
             : Symbol.for(target.toString());
         Reflect.defineMetadata(MetadataKeys.DEPENDENCY_KEY, dependencyKey, target.prototype);
 
