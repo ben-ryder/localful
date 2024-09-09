@@ -8,7 +8,7 @@ import {validateSchema} from "@common/schema-validator.js";
 import {validateAuthentication} from "@modules/auth/validate-authentication.js";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
 import {VaultsService} from "@modules/vaults/vaults.service.js";
-import {Injectable, container} from "@ben-ryder/decoject";
+import {Injectable, container} from "@ben-ryder/injectable";
 
 @Injectable()
 export class VaultsController {

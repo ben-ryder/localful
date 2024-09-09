@@ -6,7 +6,7 @@ import {PG_FOREIGN_KEY_VIOLATION, PG_UNIQUE_VIOLATION} from "@services/database/
 import {ResourceRelationshipError} from "@services/errors/resource/resource-relationship.error.js";
 import {SystemError} from "@services/errors/base/system.error.js";
 import {ResourceNotFoundError} from "@services/errors/resource/resource-not-found.error.js";
-import {Injectable} from "@ben-ryder/decoject";
+import {Injectable} from "@ben-ryder/injectable";
 
 
 @Injectable()

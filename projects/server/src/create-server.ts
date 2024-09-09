@@ -12,7 +12,7 @@ import AuthController from "@modules/auth/auth.http.js";
 import UsersController from "@modules/users/users.http.js";
 import VaultsController from "@modules/vaults/vaults.http.js";
 import {ConfigService} from "@services/config/config.service.js";
-import {container} from "@ben-ryder/decoject";
+import {container} from "@ben-ryder/injectable";
 import {DatabaseService} from "@services/database/database.service.js";
 import {DataStoreService} from "@services/data-store/data-store.service.js";
 

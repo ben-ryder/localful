@@ -8,7 +8,7 @@ export interface Instantiable<T> {
 }
 
 /**
- * The interface for a single dependency
+ * The interface for a single dependency.
  */
 export interface StoredDependency<T> {
     signature: Instantiable<T>,
@@ -37,11 +37,11 @@ export class DependencyContainer {
     }
 
     /**
-     * Get the dependency config attached to the metadata if it exists.
+     * Get the injectable config attached to the dependency if it exists.
      * @param dependency
      */
     private getDependencyConfig<T>(dependency: Instantiable<T>): InjectableConfig | undefined {
-        // @ts-ignore
+        // @ts-ignore -- injectable can be used here.
         return dependency[injectable]
     }
 
@@ -50,17 +50,20 @@ export class DependencyContainer {
      * @param dependency
      */
     has<T>(dependency: Instantiable<T>) {
-        const dependencyKey = this.getDependencyKey(dependency);
-        if (!dependencyKey) {
+        const dependencyConfig = this.getDependencyConfig(dependency);
+        if (!dependencyConfig) {
             throw new Error("You can't check for a dependency that isn't marked as injectable");
         }
 
+        const dependencyKey = this.getDependencyKey(dependency);
         return dependencyKey in this.dependencyStore;
     }
 
     /**
-     * Use the supplied dependency via the IoC container.
-     * This method will register the dependency or retrieve the existing dependency if already registered,
+     * Get an instance of the dependency via the IoC container.
+     *
+     * This method will register the dependency or retrieve the existing dependency instance depending
+     * on the injection type and if an instance already exists.
      *
      * @param dependency
      */
@@ -76,7 +79,10 @@ export class DependencyContainer {
     }
 
     /**
-     * Register the given dependency to the container
+     * Register the given dependency to the container.
+     *
+     * For transient dependencies this will just register the signature for instantiation later,
+     * and for singleton dependencies this will create the instance now.
      *
      * @param dependencyKey
      * @param dependency
@@ -85,20 +91,22 @@ export class DependencyContainer {
     private register<T>(dependencyKey: symbol, dependency: Instantiable<T>) {
         const dependencyConfig = this.getDependencyConfig(dependency);
 
-        // For transient dependencies just register the signature for instantiation later, and for singleton
-        // dependencies create the instance now.
         if (dependencyConfig?.type === "transient") {
             this.dependencyStore[dependencyKey] = {
                 signature: dependency
             };
         }
         else {
-            this.createInstance<T>(dependencyKey, dependency);
+            const instance = this.createInstance<T>(dependency);
+            this.dependencyStore[dependencyKey] = {
+                signature: dependency,
+                instance: instance
+            };
         }
     }
 
     /**
-     * Return the dependency for the given key
+     * Return an instance of the stored dependency with the given key.
      *
      * @private
      * @param dependencyKey
@@ -106,22 +114,25 @@ export class DependencyContainer {
     private getDependency<T>(dependencyKey: symbol): T {
         const storedDependency = this.dependencyStore[dependencyKey];
 
+        if (!storedDependency) {
+            throw new Error(`Dependency '${String(dependencyKey)}' was requested but not found in the store`);
+        }
+
         if (storedDependency.instance) {
             return storedDependency.instance as T;
         }
         else {
-            return new storedDependency.signature as T;
+            return this.createInstance(storedDependency.signature);
         }
     }
 
     /**
-     * Create an instance of the given dependency, recursively injecting child dependencies too.
+     * Return an instance of the given dependency, recursively injecting child dependencies.
      *
      * @param dependency
-     * @param dependencyKey
      * @private
      */
-    private createInstance<T>(dependencyKey: symbol, dependency: Instantiable<T>) {
+    private createInstance<T>(dependency: Instantiable<T>): T {
         const dependencyConfig = this.getDependencyConfig(dependency);
 
         if (!dependencyConfig) {
@@ -131,6 +142,11 @@ export class DependencyContainer {
         const constructorArguments: any[] = []
         if (dependencyConfig.args) {
             for (const constructorArgument of dependencyConfig.args) {
+
+                if (typeof constructorArgument === 'undefined') {
+                    throw new Error("Encountered 'undefined' dependency argument, this likely means a dependency has a circular reference which isn't supported");
+                }
+
                 const constructorArgumentConfig = this.getDependencyConfig(constructorArgument)
 
                 if (constructorArgumentConfig) {
@@ -144,15 +160,12 @@ export class DependencyContainer {
             }
         }
 
-        this.dependencyStore[dependencyKey] = {
-            signature: dependency,
-            instance: new dependency(...constructorArguments)
-        };
+        return new dependency(...constructorArguments)
     }
 
     /**
-     * Override the given dependency with a new one.
-     * This can be used for overriding default dependencies for things like testing or custom implementations.
+     * Override a given dependency with a new one.
+     * This can be used for overriding dependencies for things like testing or custom implementations.
      *
      * // todo: is there a way to make this properly type safe?
      *    so ideally you would only be able to pass a dependencyOverride that matches types with dependency
@@ -162,13 +175,15 @@ export class DependencyContainer {
      */
     override<T>(dependency: Instantiable<T>, dependencyOverride: Instantiable<T>) {
         const baseDependencyKey = this.getDependencyKey<T>(dependency);
+        const baseDependencyConfig = this.getDependencyConfig<T>(dependency);
+
         const dependencyOverrideKey = this.getDependencyKey<T>(dependencyOverride);
         const dependencyOverrideConfig = this.getDependencyConfig<T>(dependencyOverride);
 
-        if (!baseDependencyKey) {
-            throw new Error("You can't override a dependency that isn't marked as injectable as it can never be used");
+        if (!baseDependencyConfig) {
+            throw new Error("You can't override a dependency that isn't marked as injectable");
         }
-        if (!dependencyOverrideConfig || !dependencyOverrideKey) {
+        if (!dependencyOverrideConfig) {
             throw new Error("You can't override a dependency with one that isn't marked as injectable");
         }
 
@@ -177,27 +192,31 @@ export class DependencyContainer {
     }
 
     /**
-     * Force set a dependency.
-     * This bypasses all automatic dependency creation & injection, but it offers a quick
-     * way to manually create dependencies if they need something custom.
-     *
-     * // todo: can this be replaced with more generic factory based DI?
+     * Force set the stored instance of a dependency, bypassing all dependency creation & injection logic.
+     * This method can only be used with singleton dependencies.
      *
      * @param dependency
-     * @param storedDependency
+     * @param instance
      */
-    set<T>(dependency: Instantiable<T>, storedDependency: StoredDependency<T>) {
+    set<T>(dependency: Instantiable<T>, instance: T) {
         const dependencyKey = this.getDependencyKey<T>(dependency);
         const dependencyConfig = this.getDependencyConfig<T>(dependency);
-        if (!dependencyKey) {
-            throw new Error("You can't set a dependency that isn't marked as injectable as it can never be used");
+
+        if (!dependencyConfig) {
+            throw new Error("You can't override a dependency that isn't marked as injectable");
         }
         if (dependencyConfig?.type === "transient") {
-            throw new Error("You can't set a dependency that has an injection mode of transient, as the provided instance wouldn't be used anyway.");
+            throw new Error("You can't set the instance of a transient dependency, as a new instance will be returned each time.");
         }
 
-        this.dependencyStore[dependencyKey] = storedDependency;
+        this.dependencyStore[dependencyKey] = {
+            signature: dependency,
+            instance: instance
+        };
     }
 }
 
+/**
+ * Export a default singleton container that can be used by package consumers.
+ */
 export const container = new DependencyContainer()

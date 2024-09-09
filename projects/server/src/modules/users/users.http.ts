@@ -5,7 +5,7 @@ import {HttpStatusCodes} from "@common/http-status-codes.js";
 import {validateAuthentication} from "@modules/auth/validate-authentication.js";
 import {UsersService} from "@modules/users/users.service.js";
 import {TokenService} from "@services/token/token.service.js";
-import {Injectable, container} from "@ben-ryder/decoject";
+import {Injectable, container} from "@ben-ryder/injectable";
 
 
 @Injectable()

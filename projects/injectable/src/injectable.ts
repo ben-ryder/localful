@@ -5,4 +5,3 @@ export type InjectableConfig = {
     type: 'singleton' | 'transient'
     args?: any[]
 }
-

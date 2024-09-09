@@ -2,7 +2,7 @@ import {Redis} from "ioredis";
 
 import {ConfigService} from "@services/config/config.service.js";
 import {SystemError} from "@services/errors/base/system.error.js";
-import {Injectable} from "@ben-ryder/decoject";
+import {Injectable} from "@ben-ryder/injectable";
 
 export interface CacheOptions {
   epochExpiry: number;

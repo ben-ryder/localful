@@ -2,7 +2,7 @@ import {ServerInfoDto} from "@localful/common";
 import {ConfigService} from "@services/config/config.service.js";
 import express, {NextFunction, Request, Response} from "express";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
-import {Injectable, container} from "@ben-ryder/decoject";
+import {Injectable, container} from "@ben-ryder/injectable";
 
 
 @Injectable()

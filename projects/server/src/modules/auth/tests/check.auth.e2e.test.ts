@@ -6,7 +6,7 @@ import {TestHelper} from "@testing/test-helper.js";
 import {testUser1} from "@testing/data/users.js";
 import {expectUnauthorized} from "@testing/common/expect-unauthorized.js";
 import {ConfigService} from "@services/config/config.service.js";
-import {container} from "@ben-ryder/decoject";
+import {container} from "@ben-ryder/injectable";
 
 const testHelper = new TestHelper();
 beforeAll(async () => {

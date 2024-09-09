@@ -1,0 +1,36 @@
+{
+  "name": "@ben-ryder/injectable",
+  "version": "0.1.0",
+  "description": "A minimal dependency injection library for typescript and javascript without using decorators.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "build/index.js",
+  "types": "./build/index.d.ts",
+  "scripts": {
+    "prebuild": "rimraf ./build",
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ben-ryder/injectable.git"
+  },
+  "keywords": [
+    "dependency injection"
+  ],
+  "author": "Ben Ryder",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ben-ryder/injectable/issues"
+  },
+  "homepage": "https://github.com/ben-ryder/injectable#readme",
+  "type": "module",
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
+}

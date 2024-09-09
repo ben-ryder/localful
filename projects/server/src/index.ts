@@ -1,6 +1,6 @@
 import {ConfigService} from "@services/config/config.service.js";
 import {createServer} from "./create-server.js";
-import {container} from "@ben-ryder/decoject";
+import {container} from "@ben-ryder/injectable";
 
 async function bootstrap() {
   console.debug("[Server] Starting server")
