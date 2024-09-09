@@ -1,5 +1,4 @@
-import {MetadataKeys} from "./metadata-keys.js";
-import {DependencyConfig} from "./injectable-decorator.js";
+import {injectable, InjectableConfig} from "./injectable.js";
 
 /**
  * An interface for something that is instantiable.
@@ -33,16 +32,17 @@ export class DependencyContainer {
      * Get the dependency key attached to the metadata if it exists.
      * @param dependency
      */
-    private getDependencyKey<T>(dependency: Instantiable<T>): symbol | undefined {
-        return <symbol> Reflect.getMetadata(MetadataKeys.DEPENDENCY_KEY, dependency.prototype);
+    private getDependencyKey<T>(dependency: Instantiable<T>): symbol {
+        return Symbol.for(dependency.toString())
     }
 
     /**
      * Get the dependency config attached to the metadata if it exists.
      * @param dependency
      */
-    private getDependencyConfig<T>(dependency: Instantiable<T>): DependencyConfig | undefined {
-        return <DependencyConfig> Reflect.getMetadata(MetadataKeys.DEPENDENCY_CONFIG, dependency.prototype);
+    private getDependencyConfig<T>(dependency: Instantiable<T>): InjectableConfig | undefined {
+        // @ts-ignore
+        return dependency[injectable]
     }
 
     /**
@@ -67,11 +67,6 @@ export class DependencyContainer {
     use<T>(dependency: Instantiable<T>): T {
         const dependencyKey = this.getDependencyKey(dependency);
 
-        // To prevent possible issues only accept dependencies that are explicitly marked as injectable
-        if (!dependencyKey) {
-            throw new Error("You can't use a dependency that isn't marked as injectable");
-        }
-
         // Register the dependency if it doesn't already exist.
         if (!(dependencyKey in this.dependencyStore)) {
             this.register<T>(dependencyKey, dependency);
@@ -90,7 +85,9 @@ export class DependencyContainer {
     private register<T>(dependencyKey: symbol, dependency: Instantiable<T>) {
         const dependencyConfig = this.getDependencyConfig(dependency);
 
-        if (dependencyConfig?.injectMode === "unique") {
+        // For transient dependencies just register the signature for instantiation later, and for singleton
+        // dependencies create the instance now.
+        if (dependencyConfig?.type === "transient") {
             this.dependencyStore[dependencyKey] = {
                 signature: dependency
             };
@@ -125,22 +122,26 @@ export class DependencyContainer {
      * @private
      */
     private createInstance<T>(dependencyKey: symbol, dependency: Instantiable<T>) {
-        const constructorArguments: any[] = [];
-        const argumentTypes = <any[]> Reflect.getMetadata("design:paramtypes", dependency) ?? [];
+        const dependencyConfig = this.getDependencyConfig(dependency);
 
-        for (const constructorArgument of argumentTypes) {
-            if (constructorArgument.constructor) {
-                const constructorArgumentKey = <symbol> Reflect.getMetadata(MetadataKeys.DEPENDENCY_KEY, constructorArgument.prototype);
+        if (!dependencyConfig) {
+            throw new Error("Attempted to create instance of dependency that isn't marked as injectable");
+        }
 
-                if (constructorArgumentKey) {
+        const constructorArguments: any[] = []
+        if (dependencyConfig.args) {
+            for (const constructorArgument of dependencyConfig.args) {
+                const constructorArgumentConfig = this.getDependencyConfig(constructorArgument)
+
+                if (constructorArgumentConfig) {
                     constructorArguments.push(
                         this.use<T>(constructorArgument)
                     );
                     continue;
                 }
-            }
 
-            constructorArguments.push(constructorArgument);
+                constructorArguments.push(constructorArgument);
+            }
         }
 
         this.dependencyStore[dependencyKey] = {
@@ -191,8 +192,8 @@ export class DependencyContainer {
         if (!dependencyKey) {
             throw new Error("You can't set a dependency that isn't marked as injectable as it can never be used");
         }
-        if (dependencyConfig?.injectMode === "unique") {
-            throw new Error("You can't set a dependency that has an injectMode of unique, as the provided instance wouldn't be used anyway.");
+        if (dependencyConfig?.type === "transient") {
+            throw new Error("You can't set a dependency that has an injection mode of transient, as the provided instance wouldn't be used anyway.");
         }
 
         this.dependencyStore[dependencyKey] = storedDependency;

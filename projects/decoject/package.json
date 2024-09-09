@@ -6,7 +6,8 @@
   "types": "./build/index.d.ts",
   "scripts": {
     "prebuild": "rimraf ./build",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "tsx test/test.ts"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,8 @@
   "type": "module",
   "devDependencies": {
     "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.0",
     "typescript": "^5.5.4"
   },
   "dependencies": {
