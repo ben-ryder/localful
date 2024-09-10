@@ -7,8 +7,8 @@
   "scripts": {
     "prebuild": "rimraf build",
     "build": "tsc --project ./tsconfig.build.json && tsc-alias",
-    "start": "tsx ./src/index.ts",
-    "start:prod": "npm run build && node build/index.js",
+    "start": "tsx watch ./bin/index.ts",
+    "start:prod": "npm run build && node ./build/bin/index.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "vitest run",
     "db:init": "psql postgres -f ./scripts/setup.sql && npm run db:init:data",

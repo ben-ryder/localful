@@ -7,7 +7,6 @@ import {testUser1} from "@testing/data/users.js";
 import {expectBadRequest} from "@testing/common/expect-bad-request.js";
 import {testInvalidDataTypes} from "@testing/common/test-invalid-data-types.js";
 import {ConfigService} from "@services/config/config.service.js";
-import {container} from "../../../di-container.js";
 
 const testHelper = new TestHelper();
 beforeAll(async () => {
@@ -51,7 +50,7 @@ describe("Logout Auth",() => {
 
   describe("Invalid/Expired Tokens", () => {
     test("When an expired refresh token is supplied, the request should fail", async () => {
-      const configService = container.resolve<ConfigService>(ConfigService);
+      const configService = testHelper.getAppDependency<ConfigService>(ConfigService);
       const refreshToken = sign(
         {userId: testUser1.id, type: "refreshToken"},
         configService.config.auth.refreshToken.secret,

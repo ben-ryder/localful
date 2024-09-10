@@ -10,7 +10,7 @@ import {VaultsService} from "@modules/vaults/vaults.service.js";
 import {AccessControlService} from "@modules/auth/access-control.service.js";
 
 
-export class VaultsController {
+export class VaultsHttpController {
   constructor(
       private vaultsService: VaultsService,
       private accessControlService: AccessControlService

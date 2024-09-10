@@ -9,7 +9,7 @@ import {AuthService} from "@modules/auth/auth.service.js";
 import {AccessControlService} from "@modules/auth/access-control.service.js";
 
 
-export class AuthController {
+export class AuthHttpController {
   constructor(
       private readonly authService: AuthService,
       private readonly accessControlService: AccessControlService

@@ -1,10 +1,10 @@
 import {ServerInfoDto} from "@localful/common";
 import {ConfigService} from "@services/config/config.service.js";
-import express, {NextFunction, Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
 
 
-export class InfoController {
+export class InfoHttpController {
   constructor(private configService: ConfigService) {}
 
   async getInfo(req: Request, res: Response, next: NextFunction) {

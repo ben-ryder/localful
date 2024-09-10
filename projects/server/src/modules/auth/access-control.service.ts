@@ -28,6 +28,7 @@ export interface AccessControlOptions {
 
 export class AccessControlService {
     constructor(
+        // todo: must depend on UsersDatabaseService not UsersService to prevent circular dependency. Ideally everything should go through main service?
         private readonly usersDatabaseService: UsersDatabaseService,
         private readonly tokenService: TokenService
     ) {}

@@ -7,7 +7,7 @@ import {TokenService} from "@services/token/token.service.js";
 import {AccessControlService} from "@modules/auth/access-control.service.js";
 
 
-export class UsersController {
+export class UsersHttpController {
   constructor(
       private usersService: UsersService,
       private tokenService: TokenService,
