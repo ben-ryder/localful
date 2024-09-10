@@ -1,24 +1,19 @@
 import {UsersDatabaseService} from "@modules/users/database/users.database.service.js";
-import type {AuthService} from "@modules/auth/auth.service.js";
 import {ConfigService} from "@services/config/config.service.js";
 import {CreateUserDto, ErrorIdentifiers, UpdateUserDto, UserDto} from "@localful/common";
 import {UserContext} from "@common/request-context.js";
 import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto} from "@modules/users/database/database-user.js";
 import {AccessForbiddenError} from "@services/errors/access/access-forbidden.error.js";
 import {PasswordService} from "@services/password/password.service.js";
-import {Injectable} from "@ben-ryder/injectable";
+import {AccessControlService} from "@modules/auth/access-control.service.js";
 
 
-@Injectable()
 export class UsersService {
     constructor(
        private usersDatabaseService: UsersDatabaseService,
-       private authService: AuthService,
        private configService: ConfigService,
-    ) {
-        this._UNSAFE_get = this._UNSAFE_get.bind(this);
-        this.create = this.create.bind(this);
-    }
+       private accessControlService: AccessControlService,
+    ) {}
 
     async _UNSAFE_get(userId: string): Promise<UserDto> {
         const user = await this.usersDatabaseService.get(userId);
@@ -26,7 +21,7 @@ export class UsersService {
     }
 
     async get(userContext: UserContext, userId: string): Promise<UserDto> {
-        await this.authService.validateAccessControlRules({
+        await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["users:retrieve"],
             unscopedPermissions: ["users:retrieve:all"],
             requestingUserContext: userContext,
@@ -66,8 +61,8 @@ export class UsersService {
 
         const databaseUser = await this.usersDatabaseService.create(databaseCreateUserDto);
 
-        // todo: add test that email verification fires when creating an account?
-        await this.authService.requestEmailVerification(databaseUser.id)
+        // todo: add email verification when an account is created?
+        // needs to be done in a way that doesn't add a circular reference to the auth service, maybe requires a restructure?
 
         return this.convertDatabaseDto(databaseUser);
     }
@@ -89,7 +84,7 @@ export class UsersService {
     }
 
     async update(userContext: UserContext, userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
-        await this.authService.validateAccessControlRules({
+        await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["users:update"],
             unscopedPermissions: ["users:update:all"],
             requestingUserContext: userContext,
@@ -104,7 +99,7 @@ export class UsersService {
     }
 
     async delete(userContext: UserContext, userId: string): Promise<void> {
-        await this.authService.validateAccessControlRules({
+        await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["users:delete"],
             unscopedPermissions: ["users:delete:all"],
             requestingUserContext: userContext,

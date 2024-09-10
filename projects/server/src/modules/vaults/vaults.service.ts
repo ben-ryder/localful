@@ -1,15 +1,13 @@
 import {VaultsDatabaseService} from "@modules/vaults/database/vaults.database.service.js";
-import {AuthService} from "@modules/auth/auth.service.js";
 import {UserContext} from "@common/request-context.js";
 import {CreateVaultDto, UpdateVaultDto, VaultDto} from "@localful/common";
-import {Injectable} from "@ben-ryder/injectable";
+import {AccessControlService} from "@modules/auth/access-control.service.js";
 
 
-@Injectable()
 export class VaultsService {
     constructor(
        private vaultsDatabaseService: VaultsDatabaseService,
-       public authService: AuthService,
+       public accessControlService: AccessControlService,
     ) {}
 
     async _UNSAFE_get(id: string) {
@@ -19,7 +17,7 @@ export class VaultsService {
     async get(userContext: UserContext, id: string) {
         const vault = await this._UNSAFE_get(id);
 
-        await this.authService.validateAccessControlRules({
+        await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["vaults:retrieve"],
             unscopedPermissions: ["vaults:retrieve:all"],
             requestingUserContext: userContext,
@@ -34,7 +32,7 @@ export class VaultsService {
     }
 
     async create(userContext: UserContext, createVaultDto: CreateVaultDto): Promise<VaultDto> {
-        await this.authService.validateAccessControlRules({
+        await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["vaults:create"],
             unscopedPermissions: ["vaults:create:all"],
             requestingUserContext: userContext,
@@ -51,7 +49,7 @@ export class VaultsService {
     async update(userContext: UserContext, id: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {
         const vault = await this._UNSAFE_get(id);
 
-        await this.authService.validateAccessControlRules({
+        await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["vaults:update"],
             unscopedPermissions: ["vaults:update:all"],
             requestingUserContext: userContext,
@@ -68,7 +66,7 @@ export class VaultsService {
     async delete(userContext: UserContext, id: string): Promise<void> {
         const vault = await this._UNSAFE_get(id);
 
-        await this.authService.validateAccessControlRules({
+        await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["vaults:delete"],
             unscopedPermissions: ["vaults:delete:all"],
             requestingUserContext: userContext,

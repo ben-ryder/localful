@@ -7,8 +7,6 @@ import {errorHttpMapping, fallbackMapping} from "./error-http-mappings.js";
 export async function httpErrorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
   const errorName = err.constructor.name;
 
-  console.error(err);
-
   const httpCode = errorHttpMapping[errorName]?.statusCode || fallbackMapping.statusCode;
   let message = fallbackMapping.defaultMessage;
   let identifier = fallbackMapping.identifier;

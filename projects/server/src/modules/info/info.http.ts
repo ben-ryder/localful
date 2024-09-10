@@ -2,10 +2,8 @@ import {ServerInfoDto} from "@localful/common";
 import {ConfigService} from "@services/config/config.service.js";
 import express, {NextFunction, Request, Response} from "express";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
-import {Injectable, container} from "@ben-ryder/injectable";
 
 
-@Injectable()
 export class InfoController {
   constructor(private configService: ConfigService) {}
 
@@ -29,11 +27,3 @@ export class InfoController {
     }
   }
 }
-
-const infoController = container.use(InfoController);
-
-const InfoRouter = express.Router();
-InfoRouter
-    .get("/info", infoController.getInfo);
-
-export default InfoRouter;

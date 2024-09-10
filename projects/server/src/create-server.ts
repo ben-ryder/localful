@@ -1,34 +1,32 @@
 import express, {NextFunction, Request, Response} from "express";
 import http, {Server} from "node:http";
-import {httpErrorHandler} from "@services/errors/http-error-handler.js";
 import cors from "cors";
-import {createCorsOptions} from "@common/validate-cors.js";
-import {HttpStatusCodes} from "@common/http-status-codes.js";
+
 import {ErrorIdentifiers} from "@localful/common";
 
-import BaseController from "@modules/base/base.http.js";
-import InfoController from "@modules/info/info.http.js";
-import AuthController from "@modules/auth/auth.http.js";
-import UsersController from "@modules/users/users.http.js";
-import VaultsController from "@modules/vaults/vaults.http.js";
+import {createCorsOptions} from "@common/validate-cors.js";
+import {HttpStatusCodes} from "@common/http-status-codes.js";
+
+import {container} from "./di-container.js";
 import {ConfigService} from "@services/config/config.service.js";
-import {container} from "@ben-ryder/injectable";
 import {DatabaseService} from "@services/database/database.service.js";
 import {DataStoreService} from "@services/data-store/data-store.service.js";
+import {httpErrorHandler} from "@services/errors/http-error-handler.js";
+import {AuthRouter, BaseRouter, InfoRouter, UsersRouter, VaultsRouter} from "./routes.js";
 
 
 export async function createServer(): Promise<Server> {
   // Start by running health checks for external services (Postgres and Redis).
   // This allows any connection errors to be immediately thrown rather than the server being able to start with problems.
   // todo: allow server to start and expose a /health endpoint protected by a static token for monitoring?
-  const databaseService = container.use(DatabaseService)
+  const databaseService = container.resolve<DatabaseService>(DatabaseService)
   const dbIsHealth = await databaseService.healthCheck()
   if (!dbIsHealth) {
     console.error("Database service failed health check, likely a Postgres connection could not be established.")
     process.exit(1);
   }
 
-  const dataStoreService = container.use(DataStoreService)
+  const dataStoreService = container.resolve<DataStoreService>(DataStoreService)
   const dataStoreIsHealthy = await dataStoreService.healthCheck()
   if (!dataStoreIsHealthy) {
     console.error("Data store service failed health check, likely a Redis connection could not be established.")
@@ -43,7 +41,7 @@ export async function createServer(): Promise<Server> {
   app.use(express.urlencoded({extended: true}));
 
   // Cors setup
-  const configService = container.use(ConfigService);
+  const configService = container.resolve<ConfigService>(ConfigService);
   const corsOptions = createCorsOptions(configService)
   app.use(cors(corsOptions))
   app.options("*", cors(corsOptions))
@@ -55,11 +53,11 @@ export async function createServer(): Promise<Server> {
   });
 
   // Load all route controllers
-  app.use(BaseController)
-  app.use(InfoController)
-  app.use(AuthController)
-  app.use(UsersController)
-  app.use(VaultsController)
+  app.use(BaseRouter)
+  app.use(InfoRouter)
+  app.use(AuthRouter)
+  app.use(UsersRouter)
+  app.use(VaultsRouter)
 
   // Setup error response handlers for 404 and server errors
   app.use(function (req: Request, res: Response, next: NextFunction) {

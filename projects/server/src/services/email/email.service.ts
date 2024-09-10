@@ -3,7 +3,6 @@ import formData from "form-data";
 import {IMailgunClient} from "mailgun.js/Interfaces";
 
 import {ConfigService} from "@services/config/config.service.js";
-import {Injectable} from "@ben-ryder/injectable";
 
 
 export interface EmailData {
@@ -13,7 +12,6 @@ export interface EmailData {
 }
 
 
-@Injectable()
 export class EmailService {
   private readonly mailgunClient: IMailgunClient;
   private readonly senderString: string;

@@ -2,7 +2,6 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import {ConfigSchema} from "./config-schema.js";
-import {Injectable} from "@ben-ryder/injectable";
 
 
 /**
@@ -13,7 +12,6 @@ import {Injectable} from "@ben-ryder/injectable";
  * The config uses a zod schema, so it will throw an error if the config doesn't follow the schema.
  */
 
-@Injectable()
 export class ConfigService {
   readonly config: ConfigSchema = ConfigSchema.parse({
     general: {

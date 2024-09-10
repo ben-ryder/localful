@@ -2,20 +2,15 @@ import type {UsersService} from "@modules/users/users.service.js";
 import {TokenService} from "@services/token/token.service.js";
 import {ConfigService} from "@services/config/config.service.js";
 import {EmailService} from "@services/email/email.service.js";
-import {AuthUserResponse, ErrorIdentifiers, RolePermissions, Roles, TokenPair} from "@localful/common";
+import {AuthUserResponse, ErrorIdentifiers, TokenPair} from "@localful/common";
 import {DatabaseUserDto} from "@modules/users/database/database-user.js";
 import {AccessForbiddenError} from "@services/errors/access/access-forbidden.error.js";
 import {PasswordService} from "@services/password/password.service.js";
 import {AccessUnauthorizedError} from "@services/errors/access/access-unauthorized.error.js";
 import {UserRequestError} from "@services/errors/base/user-request.error.js";
-import {ResourceNotFoundError} from "@services/errors/resource/resource-not-found.error.js";
 import {UserContext} from "@common/request-context.js";
-import {Permissions} from "@localful/common";
-import {AccessControlOptions} from "@modules/auth/validate-authentication.js";
-import {Injectable} from "@ben-ryder/injectable";
 
 
-@Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
@@ -89,95 +84,6 @@ export class AuthService {
     }
 
     await this.tokenService.blacklistTokenGroup(tokenPayload.gid, tokenPayload.exp);
-  }
-
-  /**
-   * A function that validates the supplied access token against
-   * Returns the user context if valid, throws an error if not.
-   *
-   * @param options
-   */
-  async validateAccessControlRules(options: AccessControlOptions): Promise<void> {
-    // Validate the requesting users verification first, as they shouldn't be able to do anything when unverified even if they have valid permissions.
-    if (!options.requestingUserContext.verifiedAt && !options.allowUnverifiedRequestingUser) {
-      throw new AccessForbiddenError({
-        identifier: ErrorIdentifiers.AUTH_NOT_VERIFIED,
-        applicationMessage: "You are unverified and do not have the permissions required to perform this action."
-      });
-    }
-
-    let hasValidPermission = false;
-    for (const userPermission of options.userScopedPermissions) {
-      if (
-        options.requestingUserContext?.permissions.includes(userPermission) &&
-        options.requestingUserContext.id === options.targetUserId
-      ) {
-        hasValidPermission = true;
-        break
-      }
-    }
-    for (const globalPermission of options.unscopedPermissions) {
-      if (
-        options.requestingUserContext?.permissions.includes(globalPermission)
-      ) {
-        hasValidPermission = true;
-        break
-      }
-    }
-
-    if (!hasValidPermission) {
-      throw new AccessForbiddenError({
-        applicationMessage: "You do not have the permissions required to perform this action."
-      });
-    }
-
-    // Check target user permissions AFTER permission checks.
-    // This ensures no target user information (like verification status) will be exposed to users that only have
-    // permissions to access their own data.
-    if (!options.allowUnverifiedTargetUser && options.requestingUserContext.id !== options.targetUserId) {
-
-      let targetUser
-      try {
-        targetUser = await this.usersService._UNSAFE_get(options.targetUserId)
-      }
-      catch (e) {
-        // Rethrow a user not found error as a request error
-        if (e instanceof ResourceNotFoundError && e.identifier === ErrorIdentifiers.USER_NOT_FOUND) {
-          throw new UserRequestError({
-            identifier: ErrorIdentifiers.USER_NOT_FOUND,
-            applicationMessage: "You have attempted to perform an action against a user that doesn't exist."
-          })
-        }
-
-        throw e
-      }
-
-      if (!targetUser.verifiedAt) {
-        throw new UserRequestError({
-          identifier: ErrorIdentifiers.AUTH_NOT_VERIFIED,
-          applicationMessage: "You have attempted to perform an action against an unverified user."
-        });
-      }
-    }
-
-    return
-  }
-
-  /**
-   * Get the permissions associated with the given role.
-   * This function includes resolving all inherited permissions too.
-   *
-   * @param role
-   */
-  static resolveRolePermissions(role: Roles): Permissions[] {
-    const permissionProfile = RolePermissions[role]
-    let permissions = permissionProfile.permissions
-
-    if (permissionProfile.inherit) {
-      permissions = permissions.concat(AuthService.resolveRolePermissions(permissionProfile.inherit))
-    }
-
-    return permissions
   }
 
   async requestEmailVerification(userId: string) {

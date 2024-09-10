@@ -1,8 +1,6 @@
-import express, {NextFunction, Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
-import {Injectable, container} from "@ben-ryder/injectable";
 
-@Injectable()
 export class BaseController {
   async sendWelcomeMessage(req: Request, res: Response, next: NextFunction) {
     return res.status(HttpStatusCodes.OK).send({
@@ -10,12 +8,3 @@ export class BaseController {
     })
   }
 }
-
-const baseController = container.use(BaseController);
-
-const BaseRouter = express.Router();
-BaseRouter
-    .get("/", baseController.sendWelcomeMessage)
-    .get("/v1", baseController.sendWelcomeMessage)
-
-export default BaseRouter;

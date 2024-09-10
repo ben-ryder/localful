@@ -1,18 +1,19 @@
-import express, {NextFunction, Request, Response} from "express"
+import {NextFunction, Request, Response} from "express"
 
 import {LoginRequest, LogoutRequest, RefreshRequest, VerifyEmailDto} from "@localful/common";
 
 import {RequestWithContext} from "@common/request-context.js";
 import { validateSchema } from "@common/schema-validator.js";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
-import {validateAuthentication} from "@modules/auth/validate-authentication.js";
 import {AuthService} from "@modules/auth/auth.service.js";
-import {Injectable, container} from "@ben-ryder/injectable";
+import {AccessControlService} from "@modules/auth/access-control.service.js";
 
 
-@Injectable()
 export class AuthController {
-  constructor(public authService: AuthService) {}
+  constructor(
+      private readonly authService: AuthService,
+      private readonly accessControlService: AccessControlService
+  ) {}
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
@@ -49,7 +50,7 @@ export class AuthController {
 
   async check(req: Request, res: Response, next: NextFunction) {
     try {
-      await validateAuthentication(req);
+      await this.accessControlService.validateAuthentication(req);
       return res.status(HttpStatusCodes.OK).send({
         statusCode: HttpStatusCodes.OK,
         message: "Current user is authenticated"
@@ -70,8 +71,8 @@ export class AuthController {
    */
   async requestEmailVerification(req: RequestWithContext, res: Response, next: NextFunction) {
     try {
-      await validateAuthentication(req);
-      await this.authService.requestEmailVerification(req.context.user.id)
+      const requestUser = await this.accessControlService.validateAuthentication(req);
+      await this.authService.requestEmailVerification(requestUser.id)
       return res.sendStatus(HttpStatusCodes.OK)
     }
     catch (error) {
@@ -88,10 +89,10 @@ export class AuthController {
    */
   async verifyEmail(req: RequestWithContext, res: Response, next: NextFunction) {
     try {
-      await validateAuthentication(req);
+      const requestUser = await this.accessControlService.validateAuthentication(req);
       const data = await validateSchema(req.body, VerifyEmailDto);
-      await this.authService.verifyEmail(req.context.user, data.token)
-      return res.sendStatus(HttpStatusCodes.OK)
+      const response = await this.authService.verifyEmail(requestUser, data.token)
+      return res.status(HttpStatusCodes.OK).send(response)
     }
     catch (error) {
       next(error)
@@ -100,7 +101,7 @@ export class AuthController {
 
   async requestEmailChange(req: Request, res: Response, next: NextFunction) {
     try {
-      await validateAuthentication(req);
+      await this.accessControlService.validateAuthentication(req);
 
       // todo: implement /v1/auth/verify [GET]
       return res.status(HttpStatusCodes.NOT_IMPLEMENTED).send({
@@ -115,7 +116,7 @@ export class AuthController {
 
   async changeEmail(req: RequestWithContext, res: Response, next: NextFunction) {
     try {
-      await validateAuthentication(req);
+      await this.accessControlService.validateAuthentication(req);
 
       // todo: implement /v1/auth/verify [GET]
       return res.status(HttpStatusCodes.NOT_IMPLEMENTED).send({
@@ -130,7 +131,7 @@ export class AuthController {
 
   async requestPasswordChange(req: RequestWithContext, res: Response, next: NextFunction) {
     try {
-      await validateAuthentication(req);
+      await this.accessControlService.validateAuthentication(req);
 
       // todo: implement /v1/auth/verify [GET]
       return res.status(HttpStatusCodes.NOT_IMPLEMENTED).send({
@@ -145,7 +146,7 @@ export class AuthController {
 
   async changePassword(req: RequestWithContext, res: Response, next: NextFunction) {
     try {
-      await validateAuthentication(req);
+      await this.accessControlService.validateAuthentication(req);
 
       // todo: implement /v1/auth/verify [GET]
       return res.status(HttpStatusCodes.NOT_IMPLEMENTED).send({
@@ -158,24 +159,3 @@ export class AuthController {
     }
   }
 }
-
-const authController = container.use(AuthController);
-
-const AuthRouter = express.Router();
-AuthRouter
-    // Basic Auth
-    .post("/v1/auth/login", authController.login.bind(authController))
-    .post("/v1/auth/logout", authController.logout.bind(authController))
-    .post("/v1/auth/refresh", authController.refresh.bind(authController))
-    .post("/v1/auth/check", authController.check.bind(authController))
-    // Email Verification
-    .get("/v1/auth/verify-email", authController.requestEmailVerification.bind(authController))
-    .post("/v1/auth/verify-email", authController.verifyEmail.bind(authController))
-    // Change Email
-    .get("/v1/auth/change-email", authController.requestEmailChange.bind(authController))
-    .post("/v1/auth/change-email", authController.changeEmail.bind(authController))
-    // Change Password
-    .get("/v1/auth/change-password", authController.requestPasswordChange.bind(authController))
-    .post("/v1/auth/change-password", authController.changePassword.bind(authController))
-
-export default AuthRouter;

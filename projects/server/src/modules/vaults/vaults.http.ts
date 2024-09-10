@@ -3,24 +3,26 @@ import {
   UpdateVaultDto,
   VaultsURLParams
 } from "@localful/common";
-import express, {NextFunction, Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 import {validateSchema} from "@common/schema-validator.js";
-import {validateAuthentication} from "@modules/auth/validate-authentication.js";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
 import {VaultsService} from "@modules/vaults/vaults.service.js";
-import {Injectable, container} from "@ben-ryder/injectable";
+import {AccessControlService} from "@modules/auth/access-control.service.js";
 
-@Injectable()
+
 export class VaultsController {
-  constructor(private vaultsService: VaultsService) {}
+  constructor(
+      private vaultsService: VaultsService,
+      private accessControlService: AccessControlService
+  ) {}
 
   async createVault(req: Request, res: Response, next: NextFunction) {
     try {
       const createVaultDto = await validateSchema(req.body, CreateVaultDto);
-      const requestUser = await validateAuthentication(req);
+      const requestUser = await this.accessControlService.validateAuthentication(req);
 
       const result = await this.vaultsService.create(requestUser, createVaultDto);
-      res.status(HttpStatusCodes.OK).json(result);
+      res.status(HttpStatusCodes.CREATED).json(result);
     }
     catch (error) {
       next(error);
@@ -30,7 +32,7 @@ export class VaultsController {
   async getVault(req: Request, res: Response, next: NextFunction) {
     try {
       const params = await validateSchema(req.params, VaultsURLParams);
-      const requestUser = await validateAuthentication(req);
+      const requestUser = await this.accessControlService.validateAuthentication(req);
 
       const result = await this.vaultsService.get(requestUser, params.vaultId);
       res.status(HttpStatusCodes.OK).json(result);
@@ -44,7 +46,7 @@ export class VaultsController {
     try {
       const params = await validateSchema(req.params, VaultsURLParams);
       const updateVaultDto = await validateSchema(req.body, UpdateVaultDto);
-      const requestUser = await validateAuthentication(req);
+      const requestUser = await this.accessControlService.validateAuthentication(req);
 
       const result = await this.vaultsService.update(requestUser, params.vaultId, updateVaultDto);
       res.status(HttpStatusCodes.OK).json(result);
@@ -57,7 +59,7 @@ export class VaultsController {
   async deleteVault(req: Request, res: Response, next: NextFunction) {
     try {
       const params = await validateSchema(req.params, VaultsURLParams);
-      const requestUser = await validateAuthentication(req);
+      const requestUser = await this.accessControlService.validateAuthentication(req);
 
       const result = await this.vaultsService.delete(requestUser, params.vaultId);
       res.status(HttpStatusCodes.OK).json(result);
@@ -67,14 +69,3 @@ export class VaultsController {
     }
   }
 }
-
-const vaultController = container.use(VaultsController);
-
-const VaultsRouter = express.Router();
-VaultsRouter
-    .get("/v1/vaults/:vaultId", vaultController.getVault)
-    .post("/v1/vaults/:vaultId", vaultController.createVault)
-    .patch("/v1/vaults/:vaultId", vaultController.updateVault)
-    .delete("/v1/vaults/:vaultId", vaultController.deleteVault);
-
-export default VaultsRouter;

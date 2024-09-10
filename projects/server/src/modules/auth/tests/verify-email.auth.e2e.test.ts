@@ -142,23 +142,23 @@ describe("Email Verification - /v1/auth/verify-email [GET, POST]",() => {
   })
 
   // Testing auth & user permissions work.
-  describe("Authentication & Permissions", () => {})
+  // describe("Authentication & Permissions", () => {})
 
   // Testing all unique constraint work.
-  describe("Unique Validation", () => {})
+  // describe("Unique Validation", () => {})
 
   // Testing all required field work.
-  describe("Required Field Validation", () => {})
+  // describe("Required Field Validation", () => {})
 
   // Testing internal/system fields are not user editable (timestamps, id, owner relationships etc).
-  describe("Forbidden Field Validation", () => {})
+  // describe("Forbidden Field Validation", () => {})
 
   // Testing logical validation works (string formats like email, number ranges, etc)
-  describe("Logical Validation", () => {})
+  // describe("Logical Validation", () => {})
 
   // Testing relationship validation works (fails on invalid foreign keys).
-  describe("Relationship Validation", () => {})
+  // describe("Relationship Validation", () => {})
 
   // Testing invalid type validation works (pass number to sting field, malformed data etc).
-  describe("Type Validation", () => {})
+  // describe("Type Validation", () => {})
 })

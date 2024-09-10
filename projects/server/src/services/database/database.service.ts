@@ -1,10 +1,8 @@
 import postgres, { Sql } from "postgres";
 
 import {ConfigService} from "@services/config/config.service.js";
-import {Injectable} from "@ben-ryder/injectable";
 
 
-@Injectable()
 export class DatabaseService {
   private sql: Sql<any> | null = null;
 

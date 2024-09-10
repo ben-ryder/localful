@@ -10,7 +10,7 @@ import {expectUnauthorized} from "@testing/common/expect-unauthorized.js";
 import {expectBadRequest} from "@testing/common/expect-bad-request.js";
 import {testInvalidDataTypes} from "@testing/common/test-invalid-data-types.js";
 import {ConfigService} from "@services/config/config.service.js";
-import {container} from "@ben-ryder/injectable";
+import {container} from "../../../di-container.js";
 
 // todo: remove direct use of DI container?
 
@@ -99,7 +99,7 @@ describe("Refresh Auth",() => {
 
     test("When supplying an expired refreshToken, the request should fail", async () => {
       // Create an expired token with the correct payload & sign it correctly
-      const configService = container.use(ConfigService);
+      const configService = container.resolve<ConfigService>(ConfigService);
       const refreshToken = sign(
         {userId: testUser1.id, type: "refreshToken"},
         configService.config.auth.refreshToken.secret,

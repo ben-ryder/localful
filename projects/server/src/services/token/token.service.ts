@@ -15,10 +15,8 @@ import {
 import {DataStoreService} from "@services/data-store/data-store.service.js";
 import {SystemError} from "@services/errors/base/system.error.js";
 import {ConfigService} from "@services/config/config.service.js";
-import {Injectable} from "@ben-ryder/injectable";
 
 
-@Injectable()
 export class TokenService {
   constructor(
     private configService: ConfigService,

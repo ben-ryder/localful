@@ -1,18 +1,17 @@
 import {CreateUserDto, UpdateUserDto, UsersURLParams} from "@localful/common";
-import express, {NextFunction, Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 import {validateSchema} from "@common/schema-validator.js";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
-import {validateAuthentication} from "@modules/auth/validate-authentication.js";
 import {UsersService} from "@modules/users/users.service.js";
 import {TokenService} from "@services/token/token.service.js";
-import {Injectable, container} from "@ben-ryder/injectable";
+import {AccessControlService} from "@modules/auth/access-control.service.js";
 
 
-@Injectable()
-export class UserController {
+export class UsersController {
   constructor(
       private usersService: UsersService,
-      private tokenService: TokenService
+      private tokenService: TokenService,
+      private accessControlService: AccessControlService,
   ) {}
 
   async createUser(req: Request, res: Response, next: NextFunction) {
@@ -23,7 +22,7 @@ export class UserController {
       const newUser = await this.usersService.create(createUserDto);
       const tokens = await this.tokenService.createNewTokenPair(newUser);
 
-      res.status(HttpStatusCodes.OK).json({
+      res.status(HttpStatusCodes.CREATED).json({
         user: newUser,
         tokens: {
           accessToken: tokens.accessToken,
@@ -39,7 +38,7 @@ export class UserController {
   async getUser(req: Request, res: Response, next: NextFunction) {
     try {
       const params = await validateSchema(req.params, UsersURLParams);
-      const requestUser = await validateAuthentication(req);
+      const requestUser = await this.accessControlService.validateAuthentication(req);
 
       const user = await this.usersService.get(requestUser, params.userId);
       res.status(HttpStatusCodes.OK).json(user)
@@ -53,7 +52,7 @@ export class UserController {
     try {
       const params = await validateSchema(req.params, UsersURLParams);
       const updateUserDto = await validateSchema(req.body, UpdateUserDto);
-      const requestUser = await validateAuthentication(req);
+      const requestUser = await this.accessControlService.validateAuthentication(req);
 
       const result = await this.usersService.update(requestUser, params.userId, updateUserDto);
       res.status(HttpStatusCodes.OK).json(result)
@@ -66,7 +65,7 @@ export class UserController {
   async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
       const params = await validateSchema(req.params, UsersURLParams);
-      const requestUser = await validateAuthentication(req);
+      const requestUser = await this.accessControlService.validateAuthentication(req);
 
       await this.usersService.delete(requestUser, params.userId);
       res.sendStatus(HttpStatusCodes.OK)
@@ -76,14 +75,3 @@ export class UserController {
     }
   }
 }
-
-const userController = container.use(UserController);
-
-const UsersRouter = express.Router();
-UsersRouter
-    .get("/v1/users/:userId", userController.getUser.bind(userController))
-    .post("/v1/users", userController.createUser.bind(userController))
-    .patch("/v1/users/:userId", userController.updateUser.bind(userController))
-    .delete("/v1/users/:userId", userController.deleteUser.bind(userController));
-
-export default UsersRouter;
