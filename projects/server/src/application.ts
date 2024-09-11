@@ -24,6 +24,8 @@ import {VaultsHttpController} from "@modules/vaults/vaults.http.js";
 import {httpErrorHandler} from "@services/errors/http-error-handler.js";
 import {HttpStatusCodes} from "@common/http-status-codes.js";
 import {createCorsOptions} from "@common/validate-cors.js";
+import {SyncWebsocketController} from "@modules/sync/sync.websockets.js";
+import {EventsService} from "@services/events/events.service.js";
 
 
 /**
@@ -57,6 +59,7 @@ export class Application {
         this.container.bindClass(EmailService, { value: EmailService, inject: [ConfigService]}, {scope: "SINGLETON"})
         this.container.bindClass(PasswordService, { value: PasswordService}, {scope: "SINGLETON"})
         this.container.bindClass(TokenService, { value: TokenService, inject: [ConfigService, DataStoreService]}, {scope: "SINGLETON"})
+        this.container.bindClass(EventsService, { value: EventsService }, {scope: "SINGLETON"})
 
         // Base module
         this.container.bindClass(BaseHttpController, { value: BaseHttpController}, {scope: "SINGLETON"})
@@ -78,6 +81,9 @@ export class Application {
         this.container.bindClass(VaultsDatabaseService, { value: VaultsDatabaseService, inject: [DatabaseService]}, {scope: "SINGLETON"})
         this.container.bindClass(VaultsService, { value: VaultsService, inject: [VaultsDatabaseService, AccessControlService]}, {scope: "SINGLETON"})
         this.container.bindClass(VaultsHttpController, { value: VaultsHttpController, inject: [VaultsService, AccessControlService]}, {scope: "SINGLETON"})
+
+        // Sync module
+        this.container.bindClass(SyncWebsocketController, { value: SyncWebsocketController, inject: [ConfigService, EventsService] }, {scope: "SINGLETON"})
     }
 
     /**
@@ -126,6 +132,7 @@ export class Application {
         const authController = this.container.resolve<AuthHttpController>(AuthHttpController);
         const userController = this.container.resolve<UsersHttpController>(UsersHttpController);
         const vaultController = this.container.resolve<VaultsHttpController>(VaultsHttpController);
+        const syncController = this.container.resolve<SyncWebsocketController>(SyncWebsocketController)
 
         // Base module routes
         app.get("/", baseController.sendWelcomeMessage.bind(baseController))
@@ -159,6 +166,7 @@ export class Application {
         app.delete("/v1/vaults/:vaultId", vaultController.deleteVault.bind(vaultController));
 
         // Events module websocket server
+        await syncController.init({server: httpServer, path: "/v1/events"})
 
         // Setup HTTP error handlers to serve 404s and server error responses
         app.use(function (req: Request, res: Response, next: NextFunction) {
