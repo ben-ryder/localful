@@ -6,6 +6,7 @@ import {Permissions} from "@localful/common";
  */
 export interface RequestUser {
   id: string;
+  sessionId: string;
   verifiedAt: string | null;
   permissions: Permissions[]
 }

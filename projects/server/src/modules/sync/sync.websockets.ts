@@ -26,14 +26,19 @@ export class SyncWebsocketController {
                 !req.headers.origin ||
                 !this.configService.config.app.allowedOrigins.includes(req.headers.origin)
             ) {
-                console.debug(req.headers.origin);
-                console.debug(this.configService.config.app.allowedOrigins)
                 socket.destroy();
                 return
             }
 
+            const websocketProtocol = req.headers["sec-websocket-protocol"]
+            if (typeof websocketProtocol !== "string" || !websocketProtocol.startsWith("localful.ticket.")) {
+                socket.destroy()
+                return;
+            }
+            const connectionTicket = websocketProtocol.replace("localful.ticket.", "");
+
             // todo: validate some initial ticket or other authentication data before opening connection?
-            console.debug("[SyncWebsocketController] upgrade request");
+            console.debug(`connection with ${connectionTicket}`)
 
             this.wss.handleUpgrade(req, socket, head, (ws) => {
                 this.wss.emit("connection", ws, req)

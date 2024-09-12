@@ -166,7 +166,7 @@ export class Application {
         app.delete("/v1/vaults/:vaultId", vaultController.deleteVault.bind(vaultController));
 
         // Events module websocket server
-        await syncController.init({server: httpServer, path: "/v1/events"})
+        await syncController.init({server: httpServer, path: "/v1/sync"})
 
         // Setup HTTP error handlers to serve 404s and server error responses
         app.use(function (req: Request, res: Response, next: NextFunction) {
