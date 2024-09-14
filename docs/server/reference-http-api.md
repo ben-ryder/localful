@@ -9,7 +9,7 @@ Any errors will be returned with the appropriate status code and the following J
   "statusCode": 404, // a copy of the HTTP status code.
   "identifier": "RESOURCE_NOT_FOUND", // an identifier for the specific error.
   "message": "An error occurred.", // a message explaining the error.
-  "context": null // an optional property of any type which may contain extra information about why the error occured.
+  "context": null // an optional property of any type which may contain extra information about why the error occurred.
 }
 ```
 
@@ -37,7 +37,7 @@ Any errors will be returned with the appropriate status code and the following J
 ### Vaults
 - `/v1/vaults [GET, POST]`
 - `/v1/vaults/:vaultId [GET, PATCH, DELETE]`
-- `/v1/vaults/:vaultId/summary [GET]`
+- `/v1/vaults/:vaultId/snapshot [GET]`
 
 ### Items
 - `/v1/items [GET, POST]`

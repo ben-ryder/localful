@@ -26,6 +26,10 @@ import {HttpStatusCodes} from "@common/http-status-codes.js";
 import {createCorsOptions} from "@common/validate-cors.js";
 import {SyncWebsocketController} from "@modules/sync/sync.websockets.js";
 import {EventsService} from "@services/events/events.service.js";
+import {SyncService} from "@modules/sync/sync.service.js";
+import {SyncHttpController} from "@modules/sync/sync.http.js";
+import {HealthCheckService} from "@modules/health-check/health-check.service.js";
+import {HealthCheckHttpController} from "@modules/health-check/health-check.http.js";
 
 
 /**
@@ -67,6 +71,10 @@ export class Application {
         // Info module
         this.container.bindClass(InfoHttpController, { value: InfoHttpController, inject: [ConfigService]}, {scope: "SINGLETON"})
 
+        // Health check module
+        this.container.bindClass(HealthCheckService, { value: HealthCheckService, inject: [DatabaseService, DataStoreService] }, {scope: "SINGLETON"})
+        this.container.bindClass(HealthCheckHttpController, { value: HealthCheckHttpController, inject: [HealthCheckService] }, {scope: "SINGLETON"})
+
         // Auth module
         this.container.bindClass(AuthService, { value: AuthService, inject: [UsersService, TokenService, ConfigService, EmailService]}, {scope: "SINGLETON"})
         this.container.bindClass(AccessControlService, { value: AccessControlService, inject: [UsersDatabaseService, TokenService] }, {scope: "SINGLETON"})
@@ -83,7 +91,9 @@ export class Application {
         this.container.bindClass(VaultsHttpController, { value: VaultsHttpController, inject: [VaultsService, AccessControlService]}, {scope: "SINGLETON"})
 
         // Sync module
-        this.container.bindClass(SyncWebsocketController, { value: SyncWebsocketController, inject: [ConfigService, EventsService] }, {scope: "SINGLETON"})
+        this.container.bindClass(SyncService, {value: SyncService, inject: [EventsService, DataStoreService, VaultsDatabaseService]}, {scope: "SINGLETON"})
+        this.container.bindClass(SyncHttpController, {value: SyncHttpController, inject: [AccessControlService, SyncService]}, {scope: "SINGLETON"})
+        this.container.bindClass(SyncWebsocketController, { value: SyncWebsocketController, inject: [ConfigService, SyncService] }, {scope: "SINGLETON"})
     }
 
     /**
@@ -93,17 +103,10 @@ export class Application {
         // Start by running health checks for external services (Postgres and Redis).
         // This allows any connection errors to be immediately thrown rather than the server being able to start with problems.
         // todo: allow server to start and expose a /health endpoint protected by a static token for monitoring?
-        const databaseService = this.container.resolve<DatabaseService>(DatabaseService)
-        const dbIsHealth = await databaseService.healthCheck()
-        if (!dbIsHealth) {
-            console.error("Database service failed health check during initialization, likely a Postgres connection could not be established.")
-            process.exit(1);
-        }
-
-        const dataStoreService = this.container.resolve<DataStoreService>(DataStoreService)
-        const dataStoreIsHealthy = await dataStoreService.healthCheck()
-        if (!dataStoreIsHealthy) {
-            console.error("Data store service failed health check during initialization, likely a Redis connection could not be established.")
+        const healthCheckService = this.container.resolve<HealthCheckService>(HealthCheckService)
+        const healthCheck = await healthCheckService.runHealthCheck()
+        if (healthCheck.status !== "ok") {
+            console.error(`[Server] Server failed health checks during initialization: ${healthCheck.services}`)
             process.exit(1);
         }
         console.debug("[Server] Health checks passed")
@@ -126,47 +129,52 @@ export class Application {
             next();
         });
 
-        // Load all route controllers
-        const baseController = this.container.resolve<BaseHttpController>(BaseHttpController);
-        const infoController = this.container.resolve<InfoHttpController>(InfoHttpController);
-        const authController = this.container.resolve<AuthHttpController>(AuthHttpController);
-        const userController = this.container.resolve<UsersHttpController>(UsersHttpController);
-        const vaultController = this.container.resolve<VaultsHttpController>(VaultsHttpController);
-        const syncController = this.container.resolve<SyncWebsocketController>(SyncWebsocketController)
-
         // Base module routes
-        app.get("/", baseController.sendWelcomeMessage.bind(baseController))
-        app.get("/v1", baseController.sendWelcomeMessage.bind(baseController))
+        const baseHttpController = this.container.resolve<BaseHttpController>(BaseHttpController);
+        app.get("/", baseHttpController.sendWelcomeMessage.bind(baseHttpController))
+        app.get("/v1", baseHttpController.sendWelcomeMessage.bind(baseHttpController))
 
         // Info module routes
-        app.get("/info", infoController.getInfo.bind(infoController));
+        const infoHttpController = this.container.resolve<InfoHttpController>(InfoHttpController);
+        app.get("/v1/info", infoHttpController.getInfo.bind(infoHttpController));
+
+        // Health check routes
+        const healthCheckHttpController = this.container.resolve<HealthCheckHttpController>(HealthCheckHttpController);
+        app.get("/v1/health", healthCheckHttpController.requestHealthCheck.bind(healthCheckHttpController));
 
         // Auth module routes
-        app.post("/v1/auth/login", authController.login.bind(authController))
-        app.post("/v1/auth/logout", authController.logout.bind(authController))
-        app.post("/v1/auth/refresh", authController.refresh.bind(authController))
-        app.get("/v1/auth/check", authController.check.bind(authController))
-        app.get("/v1/auth/verify-email", authController.requestEmailVerification.bind(authController))
-        app.post("/v1/auth/verify-email", authController.verifyEmail.bind(authController))
-        app.get("/v1/auth/change-email", authController.requestEmailChange.bind(authController))
-        app.post("/v1/auth/change-email", authController.changeEmail.bind(authController))
-        app.get("/v1/auth/change-password", authController.requestPasswordChange.bind(authController))
-        app.post("/v1/auth/change-password", authController.changePassword.bind(authController))
+        const authHttpController = this.container.resolve<AuthHttpController>(AuthHttpController);
+        app.post("/v1/auth/login", authHttpController.login.bind(authHttpController))
+        app.post("/v1/auth/logout", authHttpController.logout.bind(authHttpController))
+        app.post("/v1/auth/refresh", authHttpController.refresh.bind(authHttpController))
+        app.get("/v1/auth/check", authHttpController.check.bind(authHttpController))
+        app.get("/v1/auth/verify-email", authHttpController.requestEmailVerification.bind(authHttpController))
+        app.post("/v1/auth/verify-email", authHttpController.verifyEmail.bind(authHttpController))
+        app.get("/v1/auth/change-email", authHttpController.requestEmailChange.bind(authHttpController))
+        app.post("/v1/auth/change-email", authHttpController.changeEmail.bind(authHttpController))
+        app.get("/v1/auth/change-password", authHttpController.requestPasswordChange.bind(authHttpController))
+        app.post("/v1/auth/change-password", authHttpController.changePassword.bind(authHttpController))
 
         // Users module routes
-        app.get("/v1/users/:userId", userController.getUser.bind(userController))
-        app.post("/v1/users", userController.createUser.bind(userController))
-        app.patch("/v1/users/:userId", userController.updateUser.bind(userController))
-        app.delete("/v1/users/:userId", userController.deleteUser.bind(userController));
+        const usersHttpController = this.container.resolve<UsersHttpController>(UsersHttpController);
+        app.get("/v1/users/:userId", usersHttpController.getUser.bind(usersHttpController))
+        app.post("/v1/users", usersHttpController.createUser.bind(usersHttpController))
+        app.patch("/v1/users/:userId", usersHttpController.updateUser.bind(usersHttpController))
+        app.delete("/v1/users/:userId", usersHttpController.deleteUser.bind(usersHttpController));
 
         // Vaults module routes
-        app.get("/v1/vaults/:vaultId", vaultController.getVault.bind(vaultController))
-        app.post("/v1/vaults", vaultController.createVault.bind(vaultController))
-        app.patch("/v1/vaults/:vaultId", vaultController.updateVault.bind(vaultController))
-        app.delete("/v1/vaults/:vaultId", vaultController.deleteVault.bind(vaultController));
+        const vaultsHttpController = this.container.resolve<VaultsHttpController>(VaultsHttpController);
+        app.get("/v1/vaults/:vaultId", vaultsHttpController.getVault.bind(vaultsHttpController))
+        app.post("/v1/vaults", vaultsHttpController.createVault.bind(vaultsHttpController))
+        app.patch("/v1/vaults/:vaultId", vaultsHttpController.updateVault.bind(vaultsHttpController))
+        app.delete("/v1/vaults/:vaultId", vaultsHttpController.deleteVault.bind(vaultsHttpController));
 
-        // Events module websocket server
-        await syncController.init({server: httpServer, path: "/v1/sync"})
+        // Sync module routes and websocket server
+        const syncHttpController = this.container.resolve<SyncHttpController>(SyncHttpController)
+        app.get("/v1/sync/ticket", syncHttpController.getConnectionTicket.bind(syncHttpController))
+
+        const syncWebsocketController = this.container.resolve<SyncWebsocketController>(SyncWebsocketController)
+        await syncWebsocketController.init(httpServer, {path: "/v1/sync"})
 
         // Setup HTTP error handlers to serve 404s and server error responses
         app.use(function (req: Request, res: Response, next: NextFunction) {

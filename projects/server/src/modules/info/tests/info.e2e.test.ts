@@ -17,9 +17,9 @@ describe("Info Module",() => {
   /**
    * Base Route (/)
    */
-  describe("/info [GET]", () => {
+  describe("/v1/info [GET]", () => {
     test("When a request is made, the response should be info message", async () => {
-      const {body, statusCode} = await testHelper.client.get("/info");
+      const {body, statusCode} = await testHelper.client.get("/v1/info");
 
       expect(statusCode).toEqual(200);
       expect(body).toEqual({

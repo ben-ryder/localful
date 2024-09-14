@@ -1,74 +1,230 @@
-import { WebSocketServer } from "ws";
-import {Server} from "node:http";
+import { WebSocketServer, WebSocket } from "ws";
+import {IncomingMessage, Server} from "node:http";
 import {ConfigService} from "@services/config/config.service.js";
-import {EventsService} from "@services/events/events.service.js";
+import {
+    ConnectionData,
+    InitialConnection,
+    SyncAction,
+    SyncService
+} from "@modules/sync/sync.service.js";
+import internal from "node:stream";
+import {ClientSentEvents, ServerSentEvents} from "@modules/sync/events.js";
+import {AccessError} from "@services/errors/access/access.error.js";
+import {ErrorIdentifiers} from "@localful/common";
 
 export interface SyncWebsocketControllerConfig {
-    server: Server;
     path: string;
+}
+
+export interface SocketStore {
+    [socketKey: string]: WebsocketWithConnectionData
+}
+
+export interface RoomStore {
+    [roomKey: string]: Set<string>
+}
+
+export interface WebsocketWithConnectionData extends WebSocket {
+    connectionData: ConnectionData;
 }
 
 export class SyncWebsocketController {
     wss: WebSocketServer
+    #config: SyncWebsocketControllerConfig
+    #sockets: SocketStore = {}
+    #rooms: RoomStore = {}
 
     constructor(
-        private configService: ConfigService,
-        private eventService: EventsService
+        private readonly configService: ConfigService,
+        private readonly syncService:  SyncService,
     ) {}
 
-    async init(config: SyncWebsocketControllerConfig) {
+    async init(server: Server, config: SyncWebsocketControllerConfig) {
+        this.#config = config
         this.wss = new WebSocketServer({ noServer: true, clientTracking: false });
 
-        config.server.on("upgrade", (req, socket, head) => {
-            // Validate that the request is to the correct path and that a valid origin is set.
-            if (
-                req.url !== config.path ||
-                !req.headers.origin ||
-                !this.configService.config.app.allowedOrigins.includes(req.headers.origin)
-            ) {
-                socket.destroy();
+        // This is how the sync service requests events to be sent.
+        // The websocket controller is just responsible for coordinating the websockets and storing "rooms" of websockets.
+        // All the logic for handling what/when events fire and the authorization for what rooms a connection belongs
+        // to is handled by the sync service.
+        this.syncService.registerActionCallback(this.syncActionCallback.bind(this))
+
+        server.on("upgrade", this.handleServerUpgrade.bind(this))
+        this.wss.on("connection", this.handleConnection.bind(this))
+    }
+
+    async handleServerUpgrade(req: IncomingMessage, socket: internal.Duplex, head: Buffer) {
+        // Validate that the request is to the correct path and that the origin header matches an allowed origin.
+        if (
+            req.url !== this.#config.path ||
+            !req.headers.origin ||
+            !this.configService.config.app.allowedOrigins.includes(req.headers.origin)
+        ) {
+            // todo: send error response of some kind?
+            socket.destroy();
+            return
+        }
+
+        // Validate that the request has a valid ticket
+        const websocketProtocol = req.headers["sec-websocket-protocol"]
+        if (typeof websocketProtocol !== "string" || !websocketProtocol.startsWith("localful.ticket.")) {
+            // todo: send error response of some kind?
+            socket.destroy()
+            return;
+        }
+        const connectionTicket = websocketProtocol.replace("localful.ticket.", "");
+
+        let initialConnection: InitialConnection
+        try {
+            initialConnection = await this.syncService.validateTicket(connectionTicket)
+        }
+        catch (error) {
+            // todo: send error response of some kind?
+            socket.destroy()
+            return;
+        }
+        
+        // If an existing socket already exists for the given session id, ensure it is closed before opening a new one.
+        // todo: should this sit with the service, or should this be blocked when receiving a token?
+        if (this.#sockets[initialConnection.connectionData.sessionId]) {
+            await this.purgeSocket(initialConnection.connectionData.sessionId);
+        }
+
+        this.wss.handleUpgrade(req, socket, head, async (ws: WebsocketWithConnectionData) => {
+            // Assign the sessionId directly to websocket so it can be used to identify it later
+            ws.connectionData = initialConnection.connectionData
+
+            // Add to the stored sockets and process any initial rooms
+            this.#sockets[initialConnection.connectionData.sessionId] = ws
+            if (initialConnection.rooms) {
+                await this.changeRooms(initialConnection.connectionData.sessionId, initialConnection.rooms)
+            }
+
+            this.wss.emit("connection", ws, req)
+        })
+    }
+
+    handleConnection(ws: WebsocketWithConnectionData) {
+        // todo: is this needed?
+        ws.on("error", console.error);
+
+        ws.on("message", async (data) => {
+            // Parse and validate that this is a known event.
+            const parsedEvent = ClientSentEvents.safeParse(data)
+            if (!parsedEvent.success) {
+                await this.purgeSocket(ws.connectionData.sessionId)
                 return
             }
+            const event = parsedEvent.data
 
-            const websocketProtocol = req.headers["sec-websocket-protocol"]
-            if (typeof websocketProtocol !== "string" || !websocketProtocol.startsWith("localful.ticket.")) {
-                socket.destroy()
-                return;
-            }
-            const connectionTicket = websocketProtocol.replace("localful.ticket.", "");
+            switch (event.type) {
+                case "ticket": {
+                    try {
+                        await this.syncService.validateTicket(event.data.ticket, ws.connectionData)
 
-            // todo: validate some initial ticket or other authentication data before opening connection?
-            console.debug(`connection with ${connectionTicket}`)
-
-            this.wss.handleUpgrade(req, socket, head, (ws) => {
-                this.wss.emit("connection", ws, req)
-            })
-        })
-
-        this.wss.on("connection", (ws) => {
-            ws.on("error", console.error);
-
-            ws.on("message", function message(data) {
-                const event = JSON.parse(data);
-
-                switch (event.type) {
-                    case "authenticate": {
-                        console.debug("[SyncWebsocketController] authenticate: %s", data);
-                        ws.send(JSON.stringify({type: "authenticate-ack"}));
-                        break;
+                        await this.sendEventToSocket(ws, {type: "ack", data: {messageId: event.messageId}})
                     }
-                    case "subscribe": {
-                        console.debug("[SyncWebsocketController] subscribe: %s", data);
-                        ws.send(JSON.stringify({type: "subscribe-ack"}));
-                        break;
+                    catch (error) {
+                        if (error instanceof AccessError) {
+                            await this.purgeSocket(ws.connectionData.sessionId)
+                        }
+
+                        // todo: write proper error handler?
+                        await this.sendEventToSocket(ws, {type: "error", data: {messageId: event.messageId, identifier: ErrorIdentifiers.SYSTEM_UNEXPECTED}})
                     }
-                    // If an unrecognised event is registered, just disconnect the client.
-                    default: {
-                        ws.close();
-                    }
+                    break;
                 }
+                case "subscribe": {
+                    try {
+                        const newRooms = await this.syncService.requestSubscriptions(ws.connectionData.userId, event.data.vaults)
+                        await this.changeRooms(ws.connectionData.sessionId, newRooms)
 
-            });
-        })
+                        await this.sendEventToSocket(ws, {
+                            type: "ack",
+                            data: {messageId: event.messageId}
+                        })
+                    }
+                    catch (error) {
+                        // todo: write proper error handler
+                        await this.sendEventToSocket(ws, {type: "error", data: {messageId: event.messageId, identifier: ErrorIdentifiers.SYSTEM_UNEXPECTED}})
+                    }
+                    break;
+                }
+                // No unrecognised event should have passed data parsing & validation, but handle this default case just in case.
+                default: {
+                    await this.purgeSocket(ws.connectionData.sessionId)
+                }
+            }
+        });
+    }
+
+    async syncActionCallback(syncAction: SyncAction) {
+        if (syncAction.type === "disconnect-session") {
+            await this.purgeSocket(syncAction.sessionId)
+        }
+        else if (syncAction.type === "disconnect-user") {
+            for (const [sessionId, socket] of Object.entries(this.#sockets)) {
+                if (socket.connectionData.userId === syncAction.userId) {
+                    await this.purgeSocket(sessionId)
+                }
+            }
+        }
+        else if (syncAction.type === "delete-rooms") {
+            for (const roomId of syncAction.rooms) {
+                if (this.#rooms[roomId]) {
+                    delete this.#rooms[roomId]
+                }
+            }
+        }
+        else {
+            for (const roomId of syncAction.rooms) {
+                await this.sendEventToRoom(roomId, syncAction.event)
+            }
+        }
+    }
+
+    async purgeSocket(sessionId: string) {
+        // Ensure the connection is removed from all rooms
+        for (const roomId of Object.keys(this.#rooms)) {
+            this.#rooms[roomId].delete(sessionId)
+        }
+
+        // Close the connection and remove from the socket store
+        if (this.#sockets[sessionId]) {
+            this.#sockets[sessionId].close()
+            delete this.#sockets[sessionId];
+        }
+    }
+
+    async sendEventToSocket(ws: WebsocketWithConnectionData, event: ServerSentEvents) {
+        // todo: should even sending go via the sessionId and #sockets?
+        ws.send(JSON.stringify(event))
+    }
+
+    async sendEventToRoom(roomId: string, event: ServerSentEvents) {
+        // todo: are checks for room and socket required, or should errors be thrown?
+        if (this.#rooms[roomId]) {
+            for (const sessionId of this.#rooms[roomId]) {
+                if (this.#sockets[sessionId]) {
+                    this.#sockets[sessionId].send(JSON.stringify(event))
+                }
+            }
+        }
+    }
+    
+    async changeRooms(sessionId: string, newRooms: string[]) {
+        // todo: is this socket check actually needed, or should error be thrown?
+        if (this.#sockets[sessionId]) {
+            // Remove session from all rooms
+            for (const roomId of Object.keys(this.#rooms)) {
+                const roomIncludesSession = this.#rooms[roomId].has(sessionId)
+                if (newRooms.includes(roomId) && !roomIncludesSession) {
+                    this.#rooms[roomId].add(sessionId)
+                }
+                else if (roomIncludesSession) {
+                    this.#rooms[roomId].delete(sessionId)
+                }
+            }
+        }
     }
 }
