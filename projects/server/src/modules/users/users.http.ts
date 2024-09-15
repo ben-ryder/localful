@@ -20,14 +20,11 @@ export class UsersHttpController {
 
       // Access control and registration enabled checks are done within the service.
       const newUser = await this.usersService.create(createUserDto);
-      const tokens = await this.tokenService.createNewTokenPair(newUser);
+      const createdTokenPair = await this.tokenService.createNewTokenPair(newUser);
 
       res.status(HttpStatusCodes.CREATED).json({
         user: newUser,
-        tokens: {
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken
-        }
+        tokens: createdTokenPair.tokens
       });
     }
     catch (error) {

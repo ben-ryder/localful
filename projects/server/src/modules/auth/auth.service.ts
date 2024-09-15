@@ -1,4 +1,3 @@
-import type {UsersService} from "@modules/users/users.service.js";
 import {TokenService} from "@services/token/token.service.js";
 import {ConfigService} from "@services/config/config.service.js";
 import {EmailService} from "@services/email/email.service.js";
@@ -9,21 +8,30 @@ import {PasswordService} from "@services/password/password.service.js";
 import {AccessUnauthorizedError} from "@services/errors/access/access-unauthorized.error.js";
 import {UserRequestError} from "@services/errors/base/user-request.error.js";
 import {UserContext} from "@common/request-context.js";
+import {EventsService} from "@services/events/events.service.js";
+import {EventIdentifiers} from "@services/events/events.js";
+import {UsersService} from "@modules/users/users.service.js";
 
 
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private tokenService: TokenService,
-    private configService: ConfigService,
-    private emailService: EmailService,
-  ) {}
+    private readonly usersService: UsersService,
+    private readonly tokenService: TokenService,
+    private readonly configService: ConfigService,
+    private readonly emailService: EmailService,
+    private readonly eventsService: EventsService
+  ) {
+    // todo: would this be better setup somewhere else?
+    this.eventsService.subscribe(EventIdentifiers.USER_CREATE, async (event) => {
+      await this.requestEmailVerification(event.detail.user.id)
+    })
+  }
 
   async login(email: string, password: string): Promise<AuthUserResponse> {
     let databaseUserDto: DatabaseUserDto;
 
     try {
-      databaseUserDto = await this.usersService.getDatabaseUser(email);
+      databaseUserDto = await this.usersService._UNSAFE_getByEmail(email);
     }
     catch (e) {
        throw new AccessForbiddenError({
@@ -43,13 +51,18 @@ export class AuthService {
     }
 
     const userDto = this.usersService.convertDatabaseDto(databaseUserDto);
-    const tokens = await this.tokenService.createNewTokenPair(userDto);
+    const result = await this.tokenService.createNewTokenPair(userDto);
+
+    await this.eventsService.dispatch({
+      type: EventIdentifiers.AUTH_LOGIN,
+      detail: {
+        userId: userDto.id,
+        sessionId: result.sessionId
+      }
+    })
 
     return {
-      tokens: {
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken
-      },
+      tokens: result.tokens,
       user: userDto,
     }
   }
@@ -68,9 +81,9 @@ export class AuthService {
     // As the token has been validated the supplied userId/sub value in the token can be trusted in theory
     // If the user isn't found, the user service will throw an error.
     // todo: the user service throwing an error not returning null makes the error handling here unclear.
-    const userDto = await this.usersService._UNSAFE_get(tokenPayload.sub);
+    const userDto = await this.usersService._UNSAFE_getById(tokenPayload.sub);
 
-    return await this.tokenService.getRefreshedTokenPair(userDto, tokenPayload.gid);
+    return await this.tokenService.getRefreshedTokenPair(userDto, tokenPayload.sid);
   }
 
   async logout(refreshToken: string) {
@@ -83,11 +96,19 @@ export class AuthService {
       });
     }
 
-    await this.tokenService.blacklistTokenGroup(tokenPayload.gid, tokenPayload.exp);
+    await this.tokenService.blacklistSession(tokenPayload.sid, tokenPayload.exp);
+
+    await this.eventsService.dispatch({
+      type: EventIdentifiers.AUTH_LOGOUT,
+      detail: {
+        userId: tokenPayload.sub,
+        sessionId: tokenPayload.sid
+      }
+    })
   }
 
   async requestEmailVerification(userId: string) {
-    const user = await this.usersService._UNSAFE_get(userId)
+    const user = await this.usersService._UNSAFE_getById(userId)
     if (user.verifiedAt) {
       throw new UserRequestError({
         identifier: ErrorIdentifiers.AUTH_NOT_VERIFIED,
@@ -112,7 +133,7 @@ export class AuthService {
   }
 
   async verifyEmail(userContext: UserContext, actionToken: string): Promise<AuthUserResponse> {
-    const user = await this.usersService._UNSAFE_get(userContext.id)
+    const user = await this.usersService._UNSAFE_getById(userContext.id)
 
     if (user.verifiedAt) {
       throw new UserRequestError({
@@ -137,11 +158,11 @@ export class AuthService {
     }
 
     const updatedUser = await this.usersService.verifyUser(user)
-    const tokenPair = await this.tokenService.createNewTokenPair(updatedUser)
+    const result = await this.tokenService.createNewTokenPair(updatedUser)
 
     return {
       user: updatedUser,
-      tokens: tokenPair
+      tokens: result.tokens
     }
   }
 }

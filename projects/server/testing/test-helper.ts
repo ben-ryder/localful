@@ -14,7 +14,7 @@ import {Application} from "../src/application.js";
 
 export class TestHelper {
   private application: Application;
-  private server: Server;
+  public server: Server;
   public client: SuperAgentTest;
 
   async beforeAll() {
@@ -42,8 +42,10 @@ export class TestHelper {
   async getUserTokens(userId: string): Promise<TokenPair> {
     const userService = this.application.getDependency<UsersService>(UsersService);
     const tokenService = this.application.getDependency<TokenService>(TokenService);
-    const user = await userService._UNSAFE_get(userId)
-    return await tokenService.createNewTokenPair(user);
+
+    const user = await userService._UNSAFE_getById(userId)
+    const createdTokenPair = await tokenService.createNewTokenPair(user);
+    return createdTokenPair.tokens
   }
 
 

@@ -2,20 +2,19 @@ import {VaultsDatabaseService} from "@modules/vaults/database/vaults.database.se
 import {UserContext} from "@common/request-context.js";
 import {CreateVaultDto, UpdateVaultDto, VaultDto} from "@localful/common";
 import {AccessControlService} from "@modules/auth/access-control.service.js";
+import {EventsService} from "@services/events/events.service.js";
+import {EventIdentifiers} from "@services/events/events.js";
 
 
 export class VaultsService {
     constructor(
-       private vaultsDatabaseService: VaultsDatabaseService,
-       public accessControlService: AccessControlService,
+       private readonly vaultsDatabaseService: VaultsDatabaseService,
+       private readonly accessControlService: AccessControlService,
+       private readonly eventsService: EventsService
     ) {}
 
-    async _UNSAFE_get(id: string) {
-        return await this.vaultsDatabaseService.get(id);
-    }
-
-    async get(userContext: UserContext, id: string) {
-        const vault = await this._UNSAFE_get(id);
+    async get(userContext: UserContext, vaultId: string) {
+        const vault = await this.vaultsDatabaseService.get(vaultId);
 
         await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["vaults:retrieve"],
@@ -27,10 +26,6 @@ export class VaultsService {
         return vault
     }
 
-    async _UNSAFE_create(createVaultDto: CreateVaultDto): Promise<VaultDto> {
-        return await this.vaultsDatabaseService.create(createVaultDto);
-    }
-
     async create(userContext: UserContext, createVaultDto: CreateVaultDto): Promise<VaultDto> {
         await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["vaults:create"],
@@ -39,15 +34,20 @@ export class VaultsService {
             targetUserId: createVaultDto.ownerId
         })
         
-        return await this._UNSAFE_create(createVaultDto);
+        const newVault = await this.vaultsDatabaseService.create(createVaultDto);
+        await this.eventsService.dispatch({
+            type: EventIdentifiers.VAULT_CREATE,
+            detail: {
+                sessionId: userContext.sessionId,
+                vault: newVault
+            }
+        })
+
+        return newVault
     }
 
-    async _UNSAFE_update(id: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {
-        return await this.vaultsDatabaseService.update(id, updateVaultDto);
-    }
-
-    async update(userContext: UserContext, id: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {
-        const vault = await this._UNSAFE_get(id);
+    async update(userContext: UserContext, vaultId: string, updateVaultDto: UpdateVaultDto): Promise<VaultDto> {
+        const vault = await this.vaultsDatabaseService.get(vaultId);
 
         await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["vaults:update"],
@@ -56,15 +56,20 @@ export class VaultsService {
             targetUserId: vault.ownerId
         })
         
-        return this._UNSAFE_update(id, updateVaultDto);
+        const updatedVault = await this.vaultsDatabaseService.update(vaultId, updateVaultDto);
+        await this.eventsService.dispatch({
+            type: EventIdentifiers.VAULT_UPDATE,
+            detail: {
+                sessionId: userContext.sessionId,
+                vault: updatedVault
+            }
+        })
+
+        return updatedVault
     }
 
-    async _UNSAFE_delete(id: string): Promise<void> {
-        await this.vaultsDatabaseService.delete(id);
-    }
-
-    async delete(userContext: UserContext, id: string): Promise<void> {
-        const vault = await this._UNSAFE_get(id);
+    async delete(userContext: UserContext, vaultId: string): Promise<void> {
+        const vault = await this.vaultsDatabaseService.get(vaultId);
 
         await this.accessControlService.validateAccessControlRules({
             userScopedPermissions: ["vaults:delete"],
@@ -73,6 +78,14 @@ export class VaultsService {
             targetUserId: vault.ownerId
         })
 
-        return this._UNSAFE_delete(id);
+        await this.vaultsDatabaseService.delete(vaultId);
+        await this.eventsService.dispatch({
+            type: EventIdentifiers.VAULT_DELETE,
+            detail: {
+                sessionId: userContext.sessionId,
+                vaultId: vaultId,
+                ownerId: vault.ownerId
+            }
+        })
     }
 }

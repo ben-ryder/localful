@@ -1,6 +1,7 @@
 // todo: move into common package
 
 import {z} from "zod";
+import {ExternalServerEvent} from "@services/events/events.js";
 
 
 export const ClientSentEvent = z.object({
@@ -51,5 +52,12 @@ export const ServerErrorEvent = z.object({
 }).strict()
 export type ServerErrorEvent = z.infer<typeof ServerErrorEvent>
 
-export const ServerSentEvents = z.union([ServerAckEvent, ServerRefreshTicketEvent, ServerErrorEvent])
-export type ServerSentEvents = z.infer<typeof ServerSentEvents>
+export const ServerWelcomeEvent = z.object({
+    type: z.literal("welcome"),
+}).strict()
+export type ServerWelcomeEvent = z.infer<typeof ServerWelcomeEvent>
+
+export const ServerSentEvents = z.union([ServerWelcomeEvent, ServerAckEvent, ServerRefreshTicketEvent, ServerErrorEvent])
+
+// todo: find better way of sharing event types/schemas between sync and events module.
+export type ServerSentEvents = z.infer<typeof ServerSentEvents> | ExternalServerEvent

@@ -12,12 +12,12 @@ allowing for a convenient user experience where users don't have to constantly r
 
 ## Implementation Details
 When the server creates a token pair for the first time (access and refresh token) it does two important things:
-- generates a random "group id" value which is added to both tokens as the "gid" claim.
+- generates a random "session id" value which is added to both tokens as the "sid" claim.
 - sets a "counter id" value of 1, adds it to both tokens as the "cid" claim, and then persists this counter on the server.
 
 ### Request Validation
 When validating the requests bearer token, in addition to checking the token is valid (signed correctly and not expired) the system will also check:
-- the group ID (gid claim) of the token should not be blacklisted
+- the session ID (sid claim) of the token should not be blacklisted
 - the counter ID (cid claim) of the token should match the currently stored counter ID for that token group
 
 ### Refresh Token Rotation
@@ -25,13 +25,13 @@ When a user requests a new access token they also receive a new refresh token an
 Storing every blacklisted token would quickly become unmanageable as refresh tokens are long-lived. This problem is solved
 by incrementing the counter ID value stored on the server and adding this updated value to the counter ID (cid) claims of the refreshed tokens.  
 This means that if an attempt is made to re-use any previous tokens, the counter ID will be old and therefore the request will be rejected.  
-The group ID (gid claim) remains the same between the old and new token pair.
+The session ID (cid claim) remains the same between the old and new token pair.
 
 ### Token Revocation
-In order to facilitate immediate logout the server can blacklist tokens. It does this by blacklisting the "group id" value
+In order to facilitate immediate logout the server can blacklist tokens. It does this by blacklisting the "session id" value
 of the given token pair which will blacklist all access and refresh tokens at the same time.
 
 ## Potential Improvements
-- Storing a blacklist flag and counter ID on the server effectively makes the JWT no longer stateless. Given this is the case, could I just use server managed sessions instead?
-- Right now these tokens are returned to the user as JSON responses and will be stored in local storage/regular cookies by web applications. Should I use HTTP only cookies?
-  - If the tokens are saved in HTTP only cookies they will be sent on every request, which potentially defeats the purpose of having a refresh token as it will always be sent anyway?
+- Storing a blacklist flag and counter ID on the server effectively makes the JWT no longer stateless. Given this is the case, could a form of server managed sessions just be used instead?
+- Right now these tokens are returned to the user as JSON responses and will be stored in local storage/regular cookies by web applications. Should HTTP only cookies be used instead?
+  - If the tokens are saved in HTTP only cookies they will be sent on every request, which seems to defeat the purpose of having a refresh token as it will always be sent anyway?

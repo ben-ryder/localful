@@ -140,7 +140,7 @@ export class AccessControlService {
                 if (tokenPayload) {
                     return {
                         id: tokenPayload.sub,
-                        sessionId: tokenPayload.gid,
+                        sessionId: tokenPayload.sid,
                         verifiedAt: tokenPayload.verifiedAt,
                         permissions: AccessControlService.resolveRolePermissions(tokenPayload.role)
                     }

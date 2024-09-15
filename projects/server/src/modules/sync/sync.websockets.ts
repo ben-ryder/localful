@@ -8,7 +8,7 @@ import {
     SyncService
 } from "@modules/sync/sync.service.js";
 import internal from "node:stream";
-import {ClientSentEvents, ServerSentEvents} from "@modules/sync/events.js";
+import {ClientSentEvents, ServerSentEvents, ServerWelcomeEvent} from "@modules/sync/events.js";
 import {AccessError} from "@services/errors/access/access.error.js";
 import {ErrorIdentifiers} from "@localful/common";
 
@@ -156,6 +156,9 @@ export class SyncWebsocketController {
                 }
             }
         });
+
+        const welcomeEvent: ServerWelcomeEvent = {type: "welcome"}
+        ws.send(JSON.stringify(welcomeEvent))
     }
 
     async syncActionCallback(syncAction: SyncAction) {
@@ -178,7 +181,7 @@ export class SyncWebsocketController {
         }
         else {
             for (const roomId of syncAction.rooms) {
-                await this.sendEventToRoom(roomId, syncAction.event)
+                await this.sendEventToRoom(roomId, syncAction.event, syncAction.ignoreSessions)
             }
         }
     }
@@ -201,11 +204,16 @@ export class SyncWebsocketController {
         ws.send(JSON.stringify(event))
     }
 
-    async sendEventToRoom(roomId: string, event: ServerSentEvents) {
+    async sendEventToRoom(roomId: string, event: ServerSentEvents, ignoreSessions?: string[]) {
         // todo: are checks for room and socket required, or should errors be thrown?
         if (this.#rooms[roomId]) {
             for (const sessionId of this.#rooms[roomId]) {
                 if (this.#sockets[sessionId]) {
+                    // If the session is to be ignored, just move onto the next one
+                    if (ignoreSessions && ignoreSessions.includes(sessionId)) {
+                        continue
+                    }
+
                     this.#sockets[sessionId].send(JSON.stringify(event))
                 }
             }
@@ -217,12 +225,26 @@ export class SyncWebsocketController {
         if (this.#sockets[sessionId]) {
             // Remove session from all rooms
             for (const roomId of Object.keys(this.#rooms)) {
-                const roomIncludesSession = this.#rooms[roomId].has(sessionId)
-                if (newRooms.includes(roomId) && !roomIncludesSession) {
+                if (this.#rooms[roomId].has(sessionId)) {
+                    this.#rooms[roomId].delete(sessionId)
+                }
+            }
+
+            // Add session to required rooms
+            for (const roomId of newRooms) {
+                if (this.#rooms[roomId]) {
                     this.#rooms[roomId].add(sessionId)
                 }
-                else if (roomIncludesSession) {
-                    this.#rooms[roomId].delete(sessionId)
+                else {
+                    this.#rooms[roomId] = new Set([sessionId])
+                }
+            }
+
+            // Use this as a chance to clean up any empty rooms
+            // todo: should this be it's own task running in the background?
+            for (const roomId of Object.keys(this.#rooms)) {
+                if (this.#rooms[roomId].size === 0) {
+                    delete this.#rooms[roomId]
                 }
             }
         }

@@ -16,6 +16,11 @@ import {DataStoreService} from "@services/data-store/data-store.service.js";
 import {SystemError} from "@services/errors/base/system.error.js";
 import {ConfigService} from "@services/config/config.service.js";
 
+export interface CreatedTokenPair {
+  sessionId: string
+  tokens: TokenPair
+}
+
 
 export class TokenService {
   constructor(
@@ -40,8 +45,8 @@ export class TokenService {
    *
    * @param userDto
    */
-  async createNewTokenPair(userDto: UserDto): Promise<TokenPair> {
-    const groupId = createUUID();
+  async createNewTokenPair(userDto: UserDto): Promise<CreatedTokenPair> {
+    const sessionId = createUUID();
     const counterId = 1;
 
     // Generate the expiry of the refresh token here so I can set an initial expiry on the sid value stored.
@@ -49,46 +54,51 @@ export class TokenService {
     // todo: the expiry of the stored sid doesn't exactly match the refresh tokens expiry as set by jsonwebtoken.
     const expiry = this._parseTokenExpiry(this.configService.config.auth.refreshToken.expiry);
 
-    await this._setTokenGroupCounterId(groupId, counterId, expiry);
-    return this._getTokenPair(userDto, groupId, counterId);
+    await this._setSessionCounterId(sessionId, counterId, expiry);
+    const tokenPair = await this._getTokenPair(userDto, sessionId, counterId);
+    
+    return {
+      sessionId: sessionId,
+      tokens: tokenPair,
+    }
   }
 
   /**
-   * Create a new token pair for the given user's token group.
+   * Create a new token pair for the given user's token session.
    *
    * @param userDto
-   * @param groupId
+   * @param sessionId
    */
-  async getRefreshedTokenPair(userDto: UserDto, groupId: string): Promise<TokenPair> {
-    const counterId = await this._getTokenGroupCounterId(groupId);
+  async getRefreshedTokenPair(userDto: UserDto, sessionId: string): Promise<TokenPair> {
+    const counterId = await this._getSessionCounterId(sessionId);
     if (!counterId) {
       throw new SystemError({
-        message: `Failed to find cid for token group '${groupId}' for user '${userDto.id}.'`
+        message: `Failed to find cid for token session '${sessionId}' for user '${userDto.id}.'`
       });
     }
 
     // Update the expiry of the sequence id to match the newly generated refresh token.
     // todo: the expiry of the stored sid doesn't exactly match the refresh tokens expiry as set by jsonwebtoken.
     const expiry = this._parseTokenExpiry(this.configService.config.auth.refreshToken.expiry);
-    await this._setTokenGroupCounterId(groupId, counterId + 1, expiry);
+    await this._setSessionCounterId(sessionId, counterId + 1, expiry);
 
-    return this._getTokenPair(userDto, groupId, counterId + 1);
+    return this._getTokenPair(userDto, sessionId, counterId + 1);
   }
 
   /**
-   * Return a token pair for the given user, group and counter ID.
+   * Return a token pair for the given user, session and counter ID.
    *
    * @param userDto
-   * @param groupId
+   * @param sessionId
    * @param counterId
    * @private
    */
-  private async _getTokenPair(userDto: UserDto, groupId: string, counterId: number): Promise<TokenPair> {
+  private async _getTokenPair(userDto: UserDto, sessionId: string, counterId: number): Promise<TokenPair> {
     const basicPayload = {
       iss: this.configService.config.auth.issuer || "localful",
       aud: this.configService.config.auth.audience || "localful",
       sub: userDto.id,
-      gid: groupId,
+      sid: sessionId,
       cid: counterId,
     };
 
@@ -127,7 +137,7 @@ export class TokenService {
   async validateAndDecodeAccessToken(accessToken: string): Promise<AccessTokenPayload|null> {
     try {
       const payload = jsonwebtoken.verify(accessToken, this.configService.config.auth.accessToken.secret) as unknown as AccessTokenPayload;
-      const isValidToken = await this._validateCustomAuthClaims(payload.gid, payload.cid);
+      const isValidToken = await this._validateCustomAuthClaims(payload.sid, payload.cid);
       if (isValidToken) {
         return payload;
       }
@@ -146,7 +156,7 @@ export class TokenService {
   async validateAndDecodeRefreshToken(refreshToken: string): Promise<RefreshTokenPayload|null> {
     try {
       const payload = jsonwebtoken.verify(refreshToken, this.configService.config.auth.refreshToken.secret) as unknown as RefreshTokenPayload;
-      const isValidToken = await this._validateCustomAuthClaims(payload.gid, payload.cid);
+      const isValidToken = await this._validateCustomAuthClaims(payload.sid, payload.cid);
       if (isValidToken) {
         return payload;
       }
@@ -160,64 +170,64 @@ export class TokenService {
 
   /**
    * Validate the custom auth claims of the token.
-   * These are the gid and cid values.
+   * These are the sid and cid values.
    *
-   * @param groupId
+   * @param sessionId
    * @param counterId
    */
-  async _validateCustomAuthClaims(groupId: string, counterId: number) {
-    const isBlacklisted = await this._isTokenGroupBlacklisted(groupId);
+  async _validateCustomAuthClaims(sessionId: string, counterId: number) {
+    const isBlacklisted = await this._isSessionBlacklisted(sessionId);
     if (isBlacklisted) {
       return false;
     }
 
-    const storedCounterId = await this._getTokenGroupCounterId(groupId);
+    const storedCounterId = await this._getSessionCounterId(sessionId);
     return counterId === storedCounterId;
   }
 
   /**
-   * Blacklist the given token group.
+   * Blacklist the given token session.
    *
-   * @param groupId
+   * @param sessionId
    * @param expiry
    */
-  async blacklistTokenGroup(groupId: string, expiry: number) {
-    await this.dataStoreService.addItem(`bl-${groupId}`, "true", {
+  async blacklistSession(sessionId: string, expiry: number) {
+    await this.dataStoreService.addItem(`bl-${sessionId}`, "true", {
       epochExpiry: expiry
     });
   }
 
   /**
-   * Determine if the given groupId has been blacklisted.
+   * Determine if the given session has been blacklisted.
    *
-   * @param groupId
+   * @param sessionId
    * @private
    */
-  private async _isTokenGroupBlacklisted(groupId: string): Promise<boolean> {
-    return await this.dataStoreService.getItem(`bl-${groupId}`) !== null;
+  private async _isSessionBlacklisted(sessionId: string): Promise<boolean> {
+    return await this.dataStoreService.getItem(`bl-${sessionId}`) !== null;
   }
 
   /**
-   * Set the counter ID for the given token group.
+   * Set the counter ID for the given token session.
    *
-   * @param groupId
+   * @param sessionId
    * @param counterId
    * @param expiry
    * @private
    */
-  private async _setTokenGroupCounterId(groupId: string, counterId: number, expiry: number): Promise<void> {
-    await this.dataStoreService.addItem(`cid-${groupId}`, counterId.toString(), {epochExpiry: expiry});
+  private async _setSessionCounterId(sessionId: string, counterId: number, expiry: number): Promise<void> {
+    await this.dataStoreService.addItem(`cid-${sessionId}`, counterId.toString(), {epochExpiry: expiry});
   }
 
   /**
-   * Fetch the counter ID for the supplied token group.
+   * Fetch the counter ID for the supplied token session.
    * Will return null if the counter ID doesn't exist or is invalid.
    *
-   * @param groupId
+   * @param sessionId
    * @private
    */
-  private async _getTokenGroupCounterId(groupId: string): Promise<number|null> {
-    const counterIdIdString = await this.dataStoreService.getItem(`cid-${groupId}`);
+  private async _getSessionCounterId(sessionId: string): Promise<number|null> {
+    const counterIdIdString = await this.dataStoreService.getItem(`cid-${sessionId}`);
     if (!counterIdIdString) {
       return null;
     }

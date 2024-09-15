@@ -76,18 +76,18 @@ export class Application {
         this.container.bindClass(HealthCheckHttpController, { value: HealthCheckHttpController, inject: [HealthCheckService] }, {scope: "SINGLETON"})
 
         // Auth module
-        this.container.bindClass(AuthService, { value: AuthService, inject: [UsersService, TokenService, ConfigService, EmailService]}, {scope: "SINGLETON"})
+        this.container.bindClass(AuthService, { value: AuthService, inject: [UsersService, TokenService, ConfigService, EmailService, EventsService]}, {scope: "SINGLETON"})
         this.container.bindClass(AccessControlService, { value: AccessControlService, inject: [UsersDatabaseService, TokenService] }, {scope: "SINGLETON"})
         this.container.bindClass(AuthHttpController, { value: AuthHttpController, inject: [AuthService, AccessControlService]}, {scope: "SINGLETON"})
 
         // Users module
         this.container.bindClass(UsersDatabaseService, { value: UsersDatabaseService, inject: [DatabaseService]}, {scope: "SINGLETON"})
-        this.container.bindClass(UsersService, { value: UsersService, inject: [UsersDatabaseService, ConfigService, AccessControlService]}, {scope: "SINGLETON"})
+        this.container.bindClass(UsersService, { value: UsersService, inject: [UsersDatabaseService, ConfigService, AccessControlService, EventsService]}, {scope: "SINGLETON"})
         this.container.bindClass(UsersHttpController, { value: UsersHttpController, inject: [UsersService, TokenService, AccessControlService]}, {scope: "SINGLETON"})
 
         // Vault module
         this.container.bindClass(VaultsDatabaseService, { value: VaultsDatabaseService, inject: [DatabaseService]}, {scope: "SINGLETON"})
-        this.container.bindClass(VaultsService, { value: VaultsService, inject: [VaultsDatabaseService, AccessControlService]}, {scope: "SINGLETON"})
+        this.container.bindClass(VaultsService, { value: VaultsService, inject: [VaultsDatabaseService, AccessControlService, EventsService]}, {scope: "SINGLETON"})
         this.container.bindClass(VaultsHttpController, { value: VaultsHttpController, inject: [VaultsService, AccessControlService]}, {scope: "SINGLETON"})
 
         // Sync module
@@ -109,7 +109,6 @@ export class Application {
             console.error(`[Server] Server failed health checks during initialization: ${healthCheck.services}`)
             process.exit(1);
         }
-        console.debug("[Server] Health checks passed")
 
         // Basic Express and HTTP server setup
         const app = express()
@@ -177,6 +176,7 @@ export class Application {
         await syncWebsocketController.init(httpServer, {path: "/v1/sync"})
 
         // Setup HTTP error handlers to serve 404s and server error responses
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- next is required to match Express error handler signature.
         app.use(function (req: Request, res: Response, next: NextFunction) {
             res.status(HttpStatusCodes.NOT_FOUND).send({
                 identifier: ErrorIdentifiers.NOT_FOUND,

@@ -11,7 +11,7 @@ export const GenericTokenPayload = z.object({
 export type GenericTokenPayload = z.infer<typeof AuthTokenPayload>;
 
 export const AuthTokenPayload = GenericTokenPayload.extend({
-  gid: z.string(),
+  sid: z.string(),
   cid: z.number(),
 }).strict()
 export type AuthTokenPayload = z.infer<typeof AuthTokenPayload>;

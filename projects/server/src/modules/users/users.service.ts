@@ -6,18 +6,22 @@ import {DatabaseCreateUserDto, DatabaseUpdateUserDto, DatabaseUserDto} from "@mo
 import {AccessForbiddenError} from "@services/errors/access/access-forbidden.error.js";
 import {PasswordService} from "@services/password/password.service.js";
 import {AccessControlService} from "@modules/auth/access-control.service.js";
+import {EventsService} from "@services/events/events.service.js";
+import {EventIdentifiers} from "@services/events/events.js";
 
 
 export class UsersService {
     constructor(
-       private usersDatabaseService: UsersDatabaseService,
-       private configService: ConfigService,
-       private accessControlService: AccessControlService,
+       private readonly usersDatabaseService: UsersDatabaseService,
+       private readonly configService: ConfigService,
+       private readonly accessControlService: AccessControlService,
+       private readonly eventsService: EventsService
     ) {}
 
-    async _UNSAFE_get(userId: string): Promise<UserDto> {
-        const user = await this.usersDatabaseService.get(userId);
-        return this.convertDatabaseDto(user);
+    convertDatabaseDto(userWithPassword: DatabaseUserDto): UserDto {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { passwordHash, ...userDto } = userWithPassword;
+        return userDto;
     }
 
     async get(userContext: UserContext, userId: string): Promise<UserDto> {
@@ -28,17 +32,16 @@ export class UsersService {
             targetUserId: userId
         })
 
-        return this._UNSAFE_get(userId);
+        const databaseUserDto = await this.usersDatabaseService.get(userId);
+        return this.convertDatabaseDto(databaseUserDto);
     }
 
-    convertDatabaseDto(userWithPassword: DatabaseUserDto): UserDto {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { passwordHash, ...userDto } = userWithPassword;
-        return userDto;
-    }
-
-    async getDatabaseUser(email: string): Promise<DatabaseUserDto> {
+    async _UNSAFE_getByEmail(email: string) {
         return this.usersDatabaseService.getByEmail(email);
+    }
+
+    async _UNSAFE_getById(id: string) {
+        return this.usersDatabaseService.get(id);
     }
 
     async create(createUserDto: CreateUserDto): Promise<UserDto> {
@@ -51,7 +54,6 @@ export class UsersService {
         }
 
         const passwordHash = await PasswordService.hashPassword(createUserDto.password);
-
         const databaseCreateUserDto: DatabaseCreateUserDto = {
             displayName: createUserDto.displayName,
             email: createUserDto.email,
@@ -60,27 +62,15 @@ export class UsersService {
         }
 
         const databaseUser = await this.usersDatabaseService.create(databaseCreateUserDto);
-
-        // todo: add email verification when an account is created?
-        // needs to be done in a way that doesn't add a circular reference to the auth service, maybe requires a restructure?
+        const userDto = this.convertDatabaseDto(databaseUser);
+        await this.eventsService.dispatch({
+            type: EventIdentifiers.USER_CREATE,
+            detail: {
+                user: userDto
+            }
+        })
 
         return this.convertDatabaseDto(databaseUser);
-    }
-
-    async _UNSAFE_update(userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
-        const databaseUpdateDto: DatabaseUpdateUserDto = {}
-
-        if (updateUserDto.displayName) {
-            databaseUpdateDto.displayName = updateUserDto.displayName;
-        }
-        // todo: don't allow email and password updates? Require this to go via verification email?
-        if (updateUserDto.email) {
-            databaseUpdateDto.email = updateUserDto.email;
-            databaseUpdateDto.verifiedAt = null;
-        }
-
-        const user = await this.usersDatabaseService.update(userId, databaseUpdateDto);
-        return this.convertDatabaseDto(user);
     }
 
     async update(userContext: UserContext, userId: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
@@ -91,11 +81,27 @@ export class UsersService {
             targetUserId: userId
         })
 
-        return this._UNSAFE_update(userId, updateUserDto);
-    }
+        const databaseUpdateDto: DatabaseUpdateUserDto = {}
+        if (updateUserDto.displayName) {
+            databaseUpdateDto.displayName = updateUserDto.displayName;
+        }
+        // todo: don't allow email and password updates? Require this to go via verification email?
+        if (updateUserDto.email) {
+            databaseUpdateDto.email = updateUserDto.email;
+            databaseUpdateDto.verifiedAt = null;
+        }
 
-    private async _UNSAFE_delete(userId: string): Promise<void> {
-        return this.usersDatabaseService.delete(userId);
+        const updatedUser = await this.usersDatabaseService.update(userId, databaseUpdateDto);
+        const updatedUserDto = this.convertDatabaseDto(updatedUser);
+        await this.eventsService.dispatch({
+            type: EventIdentifiers.USER_UPDATE,
+            detail: {
+                sessionId: userContext.sessionId,
+                user: updatedUser
+            }
+        })
+
+        return updatedUserDto
     }
 
     async delete(userContext: UserContext, userId: string): Promise<void> {
@@ -106,7 +112,14 @@ export class UsersService {
             targetUserId: userId
         })
 
-        return this._UNSAFE_delete(userId);
+        await this.usersDatabaseService.delete(userId);
+        await this.eventsService.dispatch({
+            type: EventIdentifiers.USER_DELETE,
+            detail: {
+                sessionId: userContext.sessionId,
+                userId: userId
+            }
+        })
     }
 
     async verifyUser(userDto: UserDto): Promise<UserDto> {
