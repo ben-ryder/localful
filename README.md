@@ -1,9 +1,8 @@
 ---
 
 <div align="center">
-<p><b>⚠️ Under Active Development ⚠️</b></p>
-<p>This project is early in development and not yet ready for general use.<br>
-Expect bugs, missing docs, incomplete features etc!</p>
+<p><b>⚠️ Repository Moved ⚠️</b></p>
+<p>This repository can now be found at https://github.com/localful/localful</p>
 </div>
 
 ---
