@@ -106,7 +106,7 @@ export class Application {
         const healthCheckService = this.container.resolve<HealthCheckService>(HealthCheckService)
         const healthCheck = await healthCheckService.runHealthCheck()
         if (healthCheck.status !== "ok") {
-            console.error(`[Server] Server failed health checks during initialization: ${healthCheck.services}`)
+            console.error(`[Server] Server failed health checks during initialization: ${JSON.stringify(healthCheck.services)}`)
             process.exit(1);
         }
 

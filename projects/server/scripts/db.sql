@@ -1,17 +1,3 @@
--- Cleaning up existing internal if present
-DROP DATABASE IF EXISTS localful;
-
--- Cleaning up existing user if present
-DROP USER IF EXISTS localful;
-
--- Create localful user and internal
-CREATE USER localful WITH PASSWORD 'password' LOGIN;
-CREATE DATABASE localful;
-GRANT CONNECT ON DATABASE localful TO localful;
-
--- Switch to new database
-\c localful
-
 -- Create UUID extension for uuid_generate_v4 support
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -20,7 +6,7 @@ CREATE OR REPLACE FUNCTION update_table_timestamps()
     RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = now();
-RETURN NEW;
+    RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -100,7 +86,3 @@ CREATE TABLE IF NOT EXISTS item_versions (
     CONSTRAINT item_versions_pk PRIMARY KEY (id),
     CONSTRAINT item_versions_content FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
 );
-
--- Grant privileges to lfb user after everything is created
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO localful;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO localful;

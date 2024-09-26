@@ -1,3 +1,3 @@
 *.sql
-!example.setup.sql
+!db.sql
 !example.setup-tests.sql
