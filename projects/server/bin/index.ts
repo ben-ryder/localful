@@ -9,7 +9,7 @@ async function bootstrap() {
 
   const configService = application.getDependency<ConfigService>(ConfigService);
   server.listen(configService.config.general.port, () => {
-    console.log(`[Server] Listening at http://localhost:${configService.config.general.port}`);
+    console.log(`[Server] Listening on port ${configService.config.general.port}`);
   });
 }
 bootstrap();

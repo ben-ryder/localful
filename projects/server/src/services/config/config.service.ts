@@ -16,8 +16,8 @@ export class ConfigService {
   readonly config: ConfigSchema = ConfigSchema.parse({
     general: {
       applicationName: process.env.APPLICATION_NAME,
-      port: parseInt(process.env.NODE_PORT as string) || 3000,
-      environment: process.env.NODE_ENV ?? "production"
+      port: parseInt(process.env.PORT as string),
+      environment: process.env.ENVIRONMENT ?? "production"
     },
     app: {
       registrationEnabled: process.env.APP_REGISTRATION_ENABLED === "true",
