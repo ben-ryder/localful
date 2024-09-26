@@ -105,12 +105,12 @@ export class Application {
         const httpServer = http.createServer(app)
         app.use(express.json());
         app.use(express.urlencoded({extended: true}));
+        app.disable("x-powered-by")
 
         // Cors setup
         const configService = this.container.resolve<ConfigService>(ConfigService);
         const corsOptions = createCorsOptions(configService)
         app.use(cors(corsOptions))
-        app.options(/(.*)/, cors(corsOptions))
 
         // GNU Terry Pratchett (http://www.gnuterrypratchett.com/)
         app.use(function (req: Request, res: Response, next: NextFunction) {

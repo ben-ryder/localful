@@ -1,4 +1,4 @@
-import { ErrorIdentifiers } from "@localful/common";
+import {ErrorIdentifiers} from "@localful/common";
 
 import {HttpStatusCodes} from "@common/http-status-codes.js";
 
@@ -55,4 +55,9 @@ export const errorHttpMapping: ErrorHttpMappings = {
     statusCode: HttpStatusCodes.FORBIDDEN,
     defaultMessage: "Your are forbidden from accessing the given resource.",
   },
+  AccessCorsError: {
+    identifier: ErrorIdentifiers.REQUEST_INVALID, // todo: should have unique cors error identifiers?
+    statusCode: HttpStatusCodes.BAD_REQUEST,
+    defaultMessage: "Your request has failed CORS checks"
+  }
 };
