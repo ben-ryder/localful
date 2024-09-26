@@ -100,16 +100,6 @@ export class Application {
      * Create and set up the server, running health checks, defining routes etc
      */
     async init(): Promise<Server> {
-        // Start by running health checks for external services (Postgres and Redis).
-        // This allows any connection errors to be immediately thrown rather than the server being able to start with problems.
-        // todo: allow server to start and expose a /health endpoint protected by a static token for monitoring?
-        const healthCheckService = this.container.resolve<HealthCheckService>(HealthCheckService)
-        const healthCheck = await healthCheckService.runHealthCheck()
-        if (healthCheck.status !== "ok") {
-            console.error(`[Server] Server failed health checks during initialization: ${JSON.stringify(healthCheck.services)}`)
-            process.exit(1);
-        }
-
         // Basic Express and HTTP server setup
         const app = express()
         const httpServer = http.createServer(app)
