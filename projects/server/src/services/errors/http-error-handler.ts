@@ -1,7 +1,8 @@
-import {NextFunction, Response, Request} from "express";
+import {NextFunction, Request, Response} from "express";
 
 import {BaseError} from "@services/errors/base/base.error.js";
 import {errorHttpMapping, fallbackMapping} from "./error-http-mappings.js";
+import {HttpStatusCodes} from "@common/http-status-codes.js";
 
 
 export async function httpErrorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
@@ -27,7 +28,10 @@ export async function httpErrorHandler(err: Error, req: Request, res: Response, 
     }
   }
 
-  // todo: add logging/alerting on server errors?
+  // todo: add more advanced logging/alerting on server errors?
+  if (httpCode === HttpStatusCodes.INTERNAL_SERVER_ERROR) {
+    console.error(err)
+  }
 
   return res.status(httpCode).send({
     identifier: identifier,
