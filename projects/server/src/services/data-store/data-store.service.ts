@@ -2,6 +2,7 @@ import {Redis} from "ioredis";
 
 import {ConfigService} from "@services/config/config.service.js";
 import {SystemError} from "@services/errors/base/system.error.js";
+import {HealthStatus} from "@modules/health-check/health-check.service.js";
 
 export interface CacheOptions {
   epochExpiry: number;
@@ -24,14 +25,14 @@ export class DataStoreService {
   }
 
   // todo: improve health check at all? stop ioredis logging to console but still expose errors?
-  async healthCheck(): Promise<boolean> {
+  async healthCheck(): Promise<HealthStatus> {
     try {
       const redis = await this.getRedis();
       await redis.ping()
-      return true
+      return "ok"
     }
     catch (error) {
-      return false;
+      return "error";
     }
   }
 

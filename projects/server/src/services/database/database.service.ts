@@ -1,6 +1,7 @@
 import postgres, { Sql } from "postgres";
 
 import {ConfigService} from "@services/config/config.service.js";
+import {HealthStatus} from "@modules/health-check/health-check.service.js";
 
 
 export class DatabaseService {
@@ -23,14 +24,14 @@ export class DatabaseService {
     return this.sql;
   }
 
-  async healthCheck() {
+  async healthCheck(): Promise<HealthStatus> {
     try {
       const sql = await this.getSQL()
       await sql`select 1`
-      return true
+      return "ok"
     }
     catch (error) {
-      return false;
+      return "error";
     }
   }
 

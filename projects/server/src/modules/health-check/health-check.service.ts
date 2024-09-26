@@ -1,11 +1,13 @@
 import {DatabaseService} from "@services/database/database.service.js";
 import {DataStoreService} from "@services/data-store/data-store.service.js";
 
+export type HealthStatus = "ok" | "degraded" | "error"
+
 export interface HealthCheckResult {
-    status: "ok" | "error";
+    status: HealthStatus
     services: {
-        database: boolean
-        dataStore: boolean
+        database: HealthStatus
+        dataStore: HealthStatus
     }
 }
 
@@ -16,18 +18,26 @@ export class HealthCheckService {
     ) {}
 
     async runHealthCheck(): Promise<HealthCheckResult> {
-        const databaseIsHealthy = await this.databaseService.healthCheck()
-        const dataStoreIsHealthy = await this.dataStoreService.healthCheck()
+        const databaseStatus = await this.databaseService.healthCheck()
+        const dataStoreStatus = await this.dataStoreService.healthCheck()
+        const allStatuses = [databaseStatus, dataStoreStatus]
 
-        const status = databaseIsHealthy && dataStoreIsHealthy
-            ? "ok"
-            : "error";
+        let overallStatus: HealthStatus
+        if (allStatuses.includes("error")) {
+            overallStatus = "error"
+        }
+        else if (allStatuses.includes("degraded")) {
+            overallStatus = "degraded"
+        }
+        else {
+            overallStatus = "ok"
+        }
 
         return {
-            status,
+            status: overallStatus,
             services: {
-                database: databaseIsHealthy,
-                dataStore: dataStoreIsHealthy,
+                database: databaseStatus,
+                dataStore: dataStoreStatus,
             }
         }
     }

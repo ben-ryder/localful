@@ -25,8 +25,8 @@ describe("Health Check Module",() => {
       expect(body).toEqual({
         status: "ok",
         services: {
-          database: true,
-          dataStore: true
+          database: "ok",
+          dataStore: "ok"
         }
       });
     })
