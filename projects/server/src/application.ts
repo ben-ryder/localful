@@ -120,7 +120,7 @@ export class Application {
         const configService = this.container.resolve<ConfigService>(ConfigService);
         const corsOptions = createCorsOptions(configService)
         app.use(cors(corsOptions))
-        app.options("*", cors(corsOptions))
+        app.options(/(.*)/, cors(corsOptions))
 
         // GNU Terry Pratchett (http://www.gnuterrypratchett.com/)
         app.use(function (req: Request, res: Response, next: NextFunction) {

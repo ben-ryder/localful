@@ -9,10 +9,12 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "install": "concurrently 'npm:install:*'",
-    "install:server": "cd ./projects/server && npm i",
-    "install:common": "cd ./projects/common && npm i",
-    "install:local": "cd projects/local && npm i"
+    "build": "npm run build --workspace=@localful/common --workspace=@localful/server",
+    "test": "npm run test --workspace=@localful/server",
+    "common:build": "npm run build --workspace=@localful/common",
+    "server:build": "npm run build --workspace=@localful/server",
+    "server:test": "npm run test --workspace=@localful/server",
+    "server:start:prod": "npm run start:prod --workspace=@localful/server"
   },
   "repository": {
     "type": "git",
@@ -27,10 +29,14 @@
   "devDependencies": {
     "@commitlint/cli": "^18.4.2",
     "@commitlint/config-conventional": "^18.4.2",
-    "concurrently": "^8.2.2",
     "husky": "^8.0.3"
   },
   "engines": {
-    "node": "18"
-  }
+    "node": "20"
+  },
+  "workspaces": [
+    "projects/common",
+    "projects/local",
+    "projects/server"
+  ]
 }
