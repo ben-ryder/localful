@@ -7,6 +7,7 @@
   "scripts": {
     "prebuild": "rimraf build",
     "build": "tsc --project ./tsconfig.build.json && tsc-alias",
+    "build:prod": "(cd ../common && npm ci && npm run build) && npm ci && npm run build",
     "start": "tsx watch ./bin/index.ts",
     "start:prod": "node ./build/bin/index.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
